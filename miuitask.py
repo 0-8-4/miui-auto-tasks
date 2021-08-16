@@ -8,7 +8,7 @@ from http import cookiejar
 
 # 小米ID
 mid = ''
-# 小米账号的密码MD5值
+# 小米账号的密码MD5值，请使用"passwd2md5.py"转换
 pMd5 = ''
 # 避免登录失败，如果上面的md5中有小写字母，转换为大写
 pMd5 = pMd5.upper()
@@ -16,8 +16,7 @@ pMd5 = pMd5.upper()
 devId = ''
 # 常用浏览器UA
 # 需要改成你自己常用的浏览器的UA
-lUa = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.25 Safari/537.36 ' \
-      'Core/1.70.3870.400 QQBrowser/10.8.4405.400 '
+lUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.73'
 # 开发版内测5428803 开发版公测5433318 稳定版内测5462204 目前测试三个中完成任意一个即可全部完成
 boardId = '5428803'
 # 留空
@@ -366,7 +365,10 @@ def milogin():
 
 
 if __name__ == "__main__":
-    wLog("开始登录账号")
+    wLog("miuitask v1.1.0")
+    wLog("项目地址：https://github.com/0-8-4/miui-auto-tasks")
+    wLog("欢迎star，感谢東雲研究所中的大佬")
+    wLog("开始登录小米账号")
     if milogin():
         startTask("10106263")
         wLog("正在完成BUG反馈任务")
@@ -390,13 +392,19 @@ if __name__ == "__main__":
         startTask("10106261")
         unfollowUser()
         followUser()
-        wLog("1秒后领取活跃分_关注任务")
-        time.sleep(1)
+        wLog("5秒后领取活跃分_关注任务")
+        time.sleep(5)
         acquireTask("10106261")
         wLog("正在完成活跃分_加圈任务")
         startTask("10106262")
         unfollowBoard()
         followBoard()
-        wLog("1秒后领取活跃分_加圈任务")
-        time.sleep(1)
+        wLog("5秒后领取活跃分_加圈任务")
+        time.sleep(5)
         acquireTask("10106262")
+        wLog("正在完成活跃分_发帖任务")
+        startTask("10106265")
+        newAnnounce("5")
+        wLog("5秒后领取活跃分_发帖任务")
+        time.sleep(5)
+        acquireTask("10106265")
