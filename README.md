@@ -1,7 +1,7 @@
 # MIUI Task
 一个适用于 小米社区3.0 自动完成 KPI 任务的脚本
 
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) ![python](https://img.shields.io/badge/python-3.7.3+-blue)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) ![python](https://img.shields.io/badge/python-3.6+-blue)
 =========  
 
 ## **关于项目**:
@@ -12,9 +12,9 @@
   我们认为小米社区无权在无任何回报的情况下强制要求内测用户完成KPI任务，因此诞生了这个脚本
 
 ==========
-### **安装依赖**
+### **安装依赖**：
   1. Python3
-  需要前往Python官网自行下载自己系统对应的版本，或者使用自己系统对应的包管理进行安装，这里推荐至少Python 3.6以上。
+  需要前往Python官网自行下载自己系统对应的版本，这里推荐至少Python 3.6以上
 
   ```
   https://www.python.org/downloads/
@@ -58,6 +58,11 @@
   - 示例:` lUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.73'`
   - 请务必先使用这个浏览器登录`https://account.xiaomi.com`
 - 现在可以尝试使用  `Python3 miuitask.py` 运行脚本了
+  - 如果是GNU/Linux和MacOS环境需要手动执行这两条命令
+    ```bash
+      chmod +x passwd2md5.py
+      chmod +x miuitask.py
+    ```
 
 ==========  
 
