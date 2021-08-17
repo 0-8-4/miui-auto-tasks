@@ -14,7 +14,7 @@
 ==========
 ### **安装依赖**：
   1. Python3
-  需要前往Python官网自行下载自己系统对应的版本，这里推荐至少Python 3.6以上
+  需要前往Python官网自行下载自己系统对应的版本，或使用自己系统对应的包管理安装，这里推荐至少Python 3.6以上
 
   ```
   https://www.python.org/downloads/
@@ -22,7 +22,7 @@
 
   2. 安装了Python3之后，打开命令行
   ```bash
-  pip install request
+  pip install requests
   ```
   如果不行的话，可能需要用管理员运行命令行
 
@@ -46,7 +46,7 @@
 ==========
 
 ### **使用说明**：
-- 使用你喜爱的编辑器打开 `miuitask.py` 及 `passwd2md5.py`
+- 使用你喜爱的编辑器打开 `miuitask.py` 及 `passwd2md5.py` 
 - 在脚本 Line10 中填写你的MID
   - 请注意MID不是手机号或邮箱
   - 示例: `mid = '123456'`
