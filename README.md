@@ -22,7 +22,7 @@
 
   2. 安装了Python3之后，打开命令行
   ```bash
-  pip install request
+  pip install requests
   ```
   如果不行的话，可能需要用管理员运行命令行
 
