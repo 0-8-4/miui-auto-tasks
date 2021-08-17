@@ -46,7 +46,7 @@
 ==========
 
 ### **使用说明**：
-- 使用你喜爱的编辑器打开 `miuitask.py` 及 `passwd2md5.py`
+- 使用你喜爱的编辑器打开 `miuitask.py` 及 `passwd2md5.py` 
 - 在脚本 Line10 中填写你的MID
   - 请注意MID不是手机号或邮箱
   - 示例: `mid = '123456'`
