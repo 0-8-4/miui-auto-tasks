@@ -311,6 +311,27 @@ def acquireTask(taskId):
     except:
         wLog("领取活跃分出错")
 
+# 社区拔萝卜签到
+def vipsignin():
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8', 
+        'cookie': str(cookie)
+    }
+    data = {
+        'miui_vip_ph': str(miui_vip_ph)
+    }
+    try:
+        response = requests.post('https://api.vip.miui.com/api/carrot/pull', headers=headers,
+                                 data=data)
+        rJson = response.json()
+        if rJson['code'] == 401:
+            return wLog("社区拔萝卜签到失败：Cookie无效")
+        elif rJson['code'] != 200:
+            return wLog("社区拔萝卜签到失败：" + str(rJson['message']))
+        wLog("社区拔萝卜签到成功")
+    except:
+        wLog("社区拔萝卜签到出错")
+
 
 def milogin():
     proxies = {
@@ -370,6 +391,8 @@ if __name__ == "__main__":
     wLog("欢迎star，感谢東雲研究所中的大佬")
     wLog("开始登录小米账号")
     if milogin():
+        wLog("正在进行社区拔萝卜签到")
+        vipsignin()
         startTask("10106263")
         wLog("正在完成BUG反馈任务")
         newAnnounce("7")
