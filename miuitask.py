@@ -311,6 +311,27 @@ def acquireTask(taskId):
     except:
         wLog("领取活跃分出错")
 
+# 社区拔萝卜签到
+def vipsignin():
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8', 
+        'cookie': str(cookie)
+    }
+    data = {
+        'miui_vip_ph': str(miui_vip_ph)
+    }
+    try:
+        response = requests.post('https://api.vip.miui.com/api/carrot/pull', headers=headers,
+                                 data=data)
+        rJson = response.json()
+        if rJson['code'] == 401:
+            return wLog("社区拔萝卜签到失败：Cookie无效")
+        elif rJson['code'] != 200:
+            return wLog("社区拔萝卜签到失败：" + str(rJson['message']))
+        wLog("社区拔萝卜签到成功")
+    except:
+        wLog("社区拔萝卜签到出错")
+
 
 def milogin():
     proxies = {
@@ -365,11 +386,18 @@ def milogin():
 
 
 if __name__ == "__main__":
-    wLog("miuitask v1.1.0")
+    wLog("miuitask v1.2.1")
     wLog("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     wLog("欢迎star，感谢東雲研究所中的大佬")
     wLog("开始登录小米账号")
     if milogin():
+        wLog("本脚本支持社区签到，因该功能存在风险默认禁用")
+        wLog("如您愿意承担一切可能的后果，可编辑脚本手动打开该功能")
+        # wLog("风险功能提示：正在进行社区签到")
+        # vipsignin()
+        # 警告：根据小米社区规则，非正常渠道签到可能会导致账户封禁
+        # 本脚本虽是模拟您的操作向社区发送请求，但仍不能保证绝对安全
+        # 如果您愿意自行承担一切风险，删去Line396和397的“#”即可
         startTask("10106263")
         wLog("正在完成BUG反馈任务")
         newAnnounce("7")
