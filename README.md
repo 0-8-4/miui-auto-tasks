@@ -32,7 +32,7 @@
   ```bash
   pip install requests
   ```
-  如果不行的话，可能需要用管理员运行命令行
+  注：你可能需要使用管理员权限运行命令行
 
 
 ==========
@@ -66,7 +66,7 @@
 - 在脚本 Line19 中填写你常用浏览器的UA，UA可在诸如 `https://ie.icoa.cn` 等类似的网站查看
   - 示例:` lUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.73'`
   - 请务必先使用这个浏览器登录`https://account.xiaomi.com`
-- 现在可以尝试使用  `Python3 miuitask.py` 运行脚本了
+- 确保网络正常且无代理服务器后，可以尝试在脚本目录下使用  `Python3 miuitask.py` 命令运行脚本了
   - GNU/Linux和MacOS环境下首次运行前可能需要手动执行以下命令
     ```bash
       chmod +x passwd2md5.py
@@ -76,6 +76,8 @@
 ==========  
 
 #### **其他**：  
+* 在使用本脚本时请临时关闭网络代理工具及广告拦截程序  
+* 在服务器上使用前建议先使用服务器IP登录`https://account.xiaomi.com`  
 * 建议配合 Python3 及 Crontab 使用  
 * **欢迎提供有关的思路，提交BUG以及更多完成社区其他任务方式，我们会认真对待~**
 
