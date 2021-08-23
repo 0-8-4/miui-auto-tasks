@@ -2,6 +2,7 @@
 import requests
 import time
 import json
+import system_info
 
 from urllib import request
 from http import cookiejar
@@ -387,6 +388,9 @@ def milogin():
 
 if __name__ == "__main__":
     wLog("miuitask v1.2.1")
+    wLog('----------系统信息-开始-------------')
+    system_info.system_info()
+    wLog('----------系统信息-结束-------------')
     wLog("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     wLog("欢迎star，感谢東雲研究所中的大佬")
     wLog("开始登录小米账号")
