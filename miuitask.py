@@ -2,6 +2,7 @@
 import requests
 import time
 import json
+import system_info
 
 from urllib import request
 from http import cookiejar
@@ -387,6 +388,9 @@ def milogin():
 
 if __name__ == "__main__":
     wLog("miuitask v1.2.1")
+    wLog('----------系统信息-开始-------------')
+    system_info.system_info()
+    wLog('----------系统信息-结束-------------')
     wLog("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     wLog("欢迎star，感谢東雲研究所中的大佬")
     wLog("开始登录小米账号")
@@ -397,7 +401,7 @@ if __name__ == "__main__":
         # vipsignin()
         # 警告：根据小米社区规则，非正常渠道签到可能会导致账户封禁
         # 本脚本虽是模拟您的操作向社区发送请求，但仍不能保证绝对安全
-        # 如果您愿意自行承担一切风险，删去Line396和397的“#”即可
+        # 如果您愿意自行承担一切风险，删去Line400和401"#"即可
         startTask("10106263")
         wLog("正在完成BUG反馈任务")
         newAnnounce("7")
