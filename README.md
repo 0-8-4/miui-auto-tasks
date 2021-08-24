@@ -44,7 +44,6 @@
   - [x] 可完成“在内测圈分享这个版本的体验”KPI任务  
   - [x] 可完成“参与当前版本满意度投票”KPI任务  
   - [x] 可完成“在内测圈提交带日志的bug反馈”KPI任务  
-  - [x] 可完成“在内测圈分享这个版本的体验”KPI任务
 - [x] 可自动完成以下小米社区活跃分任务且不留下可见痕迹
   - [x] 可完成“加入1个圈子”活跃分任务  
   - [x] 可完成“关注1位用户”活跃分任务  
@@ -66,7 +65,7 @@
 - 在脚本 Line19 中填写你常用浏览器的UA，UA可在诸如 `https://ie.icoa.cn` 等类似的网站查看
   - 示例:` lUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.73'`
   - 请务必先使用这个浏览器登录`https://account.xiaomi.com`
-- 确保网络正常且无代理服务器后，可以尝试在脚本目录下使用  `Python3 miuitask.py` 命令运行脚本了
+- 确保网络正常且无代理服务器后，可以尝试在脚本目录下使用  `python3 miuitask.py` 命令运行脚本了
   - GNU/Linux和MacOS环境下首次运行前可能需要手动执行以下命令
     ```bash
       chmod +x passwd2md5.py
