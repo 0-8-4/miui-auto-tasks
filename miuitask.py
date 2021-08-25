@@ -387,7 +387,7 @@ def milogin():
 
 
 if __name__ == "__main__":
-    wLog("miuitask v1.2.1")
+    wLog("MIUITask_v1.2.2")
     wLog('----------系统信息-开始-------------')
     system_info.system_info()
     wLog('----------系统信息-结束-------------')
