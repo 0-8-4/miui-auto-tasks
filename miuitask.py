@@ -2,34 +2,29 @@
 import requests
 import time
 import json
-import system_info
 
 from urllib import request
 from http import cookiejar
+from utils.utils import system_info, get_config, w_log, conf_check
 
+
+# Config
+config = get_config()
 # 小米ID
-mid = ''
+mi_id = config.get('MI_ID')
 # 小米账号的密码MD5值，请使用"passwd2md5.py"转换
-p_md5 = ''
-# 避免登录失败，如果上面的md5中有小写字母，转换为大写
-p_md5 = p_md5.upper()
+p_md5 = config.get('MI_PASSWORD').upper()
 # 如果登录一直需要短信验证码，在此填入设备id（在account.xiaomi.com的cookie中寻找deviceId）
 dev_id = ''
 # 常用浏览器UA
 # 需要改成你自己常用的浏览器的UA
-l_ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 ' \
-       'Safari/537.36 Edg/92.0.902.73 '
+l_ua = config.get('USER_AGENT')
 # 开发版内测5428803 开发版公测5433318 稳定版内测5462204 目前测试三个中完成任意一个即可全部完成
-board_id = '5428803'
+board_id = config.get('BOARD_ID')
 # 留空
 cookie = ''
 # 留空
 miui_vip_ph = ''
-
-
-def w_log(text):
-    now_localtime = time.strftime("%H:%M:%S", time.localtime())
-    print(now_localtime + ' | ' + str(text))
 
 
 def thumb_up():
@@ -374,7 +369,7 @@ def mi_login():
               '%2525252Fmio%2525252Fmio%2525252FinternalTest%2525253Fref%2525253Dhomepage%26sid%3Dmiui_vip',
         'sid': 'miui_vip',
         '_sign': 'L+dSQY6sjSQ/CRjJs4p+U1vNYLY=',
-        'user': str(mid),
+        'user': str(mi_id),
         'cc': '+86',
         'hash': str(p_md5),
         '_json': 'true'
@@ -406,19 +401,20 @@ def mi_login():
 if __name__ == "__main__":
     w_log("MIUITask_v1.2.2")
     w_log('----------系统信息-开始-------------')
-    system_info.system_info()
+    system_info()
     w_log('----------系统信息-结束-------------')
     w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     w_log("欢迎star，感谢東雲研究所中的大佬")
+    w_log('----------检测配置文件-------------')
+    conf_check(config)
+    w_log('----------------------------------')
     w_log("开始登录小米账号")
     if mi_login():
         w_log("本脚本支持社区签到，因该功能存在风险默认禁用")
-        w_log("如您愿意承担一切可能的后果，可编辑脚本手动打开该功能")
-        # wLog("风险功能提示：正在进行社区签到")
-        # vipsignin()
-        # 警告：根据小米社区规则，非正常渠道签到可能会导致账户封禁
-        # 本脚本虽是模拟您的操作向社区发送请求，但仍不能保证绝对安全
-        # 如果您愿意自行承担一切风险，删去Line400和401"#"即可
+        w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
+        if config.get('SIGN_IN'):
+            w_log("风社险功能提示：正在进行区签到")
+            vip_sign_in()
         start_task("10106263")
         w_log("正在完成BUG反馈任务")
         new_announce("7")
