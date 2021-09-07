@@ -1,9 +1,13 @@
+import os
 import time
 import platform
 
 from hashlib import md5
 from dotenv import dotenv_values
 from urllib.request import getproxies
+
+
+logs = ''
 
 
 def md5_crypto(passwd: str) -> str:
@@ -37,26 +41,37 @@ def get_config() -> dict:
     
 
 def w_log(text):
+    global logs
     now_localtime = time.strftime("%H:%M:%S", time.localtime())
+    logs += now_localtime + ' | ' + str(text) + '\n'
     print(now_localtime + ' | ' + str(text))
+
+
+def s_log():
+    logs_save= get_config().get('LOG_SAVE')
+    if logs_save == 'Y':
+        global logs
+        folder = os.path.exists('./logs')
+        if not folder:
+            os.makedirs('./logs')
+        now_localtime = time.strftime("%Y-%m-%d", time.localtime())
+        fname = now_localtime + '.log'
+        with open('./logs/' + fname, 'a+', encoding='utf-8') as f:
+            f.write(logs)
 
 
 def conf_check(config: dict):
     if not config.get('MI_ID'):
         w_log('小米账户 ID 未配置')
-        exit(127)
+        return False
     if not config.get('MI_PASSWORD'):
         w_log('小米账户 密码 / MD5 未配置')
-        exit(127)
+        return False
     if not config.get('USER_AGENT'):
         w_log('User-Agent 未配置')
-        exit(127)
+        return False
     if not config.get('BOARD_ID'):
         w_log('测试类型 ID 未配置')
-        exit(127)
+        return False
     w_log('.env 已配置')
-
-
-if __name__ == '__main__':
-    print(get_config())
-    # print(get_config()['MI_PASSWORD'])
+    return True
