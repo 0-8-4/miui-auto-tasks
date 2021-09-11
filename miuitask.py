@@ -411,11 +411,21 @@ def get_score() -> int:
         response = requests.get('https://api.vip.miui.com/mtop/planet/vip/betaTest/score', headers=headers)
         r_json = response.json()
         your_score = r_json['entity']
-        w_log('成功获取内测分' + str(your_score))
+        w_log('成功获取内测分,当前内测分：' + str(your_score))
         return your_score
     except Exception as e:
-        w_log('出现异常 - ' + str(e))
-        w_log('获取内测分失败')
+        w_log('内测分获取失败')
+        process_exception(e)
+
+
+def process_exception(e: Exception):
+    """
+    全局异常处理
+    :param e: 异常实例
+    :return: No return
+    """
+    if e.__str__() == 'check_hostname requires server_hostname':
+        w_log('系统设置了代理，出现异常')
 
 
 if __name__ == "__main__":
