@@ -37,6 +37,8 @@ def get_config() -> dict:
         config['MI_PASSWORD'] = md5_crypto(passwd)
     if config.get('SIGN_IN').upper() in ('Y', 'YES'):
         config['SIGN_IN'] = True
+    else:
+        config['SIGN_IN'] = False
     return config
     
 
