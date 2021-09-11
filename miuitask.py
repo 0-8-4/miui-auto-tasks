@@ -398,6 +398,36 @@ def mi_login():
         return False
 
 
+def get_score() -> int:
+    """
+    这个方法待返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
+    如：Qmsg发送到QQ 或者 发送邮件提醒
+    :return: 当前的内测分值
+    """
+    headers = {
+        'cookie': str(cookie)
+    }
+    try:
+        response = requests.get('https://api.vip.miui.com/mtop/planet/vip/betaTest/score', headers=headers)
+        r_json = response.json()
+        your_score = r_json['entity']
+        w_log('成功获取内测分,当前内测分：' + str(your_score))
+        return your_score
+    except Exception as e:
+        w_log('内测分获取失败')
+        process_exception(e)
+
+
+def process_exception(e: Exception):
+    """
+    全局异常处理
+    :param e: 异常实例
+    :return: No return
+    """
+    if e.__str__() == 'check_hostname requires server_hostname':
+        w_log('系统设置了代理，出现异常')
+
+
 if __name__ == "__main__":
     w_log("MIUITask_v1.3")
     w_log('----------系统信息-开始-------------')
@@ -453,4 +483,5 @@ if __name__ == "__main__":
             w_log("5秒后领取活跃分_发帖任务")
             time.sleep(5)
             acquire_task("10106265")
+            get_score()
     s_log()
