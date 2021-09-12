@@ -3,6 +3,8 @@ import time
 import platform
 
 from hashlib import md5
+
+import dotenv
 from dotenv import dotenv_values
 from urllib.request import getproxies
 
@@ -31,7 +33,12 @@ def system_info():
 
 
 def get_config() -> dict:
-    config = dotenv_values(".env")
+    w_log('正在使用' + dotenv.find_dotenv() + '配置文件')
+    config_path = dotenv.find_dotenv()
+    config = dotenv.dotenv_values(config_path)
+    if not config:
+        w_log('配置文件未配置，请编辑项目目录的.env文件。如文件不存在请自行创建')
+        exit(1)
     passwd = config.get('MI_PASSWORD')
     if len(passwd) != 32:
         config['MI_PASSWORD'] = md5_crypto(passwd)
@@ -75,5 +82,5 @@ def conf_check(config: dict):
     if not config.get('BOARD_ID'):
         w_log('测试类型 ID 未配置')
         return False
-    w_log('.env 已配置')
+    w_log('config.env 已配置')
     return True
