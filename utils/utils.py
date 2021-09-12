@@ -33,8 +33,8 @@ def system_info():
 
 
 def get_config() -> dict:
-    w_log('正在使用' + dotenv.find_dotenv() + '配置文件')
-    config_path = dotenv.find_dotenv()
+    config_path = dotenv.find_dotenv(filename='config.env')
+    w_log('正在使用 ' + config_path + ' 作为配置文件')
     config = dotenv.dotenv_values(config_path)
     if not config:
         w_log('配置文件未配置，请编辑项目目录的.env文件。如文件不存在请自行创建')
