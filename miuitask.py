@@ -429,7 +429,7 @@ def process_exception(e: Exception):
 
 
 if __name__ == "__main__":
-    w_log("MIUITask_v1.3")
+    w_log("MIUITask_v1.3.2-fix")
     w_log('----------系统信息-开始-------------')
     system_info()
     w_log('----------系统信息-结束-------------')
@@ -443,7 +443,7 @@ if __name__ == "__main__":
             w_log("本脚本支持社区签到，因该功能存在风险默认禁用")
             w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
             if config.get('SIGN_IN'):
-                w_log("风社险功能提示：正在进行区签到")
+                w_log("风险功能提示：正在进行社区签到")
                 vip_sign_in()
             start_task("10106263")
             w_log("正在完成BUG反馈任务")
@@ -479,7 +479,7 @@ if __name__ == "__main__":
             acquire_task("10106262")
             w_log("正在完成活跃分_发帖任务")
             start_task("10106265")
-            new_announce("5")
+            new_announce("3")
             w_log("5秒后领取活跃分_发帖任务")
             time.sleep(5)
             acquire_task("10106265")
