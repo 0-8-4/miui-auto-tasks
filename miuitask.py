@@ -2,6 +2,7 @@
 import requests
 import time
 import json
+import hashlib
 
 from urllib import request
 from http import cookiejar
@@ -74,16 +75,35 @@ class MIUITask:
         except Exception as e:
             w_log("删除内容出错，请手动删除")
             w_log(e)
+    
+    # 发帖签名
+    def post_sign(self,data):
+        s_data = []
+        for d in data:
+            s_data.append(str(d) + '=' + str(data[d]))
+        s_str = '&'.join(s_data)
+        w_log('签名原文：' + str(s_str))
+        s_str = hashlib.md5(str(s_str).encode(encoding='UTF-8')).hexdigest() + '067f0q5wds4'
+        s_sign = hashlib.md5(str(s_str).encode(encoding='UTF-8')).hexdigest()
+        w_log('签名结果：' + str(s_sign))
+        return s_sign, data['timestamp']
 
     # 发帖
     def new_announce(self, t_type):
         headers = {
             'cookie': str(self.cookie)
         }
+        sign_data = {
+        'announce': '{"textContent":"小米社区白屏","boards":[{"boardId":"' + self.board_id + '"}],"announceType":"' + str(t_type) + '","extraStatus":1,"extraA":"","extraB":null}',
+        'timestamp': int(round(time.time() * 1000))
+        }
+        sign = self.post_sign(sign_data)
         data = {
-            'announce': '{"textContent":"小米社区闪退","boards":[{"boardId":"' + self.board_id + '"}],"announceType":"' + str(
-                t_type) + '"}',
-            'miui_vip_ph': str(self.miui_vip_ph)
+            'announce': sign_data['announce'],
+            'pageType': '1',
+            'miui_vip_ph': str(self.miui_vip_ph),
+            'sign': sign[0],
+            'timestamp': sign[1]
         }
         try:
             response = requests.post('https://api.vip.miui.com/api/community/post/add/newAnnounce', headers=headers,
@@ -109,10 +129,19 @@ class MIUITask:
         headers = {
             'cookie': str(self.cookie)
         }
+        post_text = '小米社区白屏'
+        sign_data = {
+            'postId': str(tid),
+            'text': post_text,
+            'timestamp': int(round(time.time() * 1000))
+        }
+        sign = self.post_sign(sign_data)
         data = {
             'postId': str(tid),
-            'text': '小米社区闪退',
-            'miui_vip_ph': str(self.miui_vip_ph)
+            'text': post_text,
+            'miui_vip_ph': str(self.miui_vip_ph),
+            'sign': sign[0],
+            'timestamp': sign[1]
         }
         try:
             response = requests.post('https://api.vip.miui.com/mtop/planet/vip/content/addCommentReturnCommentInfo',
@@ -458,6 +487,14 @@ def start(miui_task: MIUITask, sign_in: bool, enhanced_mode: bool):
         if enhanced_mode:
             w_log("风险功能提示：增强模式已启用")
             w_log("增强模式已启用，存在封号风险")
+            miui_task.start_task("10106263")
+            w_log("正在完成BUG反馈任务")
+            miui_task.new_announce("7")
+            w_log("3秒后执行提建议任务")
+            miui_task.acquire_task("10106263")
+            time.sleep(3)
+            w_log("正在完成提建议任务")
+            miui_task.new_announce("6")
             w_log("正在完成活跃分_发帖任务")
             miui_task.start_task("10106265")
             miui_task.new_announce("3")
