@@ -46,6 +46,10 @@ def get_config() -> dict:
         config['SIGN_IN'] = True
     else:
         config['SIGN_IN'] = False
+    if config.get('ENHANCED_MODE').upper() in ('Y', 'YES'):
+        config['ENHANCED_MODE'] = True
+    else:
+        config['ENHANCED_MODE'] = False
     return config
     
 
