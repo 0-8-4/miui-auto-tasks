@@ -1,0 +1,2 @@
+# min	hour	day	month	weekday	command
+*   4	*	*	*	python /srv/miuitask.py
