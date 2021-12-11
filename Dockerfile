@@ -8,7 +8,7 @@ COPY ./config.env ./miuitask.py /srv/
 
 RUN pip install --no-cache-dir -i https://mirrors.bfsu.edu.cn/pypi/web/simple -r /tmp/requirements.txt && \
     rm -rf /tmp/* && \
-    echo "*   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
+    echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
 
 WORKDIR /srv
 
