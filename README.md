@@ -35,6 +35,7 @@
 
 
 ### **项目介绍**：  
+- [x] 支持 腾讯云函数（详见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-SCF)）
 - [x] 可自动登录小米账号刷新社区 Cookie 实现自动化   
 - [x] 可选择启用小米社区拔萝卜签到
 - [x] 可自动完成以下小米社区KPI任务且不留下可见痕迹  
@@ -100,6 +101,9 @@
 如果你要提交 Pull request，请确保你的代码风格和项目已有的代码保持一致，遵循 [PEP 8](https://www.python.org/dev/peps/pep-0008) ，变量命名清晰，有适当的注释。
 
 #### **更新说明**：
+
+ v1.3.3 - SCF
+  - 新增 腾讯云函数 支持（使用方法见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-SCF)） 
 
  v1.3.3
  - 新增 回帖签名算法
