@@ -35,6 +35,7 @@
 
 
 ### **项目介绍**：  
+- [x] 支持 腾讯云函数（详见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-SCF)）
 - [x] 支持 Docker 部署（详见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-Docker)） 
 - [x] 可自动登录小米账号刷新社区 Cookie 实现自动化   
 - [x] 可选择启用小米社区拔萝卜签到
@@ -102,10 +103,9 @@
 
 #### **更新说明**：
 
- v1.3.3 - docker
-  - 新增 Docker 支持（使用方法见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-Docker)） 
-
  v1.3.3
+ - 新增 Docker 支持（使用方法见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-Docker)） 
+ - 新增 腾讯云函数 支持（使用方法见 [Wiki](https://github.com/0-8-4/miui-auto-tasks/wiki/Run-on-SCF)） 
  - 新增 回帖签名算法
  - 修改 使用面向对象编程重构代码
  - 修改 发帖相关任务移至增强模式
