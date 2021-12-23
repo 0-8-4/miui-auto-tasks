@@ -19,7 +19,7 @@ def show_info(tip, info):
 
 
 def system_info():
-    w_log(show_info("操作系统平台", platform.platform()))
+    w_log(show_info('操作系统平台', platform.platform()))
     w_log(show_info('操作系统版本', platform.version()))
     w_log(show_info('操作系统名称', platform.system()))
     w_log(show_info('操作系统位元', platform.architecture()))
