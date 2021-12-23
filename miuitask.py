@@ -524,7 +524,9 @@ def main():
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), i.get('board-id'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('enhance-mode'))
+            i.get('check-in'), 
+            i.get('enhance-mode')
+        )
 
     s_log(config.get('logging'))
 
