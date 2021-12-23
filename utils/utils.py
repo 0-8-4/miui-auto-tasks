@@ -93,9 +93,7 @@ def check_config(config: dict) -> bool:
         for i in config.get('accounts'):
             if not i.get('uid') or not i.get('password') or not i.get('user-agent') or not i.get('board-id'):
                 return False
-            if not isinstance(i.get('check-in'), bool):
-                return False
-            if not isinstance(i.get('enhance-mode'), bool):
+            if not isinstance(i.get('check-in'), bool) or not isinstance(i.get('enhance-mode'), bool):
                 return False
     else:
         return False
