@@ -91,13 +91,7 @@ def s_log(flag):
 def check_config(config: dict) -> bool:
     if config.get('accounts'):
         for i in config.get('accounts'):
-            if i.get('uid') == '' or not i.get('uid'):
-                return False
-            if i.get('password') == '' or not i.get('password'):
-                return False
-            if i.get('user-agent') == '' or not i.get('user-agent'):
-                return False
-            if i.get('board-id') == '' or not i.get('board-id'):
+            if not i.get('uid') or not i.get('password') or not i.get('user-agent') or not i.get('board-id'):
                 return False
             if not isinstance(i.get('check-in'), bool):
                 return False
