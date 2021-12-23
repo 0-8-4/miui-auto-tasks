@@ -6,19 +6,18 @@ import hashlib
 
 from urllib import request
 from http import cookiejar
-from utils.utils import system_info, get_config, w_log, s_log, conf_check
+
+from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config
 
 
 class MIUITask:
 
-    def __init__(self, mi_id, p_md5, l_ua, board_id, dev_id=None):
-        self.mi_id = mi_id
-        self.p_md5 = p_md5
-        self.l_ua = l_ua
+    def __init__(self, uid, password, user_agent, board_id, device_id):
+        self.uid = uid
+        self.password = password
+        self.user_agent = user_agent
         self.board_id = board_id
-
-        if not dev_id:
-            self.dev_id = dev_id
+        self.device_id = device_id
 
         # 留空
         self.cookie = ''
@@ -335,7 +334,7 @@ class MIUITask:
             w_log(e)
 
     # 社区拔萝卜签到
-    def vip_sign_in(self):
+    def vip_check_in(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
             'cookie': str(self.cookie)
@@ -374,10 +373,10 @@ class MIUITask:
                        '%25252Fmio%25252Fmio%25252FinternalTest%25253Fref%25253Dhomepage&_sign=L%2BdSQY6sjSQ%2FCRjJs4p'
                        '%2BU1vNYLY%3D&serviceParam=%7B%22checkSafePhone%22%3Afalse%2C%22checkSafeAddress%22%3Afalse%2C'
                        '%22lsrp_score%22%3A0.0%7D&showActiveX=false&theme=&needTheme=false&bizDeviceType=',
-            'User-Agent': str(self.l_ua),
+            'User-Agent': str(self.user_agent),
             'Origin': 'https://account.xiaomi.com',
             'X-Requested-With': 'XMLHttpRequest',
-            'Cookie': 'deviceId=' + str(self.dev_id) + '; pass_ua=web; uLocale=zh_CN'
+            'Cookie': 'deviceId=' + str(self.device_id) + '; pass_ua=web; uLocale=zh_CN'
         }
         data = {
             'bizDeviceType': '',
@@ -394,9 +393,9 @@ class MIUITask:
                   '%2525252Fmio%2525252Fmio%2525252FinternalTest%2525253Fref%2525253Dhomepage%26sid%3Dmiui_vip',
             'sid': 'miui_vip',
             '_sign': 'L+dSQY6sjSQ/CRjJs4p+U1vNYLY=',
-            'user': str(self.mi_id),
+            'user': str(self.uid),
             'cc': '+86',
-            'hash': str(self.p_md5),
+            'hash': str(self.password),
             '_json': 'true'
         }
         try:
@@ -425,7 +424,7 @@ class MIUITask:
 
     def get_score(self) -> int:
         """
-        这个方法待返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
+        这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
         :return: 当前的内测分值
         """
@@ -453,14 +452,14 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, sign_in: bool, enhanced_mode: bool):
+def start(miui_task: MIUITask, check_in: bool, enhanced_mode: bool):
 
     if miui_task.mi_login():
         w_log("本脚本支持社区签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
-        if sign_in:
+        if check_in:
             w_log("风险功能提示：正在进行社区签到")
-            miui_task.vip_sign_in()
+            miui_task.vip_check_in()
         w_log("正在完成满意度调查任务")
         miui_task.get_survey_id()
         w_log("正在完成点赞任务")
@@ -505,27 +504,33 @@ def start(miui_task: MIUITask, sign_in: bool, enhanced_mode: bool):
 
 
 def main():
-    w_log("MIUITask_v1.3.3")
-    w_log('----------系统信息-开始-------------')
+    w_log("MIUI-AUTO-TASK v1.4")
+    w_log('---------- 系统信息 -------------')
     system_info()
-    w_log('----------系统信息-结束-------------')
+    w_log('---------- 项目信息 -------------')
     w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
-    w_log("欢迎star，感谢東雲研究所中的大佬")
-    w_log('----------检测配置文件-------------')
-
+    w_log("欢迎 star，感谢東雲研究所中的大佬")
+    w_log('---------- 配置检测 -------------')
+    
     config = get_config()
-    if not conf_check(config):
-        w_log('配置文件没有正确配置，请检查')
 
-    mi_id = config.get('MI_ID')
-    p_md5 = config.get('MI_PASSWORD').upper()
-    l_ua = config.get('USER_AGENT')
-    board_id = config.get('BOARD_ID')
+    if not check_config(config):
+        w_log('配置文件没有正确配置')
+        exit(1)
+    else:
+        config = format_config(config)
 
-    miui = MIUITask(mi_id, p_md5, l_ua, board_id)
-    start(miui, config.get('SIGN_IN'), config.get('ENHANCED_MODE'))
+    for i in config.get('accounts'):
+        w_log('---------- EXECUTING -------------')
+        start(
+            MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), i.get('board-id'), device_id=i.get('device-id')),
+            i.get('check-in'), i.get('enhance-mode'))
 
-    s_log()
+    s_log(config.get('logging'))
+
+
+def main_handler(event, context):
+    main()
 
 
 if __name__ == "__main__":
