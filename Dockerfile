@@ -4,7 +4,7 @@ COPY ./utils /srv/utils/
 
 COPY ./requirements.txt /tmp
 
-COPY ./config.env ./miuitask.py /srv/
+COPY ./config.yaml ./miuitask.py /srv/
 
 RUN pip install --no-cache-dir -i https://mirrors.bfsu.edu.cn/pypi/web/simple -r /tmp/requirements.txt && \
     rm -rf /tmp/* && \
