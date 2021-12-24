@@ -1,11 +1,9 @@
 import os
 import time
 import platform
+import dotenv, yaml
 
 from hashlib import md5
-
-import dotenv
-from dotenv import dotenv_values
 from urllib.request import getproxies
 
 
@@ -21,37 +19,55 @@ def show_info(tip, info):
 
 
 def system_info():
-    w_log(show_info("系统及版本信息", platform.platform()))
-    w_log(show_info('系统版本号', platform.version()))
-    w_log(show_info('系统名称', platform.system()))
-    w_log(show_info('系统位数', platform.architecture()))
-    w_log(show_info('计算机类型', platform.machine()))
-    w_log(show_info('处理器类型', platform.processor()))
-    w_log(show_info('Python版本', str(platform.python_version()) + ' ' + str(platform.python_build())))
+    w_log(show_info('操作系统平台', platform.platform()))
+    w_log(show_info('操作系统版本', platform.version()))
+    w_log(show_info('操作系统名称', platform.system()))
+    w_log(show_info('操作系统位元', platform.architecture()))
+    w_log(show_info('操作系统类型', platform.machine()))
+    w_log(show_info('处理器信息', platform.processor()))
+    w_log(show_info('Python 版本', str(platform.python_version()) + ' ' + str(platform.python_build())))
     if getproxies():
         w_log(show_info('系统代理', getproxies()))
 
 
 def get_config() -> dict:
-    config_path = dotenv.find_dotenv(filename='config.env')
-    w_log('正在使用 ' + config_path + ' 作为配置文件')
-    config = dotenv.dotenv_values(config_path)
-    if not config:
-        w_log('配置文件未配置，请编辑项目目录的.env文件。如文件不存在请自行创建')
+    config = {'account': []}
+    config_path_legacy = dotenv.find_dotenv(filename='config.env')
+    config_path_yaml = dotenv.find_dotenv(filename='config.yaml')
+
+    if config_path_legacy:
+        w_log('正在使用 ' + config_path_legacy + ' 作为配置文件')
+        legacy_config = dotenv.dotenv_values(config_path_legacy)
+        config['account'].append({'uid': legacy_config.get('MI_ID')})
+        config['account'][0]['password'] = legacy_config.get('MI_PASSWORD')
+        config['account'][0]['user-agent'] = legacy_config.get('USER_AGENT')
+        config['account'][0]['board-id'] = legacy_config.get('BOARD_ID')
+        if legacy_config.get('SIGN_IN') and legacy_config.get('SIGN_IN').upper() in ('Y', 'YES'):
+            config['account'][0]['check-in'] = True
+        else:
+            config['account'][0]['check-in'] = False
+        if legacy_config.get('ENHANCED_MODE') and legacy_config.get('ENHANCED_MODE').upper() in ('Y', 'YES'):
+            config['account'][0]['enhance-mode'] = True
+        else:
+            config['account'][0]['enhance-mode'] = False
+        if legacy_config.get('LOG_SAVE') and legacy_config.get('LOG_SAVE').upper() in ('Y', 'YES'):
+            config['logging'] = True
+        else:
+            config['logging'] = False
+        return config
+    elif config_path_yaml:
+        w_log('正在使用 ' + config_path_yaml + ' 作为配置文件')
+        with open(config_path_yaml, "rb") as stream:
+            try:
+                config = yaml.safe_load(stream)
+            except yaml.YAMLError as e:
+                w_log('配置文件载入错误')
+                w_log(e)
+            return config
+    else:
+        w_log('配置文件不存在')
         exit(1)
-    passwd = config.get('MI_PASSWORD')
-    if len(passwd) != 32:
-        config['MI_PASSWORD'] = md5_crypto(passwd)
-    if config.get('SIGN_IN').upper() in ('Y', 'YES'):
-        config['SIGN_IN'] = True
-    else:
-        config['SIGN_IN'] = False
-    if config.get('ENHANCED_MODE').upper() in ('Y', 'YES'):
-        config['ENHANCED_MODE'] = True
-    else:
-        config['ENHANCED_MODE'] = False
-    return config
-    
+
 
 def w_log(text):
     global logs
@@ -60,9 +76,8 @@ def w_log(text):
     print(now_localtime + ' | ' + str(text))
 
 
-def s_log():
-    logs_save= get_config().get('LOG_SAVE')
-    if logs_save == 'Y':
+def s_log(flag):
+    if flag == True:
         global logs
         folder = os.path.exists('./logs')
         if not folder:
@@ -73,18 +88,30 @@ def s_log():
             f.write(logs)
 
 
-def conf_check(config: dict):
-    if not config.get('MI_ID'):
-        w_log('小米账户 ID 未配置')
+def check_config(config: dict) -> bool:
+    if config.get('accounts'):
+        for i in config.get('accounts'):
+            if not i.get('uid') or not i.get('password') or not i.get('user-agent') or not i.get('board-id'):
+                return False
+            if not isinstance(i.get('check-in'), bool) or not isinstance(i.get('enhance-mode'), bool):
+                return False
+    else:
         return False
-    if not config.get('MI_PASSWORD'):
-        w_log('小米账户 密码 / MD5 未配置')
+    if not isinstance(config.get('logging'), bool):
         return False
-    if not config.get('USER_AGENT'):
-        w_log('User-Agent 未配置')
-        return False
-    if not config.get('BOARD_ID'):
-        w_log('测试类型 ID 未配置')
-        return False
-    w_log('config.env 已配置')
     return True
+
+
+def format_config(config: dict) -> dict:
+    for i in config.get('accounts'):
+        i['uid'] = str(i.get('uid'))
+        i['user-agent'] = str(i.get('user-agent'))
+        i['board-id'] = str(i.get('board-id'))
+        i['password'] = str(i.get('password')).upper()
+        if len(i.get('password')) != 32:
+            i['password'] = md5_crypto(i.get('password')).upper()
+        if i.get('device-id'):
+            i['device-id'] = str(i.get('device-id'))
+        else:
+            i['device-id'] = None
+    return config

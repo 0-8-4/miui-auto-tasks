@@ -1,0 +1,25 @@
+accounts:
+  - uid: 100000
+    # 小米账户ID 非小米账户用户名
+    password: abc123
+    # 小米账户密码或其MD5哈希
+    user-agent: 'Mozilla/5.0 (Android 11; Mobile; rv:95.0) Gecko/95.0 Firefox/95.0'
+    # 登录小米社区时所用浏览器的 User-Agent
+    # 可在此工具查看：https://tool.chinaz.com/useragent
+    board-id: 5462204
+    # 测试任务类型
+    # 开发版内测 5428803 开发版公测 5433318 稳定版内测 5462204
+    check-in: false
+    # 小米社区签到，存在封号风险
+    enhance-mode: false
+    # 增强模式，存在封号风险
+    # 一般情况下，本脚本只会执行3次发帖和回帖以及五次点赞的基本操作
+# 若有多个小米账户，按照以下模板进行修改，使用时删除前端 #注释
+#  - uid: 100001
+#    password: abc123
+#    user-agent: 'Mozilla/5.0 (Android 11; Mobile; rv:95.0) Gecko/95.0 Firefox/95.0'
+#    board-id: 5462204
+#    check-in: false
+#    enhance-mode: false
+logging: false
+# 归档日志到本地文件
