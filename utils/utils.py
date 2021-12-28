@@ -107,7 +107,7 @@ def format_config(config: dict) -> dict:
         i['uid'] = str(i.get('uid'))
         i['user-agent'] = str(i.get('user-agent'))
         i['board-id'] = str(i.get('board-id'))
-        i['password'] = str(i.get('password')).upper()
+        i['password'] = str(i.get('password'))
         if len(i.get('password')) != 32:
             i['password'] = md5_crypto(i.get('password')).upper()
         if i.get('device-id'):
