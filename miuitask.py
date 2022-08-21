@@ -12,70 +12,18 @@ from utils.utils import system_info, get_config, w_log, s_log, check_config, for
 
 class MIUITask:
 
-    def __init__(self, uid, password, user_agent, board_id, device_id):
+    def __init__(self, uid, password, user_agent, device_id):
         self.uid = uid
         self.password = password
         self.user_agent = user_agent
-        self.board_id = board_id
         self.device_id = device_id
 
         # 留空
         self.cookie = ''
         # 留空
         self.miui_vip_ph = ''
-
-    def thumb_up(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/post/thumbUp?postId=28270729',
-                                    headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("点赞失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("点赞失败：" + str(r_json['message']))
-            w_log("点赞成功")
-        except Exception as e:
-            w_log("点赞出错")
-            w_log(e)
-
-    def cancel_thumb_up(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/post/cancelThumbUp?postId=28270729',
-                                    headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("取消点赞失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("取消点赞失败：" + str(r_json['message']))
-            w_log("取消点赞成功")
-        except Exception as e:
-            w_log("取消点赞出错")
-            w_log(e)
-
-    def delete_post(self, tid):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/post/detail/delete?postId=' + str(tid),
-                                    headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("删除内容失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("删除内容失败：" + str(r_json['message']))
-            w_log("删除内容成功：" + str(r_json['message']))
-        except Exception as e:
-            w_log("删除内容出错，请手动删除")
-            w_log(e)
     
-    # 发帖签名
+    # 签名
     def post_sign(self,data):
         s_data = []
         for d in data:
@@ -87,73 +35,52 @@ class MIUITask:
         w_log('签名结果：' + str(s_sign))
         return s_sign, data['timestamp']
 
-    # 发帖
-    def new_announce(self, t_type):
+    # 点赞
+    def thumb_up(self):
         headers = {
             'cookie': str(self.cookie)
         }
         sign_data = {
-        'announce': '{"textContent":"小米社区白屏","boards":[{"boardId":"' + self.board_id + '"}],"announceType":"' + str(t_type) + '","extraStatus":1,"extraA":"","extraB":null}',
+        'postId': '36625780',
         'timestamp': int(round(time.time() * 1000))
         }
         sign = self.post_sign(sign_data)
         data = {
-            'announce': sign_data['announce'],
-            'pageType': '1',
-            'miui_vip_ph': str(self.miui_vip_ph),
+            'postId': '36625780',
             'sign': sign[0],
             'timestamp': sign[1]
         }
         try:
-            response = requests.post('https://api.vip.miui.com/api/community/post/add/newAnnounce', headers=headers,
-                                     data=data)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp', headers=headers,
+                                     params=data)
             r_json = response.json()
             if r_json['code'] == 401:
-                return w_log("发表内容失败：Cookie无效")
+                return w_log("点赞失败：Cookie无效")
             elif r_json['code'] != 200:
-                return w_log("发表内容失败：" + str(r_json['message']))
-            post_entity = json.loads(r_json['entity'])
-            w_log("发表内容成功，帖子ID：" + str(post_entity['announceId']) + "，将在3秒后删除")
-            self.add_comment_return_comment_info(str(post_entity['announceId']))
-            time.sleep(3)
-            # 执行5次删帖是为了防止删帖失败
-            for item in range(0, 5):
-                self.delete_post(post_entity['announceId'])
+                return w_log("点赞失败：" + str(r_json['message']))
+            w_log("点赞成功")
         except Exception as e:
-            w_log("发表内容出错")
+            w_log("点赞出错")
             w_log(e)
 
-    # 回帖
-    def add_comment_return_comment_info(self, tid):
+    # 取消点赞
+    def cancel_thumb_up(self):
         headers = {
             'cookie': str(self.cookie)
         }
-        post_text = '小米社区白屏'
-        sign_data = {
-            'postId': str(tid),
-            'text': post_text,
-            'timestamp': int(round(time.time() * 1000))
-        }
-        sign = self.post_sign(sign_data)
-        data = {
-            'postId': str(tid),
-            'text': post_text,
-            'miui_vip_ph': str(self.miui_vip_ph),
-            'sign': sign[0],
-            'timestamp': sign[1]
-        }
         try:
-            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/content/addCommentReturnCommentInfo',
-                                     headers=headers, data=data)
+            response = requests.get('https://api.vip.miui.com/api/community/post/cancelThumbUp?postId=36625780',
+                                    headers=headers)
             r_json = response.json()
             if r_json['code'] == 401:
-                return w_log("回复失败：Cookie无效")
+                return w_log("取消点赞失败：Cookie无效")
             elif r_json['code'] != 200:
-                return w_log("回复失败：" + str(r_json['message']))
-            w_log("回复成功")
+                return w_log("取消点赞失败：" + str(r_json['message']))
+            w_log("取消点赞成功")
         except Exception as e:
-            w_log("回复出错")
+            w_log("取消点赞出错")
             w_log(e)
+
 
     def get_vip_cookie(self, url):
 
@@ -176,164 +103,29 @@ class MIUITask:
             w_log(e)
             return False
 
-    # 提交满意度问卷
-    def submit_survey(self, sid):
+    # 浏览帖子10s
+    def browse_post(self):
         headers = {
             'cookie': str(self.cookie)
         }
-        data = {
-            'survey': '{"surveyId":' + str(sid) + ',"answer":{"1":"A"}}',
-            'businessId': '2',
-            'miui_vip_ph': str(self.miui_vip_ph)
+        params = {
+            'userId': str(self.uid),
+            'action': 'BROWSE_POST_10S',
         }
         try:
-            response = requests.post('https://api.vip.miui.com/api/miui/dev/survey/submit', headers=headers, data=data)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction', params=params, headers=headers)
             r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("满意度投票失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("满意度投票失败：" + str(r_json['message']))
-            w_log("满意度投票成功")
+            if r_json['status'] == 401:
+                return w_log("浏览帖子失败：Cookie无效")
+            elif r_json['status'] != 200:
+                return w_log("浏览帖子完成，但有错误：" + str(r_json['message']))
+            score = r_json['entity']['score']
+            w_log("浏览帖子完成，成长值+" + str(score))
         except Exception as e:
-            w_log("满意度投票出错")
+            w_log("浏览帖子出错")
             w_log(e)
 
-# 获取满意度投票问卷ID
-    def get_survey_id(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/miui/dev/survey?businessId=2', headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("获取问卷ID失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("获取问卷ID失败：" + str(r_json['message']))
-            elif r_json['entity']['surveyInfo']['surveyId'] is None:
-                w_log("获取问卷ID失败：问卷ID为空")
-            survey_id = r_json['entity']['surveyInfo']['surveyId']
-            w_log("获取问卷ID成功：" + str(survey_id))
-            self.submit_survey(survey_id)
-        except Exception as e:
-            w_log("获取问卷ID出错，满意度投票失败")
-            w_log(e)
-
-    # 取关用户
-    def unfollow_user(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/user/relation/unfollow?followeeId=210836962',
-                                    headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("取关用户失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("取关用户失败：" + str(r_json['message']))
-            w_log("取关用户成功")
-        except Exception as e:
-            w_log("取关用户出错")
-            w_log(e)
-
-    # 关注用户
-    def follow_user(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/user/relation/follow?followeeId=210836962',
-                                    headers=headers)
-            rJson = response.json()
-            if rJson['code'] == 401:
-                return w_log("关注用户失败：Cookie无效")
-            elif rJson['code'] != 200:
-                return w_log("关注用户失败：" + str(rJson['message']))
-            w_log("关注用户成功")
-        except Exception as e:
-            w_log("关注用户出错")
-            w_log(e)
-
-    # 退出圈子
-    def unfollow_board(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/board/unfollow?boardId=5462662',
-                                    headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("退出圈子失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("退出圈子失败：" + str(r_json['message']))
-            w_log("退出圈子成功")
-        except Exception as e:
-            w_log("退出圈子出错")
-            w_log(e)
-
-    # 加入圈子
-    def follow_board(self):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        try:
-            response = requests.get('https://api.vip.miui.com/api/community/board/follow?boardId=5462662', headers=headers)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("加入圈子失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("加入圈子失败：" + str(r_json['message']))
-            w_log("加入圈子成功")
-        except Exception as e:
-            w_log("加入圈子出错")
-
-    # 活跃度任务领取
-    def start_task(self, task_id):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        data = {
-            'taskId': str(task_id),
-            'miui_vip_ph': str(self.miui_vip_ph)
-        }
-        try:
-            response = requests.post('https://api.vip.miui.com/api/community/user/task/start?version=dev.210805',
-                                     headers=headers, data=data)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("开始活跃分任务失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("开始活跃分任务失败：" + str(r_json['message']))
-            w_log("开始活跃分任务成功")
-        except Exception as e:
-            w_log("开始活跃分任务出错")
-            w_log(e)
-
-    # 活跃度任务完成
-    def acquire_task(self, task_id):
-        headers = {
-            'cookie': str(self.cookie)
-        }
-        data = {
-            'taskId': str(task_id),
-            'miui_vip_ph': str(self.miui_vip_ph)
-        }
-        try:
-            response = requests.post('https://api.vip.miui.com/api/community/user/task/acquire?version=dev.210805',
-                                     headers=headers, data=data)
-            r_json = response.json()
-            if r_json['code'] == 401:
-                return w_log("领取活跃分失败：Cookie无效")
-            elif r_json['code'] != 200:
-                return w_log("领取活跃分失败：" + str(r_json['message']))
-            w_log("领取活跃分成功")
-        except Exception as e:
-            w_log("领取活跃分出错")
-            w_log(e)
-
-    # 社区拔萝卜签到
+    # 社区拔萝卜
     def vip_check_in(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -347,12 +139,35 @@ class MIUITask:
                                      data=data)
             r_json = response.json()
             if r_json['code'] == 401:
-                return w_log("社区拔萝卜签到失败：Cookie无效")
+                return w_log("社区拔萝卜失败：Cookie无效")
             elif r_json['code'] != 200:
-                return w_log("社区拔萝卜签到失败：" + str(r_json['message']))
-            w_log("社区拔萝卜签到成功")
+                return w_log("社区拔萝卜失败：" + str(r_json['entity']['message']))
+            w_log("社区拔萝卜结果：" + str(r_json['entity']['message']))
+            money_count = r_json['entity']['header']['moneyCount']
+            w_log("当前金币数：" + str(money_count))
         except Exception as e:
-            w_log("社区拔萝卜签到出错")
+            w_log("社区拔萝卜出错")
+            w_log(e)
+
+    # 社区4.0签到
+    def check_in(self):
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+            'cookie': str(self.cookie)
+        }
+        data = {
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        try:
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/user/checkin?pathname=/mio/checkIn&version=dev.1144', headers=headers)
+            r_json = response.json()
+            if r_json['status'] == 401:
+                return w_log("社区成长值签到失败：Cookie无效")
+            elif r_json['status'] != 200:
+                return w_log("社区成长值签到失败：" + str(r_json['message']))
+            w_log("社区成长值签到结果：成长值+" + str(r_json['entity']))
+        except Exception as e:
+            w_log("社区成长值签到出错")
             w_log(e)
 
     def mi_login(self):
@@ -452,7 +267,7 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool, enhanced_mode: bool):
+def start(miui_task: MIUITask, check_in: bool):
 
     if miui_task.mi_login():
         w_log("本脚本支持社区签到，因该功能存在风险默认禁用")
@@ -460,51 +275,35 @@ def start(miui_task: MIUITask, check_in: bool, enhanced_mode: bool):
         if check_in:
             w_log("风险功能提示：正在进行社区签到")
             miui_task.vip_check_in()
-        w_log("正在完成满意度调查任务")
-        miui_task.get_survey_id()
+            miui_task.check_in()
+            time.sleep(1)
+        w_log("正在完成浏览帖子10s任务，第一次")
+        time.sleep(10.5)
+        miui_task.browse_post()
+        w_log("正在完成浏览帖子10s任务，第二次")
+        time.sleep(10.5)
+        miui_task.browse_post()
+        w_log("正在完成浏览帖子10s任务，第三次")
+        time.sleep(10.5)
+        miui_task.browse_post()
         w_log("正在完成点赞任务")
-        miui_task.start_task("10106256")
         miui_task.thumb_up()
         time.sleep(0.2)
         miui_task.cancel_thumb_up()
         time.sleep(0.2)
-        miui_task.acquire_task("10106256")
-        w_log("正在完成活跃分_关注任务")
-        miui_task.start_task("10106261")
-        miui_task.unfollow_user()
-        miui_task.follow_user()
-        w_log("5秒后领取活跃分_关注任务")
-        time.sleep(5)
-        miui_task.acquire_task("10106261")
-        w_log("正在完成活跃分_加圈任务")
-        miui_task.start_task("10106262")
-        miui_task.unfollow_board()
-        miui_task.follow_board()
-        w_log("5秒后领取活跃分_加圈任务")
-        time.sleep(5)
-        miui_task.acquire_task("10106262")
-        if enhanced_mode:
-            w_log("风险功能提示：增强模式已启用")
-            w_log("增强模式已启用，存在封号风险")
-            miui_task.start_task("10106263")
-            w_log("正在完成BUG反馈任务")
-            miui_task.new_announce("7")
-            w_log("3秒后执行提建议任务")
-            miui_task.acquire_task("10106263")
-            time.sleep(3)
-            w_log("正在完成提建议任务")
-            miui_task.new_announce("6")
-            w_log("正在完成活跃分_发帖任务")
-            miui_task.start_task("10106265")
-            miui_task.new_announce("3")
-            w_log("5秒后领取活跃分_发帖任务")
-            time.sleep(5)
-            miui_task.acquire_task("10106265")
+        miui_task.thumb_up()
+        time.sleep(0.2)
+        miui_task.cancel_thumb_up()
+        time.sleep(0.2)
+        miui_task.thumb_up()
+        time.sleep(0.2)
+        miui_task.cancel_thumb_up()
+        time.sleep(0.2)
         miui_task.get_score()
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.4")
+    w_log("MIUI-AUTO-TASK v1.5")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
@@ -523,9 +322,8 @@ def main():
     for i in config.get('accounts'):
         w_log('---------- EXECUTING -------------')
         start(
-            MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), i.get('board-id'), device_id=i.get('device-id')),
+            MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
             i.get('check-in'), 
-            i.get('enhance-mode')
         )
 
     s_log(config.get('logging'))
