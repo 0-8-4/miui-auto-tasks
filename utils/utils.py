@@ -41,15 +41,10 @@ def get_config() -> dict:
         config['account'].append({'uid': legacy_config.get('MI_ID')})
         config['account'][0]['password'] = legacy_config.get('MI_PASSWORD')
         config['account'][0]['user-agent'] = legacy_config.get('USER_AGENT')
-        config['account'][0]['board-id'] = legacy_config.get('BOARD_ID')
         if legacy_config.get('SIGN_IN') and legacy_config.get('SIGN_IN').upper() in ('Y', 'YES'):
             config['account'][0]['check-in'] = True
         else:
             config['account'][0]['check-in'] = False
-        if legacy_config.get('ENHANCED_MODE') and legacy_config.get('ENHANCED_MODE').upper() in ('Y', 'YES'):
-            config['account'][0]['enhance-mode'] = True
-        else:
-            config['account'][0]['enhance-mode'] = False
         if legacy_config.get('LOG_SAVE') and legacy_config.get('LOG_SAVE').upper() in ('Y', 'YES'):
             config['logging'] = True
         else:
@@ -91,9 +86,9 @@ def s_log(flag):
 def check_config(config: dict) -> bool:
     if config.get('accounts'):
         for i in config.get('accounts'):
-            if not i.get('uid') or not i.get('password') or not i.get('user-agent') or not i.get('board-id'):
+            if not i.get('uid') or not i.get('password') or not i.get('user-agent'):
                 return False
-            if not isinstance(i.get('check-in'), bool) or not isinstance(i.get('enhance-mode'), bool):
+            if not isinstance(i.get('check-in'), bool):
                 return False
     else:
         return False
@@ -106,7 +101,6 @@ def format_config(config: dict) -> dict:
     for i in config.get('accounts'):
         i['uid'] = str(i.get('uid'))
         i['user-agent'] = str(i.get('user-agent'))
-        i['board-id'] = str(i.get('board-id'))
         if len(i.get('password')) != 32:
             i['password'] = md5_crypto(i.get('password')).upper()
         else:
