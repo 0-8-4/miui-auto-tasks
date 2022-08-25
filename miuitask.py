@@ -126,7 +126,7 @@ class MIUITask:
             w_log(e)
 
     # 社区拔萝卜
-    def vip_check_in(self):
+    def carrot_pull(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
             'cookie': str(self.cookie)
@@ -155,9 +155,6 @@ class MIUITask:
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
             'cookie': str(self.cookie)
         }
-        data = {
-            'miui_vip_ph': str(self.miui_vip_ph)
-        }
         try:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/user/checkin?pathname=/mio/checkIn&version=dev.1144', headers=headers)
             r_json = response.json()
@@ -168,6 +165,24 @@ class MIUITask:
             w_log("社区成长值签到结果：成长值+" + str(r_json['entity']))
         except Exception as e:
             w_log("社区成长值签到出错")
+            w_log(e)
+
+    # 登录社区App
+    def login_app(self):
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+            'cookie': str(self.cookie)
+        }
+        try:
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers)
+            r_code = response.status_code
+            if r_code == 401:
+                return w_log("登录社区App失败：Cookie无效")
+            elif r_code != 200:
+                return w_log("登录社区App失败")
+            w_log("登录社区App成功")
+        except Exception as e:
+            w_log("登录社区App出错")
             w_log(e)
 
     def mi_login(self):
@@ -267,16 +282,20 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool):
+def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
 
     if miui_task.mi_login():
-        w_log("本脚本支持社区签到，因该功能存在风险默认禁用")
+        w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
+        miui_task.login_app()
+        if carrot_pull:
+            w_log("风险功能提示：正在进行社区拔萝卜")
+            time.sleep(0.5)
+            miui_task.carrot_pull()
         if check_in:
-            w_log("风险功能提示：正在进行社区签到")
-            miui_task.vip_check_in()
+            w_log("风险功能提示：正在进行成长值签到")
+            time.sleep(0.5)
             miui_task.check_in()
-            time.sleep(1)
         w_log("正在完成浏览帖子10s任务，第一次")
         time.sleep(10.5)
         miui_task.browse_post()
@@ -303,7 +322,7 @@ def start(miui_task: MIUITask, check_in: bool):
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.5")
+    w_log("MIUI-AUTO-TASK v1.5.1")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
@@ -323,7 +342,7 @@ def main():
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), 
+            i.get('check-in'), i.get('carrot-pull'),
         )
 
     s_log(config.get('logging'))
