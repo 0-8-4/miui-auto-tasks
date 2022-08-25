@@ -45,6 +45,10 @@ def get_config() -> dict:
             config['account'][0]['check-in'] = True
         else:
             config['account'][0]['check-in'] = False
+        if legacy_config.get('CARROT_PULL') and legacy_config.get('CARROT_PULL').upper() in ('Y', 'YES'):
+            config['account'][0]['carrot-pull'] = True
+        else:
+            config['account'][0]['carrot-pull'] = False
         if legacy_config.get('LOG_SAVE') and legacy_config.get('LOG_SAVE').upper() in ('Y', 'YES'):
             config['logging'] = True
         else:
@@ -89,6 +93,8 @@ def check_config(config: dict) -> bool:
             if not i.get('uid') or not i.get('password') or not i.get('user-agent'):
                 return False
             if not isinstance(i.get('check-in'), bool):
+                return False
+            if not isinstance(i.get('carrot-pull'), bool):
                 return False
     else:
         return False
