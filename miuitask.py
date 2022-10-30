@@ -125,6 +125,52 @@ class MIUITask:
             w_log("浏览帖子出错")
             w_log(e)
 
+    # 浏览个人主页10s
+    def browse_user_page(self):
+        headers = {
+            'cookie': str(self.cookie)
+        }
+        params = {
+            'userId': str(self.uid),
+            'action': 'BROWSE_SPECIAL_PAGES_USER_HOME',
+        }
+        try:
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction', params=params, headers=headers)
+            r_json = response.json()
+            if r_json['status'] == 401:
+                return w_log("浏览个人主页失败：Cookie无效")
+            elif r_json['status'] != 200:
+                return w_log("浏览个人主页完成，但有错误：" + str(r_json['message']))
+            score = r_json['entity']['score']
+            w_log("浏览个人主页完成，成长值+" + str(score))
+        except Exception as e:
+            w_log("浏览个人主页出错")
+            w_log(e)
+
+    # 关注小米社区
+    def board_follow(self):
+        headers = {
+            'cookie': str(self.cookie)
+        }
+        data = {
+            'miui_vip_ph': str(self.miui_vip_ph),
+            'boardId':  5462662
+        }
+        try:
+            response = requests.post('https://prod.api.xiaomi.cn/community/board/follow', headers=headers,
+                                     data=data)
+            r_json = response.json()
+            if r_json['code'] == 401:
+                return w_log("关注小米社区失败：Cookie无效")
+            elif r_json['code'] != 200:
+                return w_log("关注小米社区失败：" + str(r_json['entity']['message']))
+            w_log("关注小米社区结果：" + str(r_json['entity']['message']))
+            money_count = r_json['entity']['header']['moneyCount']
+            w_log("当前金币数：" + str(money_count))
+        except Exception as e:
+            w_log("关注小米社区出错")
+            w_log(e)
+
     # 社区拔萝卜
     def carrot_pull(self):
         headers = {
@@ -288,37 +334,39 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
         w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
         miui_task.login_app()
-        if carrot_pull:
-            w_log("风险功能提示：正在进行社区拔萝卜")
-            time.sleep(0.5)
-            miui_task.carrot_pull()
-        if check_in:
-            w_log("风险功能提示：正在进行成长值签到")
-            time.sleep(0.5)
-            miui_task.check_in()
-        w_log("正在完成浏览帖子10s任务，第一次")
-        time.sleep(10.5)
-        miui_task.browse_post()
-        w_log("正在完成浏览帖子10s任务，第二次")
-        time.sleep(10.5)
-        miui_task.browse_post()
-        w_log("正在完成浏览帖子10s任务，第三次")
-        time.sleep(10.5)
-        miui_task.browse_post()
-        w_log("正在完成点赞任务")
-        miui_task.thumb_up()
-        time.sleep(0.2)
-        miui_task.cancel_thumb_up()
-        time.sleep(0.2)
-        miui_task.thumb_up()
-        time.sleep(0.2)
-        miui_task.cancel_thumb_up()
-        time.sleep(0.2)
-        miui_task.thumb_up()
-        time.sleep(0.2)
-        miui_task.cancel_thumb_up()
-        time.sleep(0.2)
-        miui_task.get_score()
+        # if carrot_pull:
+        #     w_log("风险功能提示：正在进行社区拔萝卜")
+        #     time.sleep(0.5)
+        #     miui_task.carrot_pull()
+        # if check_in:
+        #     w_log("风险功能提示：正在进行成长值签到")
+        #     time.sleep(0.5)
+        #     miui_task.check_in()
+        # w_log("正在完成浏览帖子10s任务，第一次")
+        # time.sleep(10.5)
+        # miui_task.browse_post()
+        # w_log("正在完成浏览帖子10s任务，第二次")
+        # time.sleep(10.5)
+        # miui_task.browse_post()
+        # w_log("正在完成浏览帖子10s任务，第三次")
+        # time.sleep(10.5)
+        # miui_task.browse_post()
+        # w_log("正在完成点赞任务")
+        # miui_task.thumb_up()
+        # time.sleep(0.2)
+        # miui_task.cancel_thumb_up()
+        # time.sleep(0.2)
+        # miui_task.thumb_up()
+        # time.sleep(0.2)
+        # miui_task.cancel_thumb_up()
+        # time.sleep(0.2)
+        # miui_task.thumb_up()
+        # time.sleep(0.2)
+        # miui_task.cancel_thumb_up()
+        # time.sleep(0.2)
+        # miui_task.get_score()
+        miui_task.board_follow()
+        # miui_task.browse_user_page()
 
 
 def main():
