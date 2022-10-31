@@ -19,3 +19,5 @@ accounts:
 #    check-in: false
 logging: false
 # 归档日志到本地文件
+version: v1.5.1
+# config 文件版本号，debug用

@@ -55,13 +55,14 @@ def get_config() -> dict:
             config['logging'] = False
         return config
     elif config_path_yaml:
-        w_log('正在使用 ' + config_path_yaml + ' 作为配置文件')
+        w_log('正在加载 ' + config_path_yaml + ' 配置文件')
         with open(config_path_yaml, "rb") as stream:
             try:
                 config = yaml.safe_load(stream)
             except yaml.YAMLError as e:
                 w_log('配置文件载入错误')
                 w_log(e)
+            w_log('配置文件已成功加载，文件版本 ' + config.get('version'))
             return config
     else:
         w_log('配置文件不存在')
