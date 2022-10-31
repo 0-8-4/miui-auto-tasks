@@ -76,7 +76,7 @@ def w_log(text):
 
 
 def s_log(flag):
-    if flag == True:
+    if flag:
         global logs
         folder = os.path.exists('./logs')
         if not folder:
