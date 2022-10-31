@@ -6,8 +6,8 @@ import dotenv, yaml
 from hashlib import md5
 from urllib.request import getproxies
 
-
 logs = ''
+CONFIG_VERSION_REQUIRE: str = 'v1.5.1'
 
 
 def md5_crypto(passwd: str) -> str:
@@ -35,6 +35,7 @@ def get_config() -> dict:
     config_path_legacy = dotenv.find_dotenv(filename='config.env')
     config_path_yaml = dotenv.find_dotenv(filename='config.yaml')
 
+    # the old legacy config
     if config_path_legacy:
         w_log('正在使用 ' + config_path_legacy + ' 作为配置文件')
         legacy_config = dotenv.dotenv_values(config_path_legacy)
@@ -54,15 +55,27 @@ def get_config() -> dict:
         else:
             config['logging'] = False
         return config
+
+    # the new version yaml config
     elif config_path_yaml:
         w_log('正在加载 ' + config_path_yaml + ' 配置文件')
         with open(config_path_yaml, "rb") as stream:
             try:
                 config = yaml.safe_load(stream)
+                config_version: str = config.get('version')
+
+                # check config file version
+                # if config version not meet the requirement
+                if CONFIG_VERSION_REQUIRE != config_version:
+                    w_log('配置文件版本和程序运行要求版本不匹配，请检查配置文件')
+                    w_log('配置文件版本: ' + config_version)
+                    w_log('运行程序配置版本要求: ' + CONFIG_VERSION_REQUIRE)
+                    exit(1)  # exit the program
+                w_log('配置文件已成功加载，文件版本 ' + config_version)
+
             except yaml.YAMLError as e:
                 w_log('配置文件载入错误')
                 w_log(e)
-            w_log('配置文件已成功加载，文件版本 ' + config.get('version'))
             return config
     else:
         w_log('配置文件不存在')
