@@ -1,10 +1,10 @@
 # -- coding:UTF-8 --
-from random import random
 import requests
 import time
 import json
 import hashlib
 
+from random import random
 from urllib import request
 from http import cookiejar
 
