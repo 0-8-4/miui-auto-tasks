@@ -338,23 +338,23 @@ class MIUITask:
             w_log(e)
             return False
 
-    def get_score(self) -> int:
+    def get_point(self) -> int:
         """
         这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
-        :return: 当前的内测分值
+        :return: 当前的成长值
         """
         headers = {
             'cookie': str(self.cookie)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/betaTest/score', headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers)
             r_json = response.json()
-            your_score = r_json['entity']
-            w_log('成功获取内测分,当前内测分：' + str(your_score))
-            return your_score
+            your_point = r_json['entity']['userGrowLevelInfo']['point']
+            w_log('成功获取成长值,当前成长值：' + str(your_point))
+            return your_point
         except Exception as e:
-            w_log('内测分获取失败')
+            w_log('成长值获取失败')
             process_exception(e)
 
 
@@ -412,6 +412,8 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
         miui_task.board_follow()
         random_sleep()
         miui_task.browse_user_page()
+        random_sleep()
+        miui_task.get_point()
 
 
 def main():
