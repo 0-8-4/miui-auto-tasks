@@ -386,7 +386,6 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
         miui_task.board_follow()
         random_sleep()
         miui_task.browse_user_page()
-        sleep_ten_sec_more()
 
 
 def main():
