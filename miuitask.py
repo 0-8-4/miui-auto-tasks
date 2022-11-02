@@ -3,12 +3,13 @@ import requests
 import time
 import json
 import hashlib
+import random
 
-from random import random
 from urllib import request
 from http import cookiejar
 
 from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config
+
 
 class MIUITask:
 
@@ -154,7 +155,9 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/api/community/board/follow?boardId=5462662&pathname=/mio/singleBoard&version=dev.1144', headers=headers)
+            response = requests.get(
+                'https://api.vip.miui.com/api/community/board/follow?boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
+                headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("加入小米圈子失败：Cookie无效")
@@ -172,7 +175,7 @@ class MIUITask:
         }
         try:
             response = requests.get('https://api.vip.miui.com/api/community/board/unfollow?'
-                                     'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144', headers=headers)
+                                    'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144', headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("退出小米圈子失败：Cookie无效")
@@ -331,6 +334,7 @@ class MIUITask:
             w_log('内测分获取失败')
             process_exception(e)
 
+
 def process_exception(e: Exception):
     """
     全局异常处理
@@ -348,46 +352,49 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
         miui_task.login_app()
         if carrot_pull:
             w_log("风险功能提示：正在进行社区拔萝卜")
-            randomSleep()
+            random_sleep()
             miui_task.carrot_pull()
         if check_in:
             w_log("风险功能提示：正在进行成长值签到")
-            randomSleep()
+            random_sleep()
             miui_task.check_in()
         w_log("正在完成浏览帖子10s任务，第一次")
-        sleepTenSecMore()
+        sleep_ten_sec_more()
         miui_task.browse_post()
         w_log("正在完成浏览帖子10s任务，第二次")
-        sleepTenSecMore()
+        sleep_ten_sec_more()
         miui_task.browse_post()
         w_log("正在完成浏览帖子10s任务，第三次")
-        sleepTenSecMore()
+        sleep_ten_sec_more()
         miui_task.browse_post()
         w_log("正在完成点赞任务")
         miui_task.thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.cancel_thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.cancel_thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.cancel_thumb_up()
-        randomSleep()
+        random_sleep()
         miui_task.board_unfollow()
-        randomSleep()
+        random_sleep()
         miui_task.board_follow()
-        randomSleep()
+        random_sleep()
         miui_task.browse_user_page()
-        sleepTenSecMore()
+        sleep_ten_sec_more()
 
-def randomSleep():
-    time.sleep(random.randint(1,9))
 
-def sleepTenSecMore():
-    time.sleep(random.randint(10,12))
+def random_sleep():
+    time.sleep(random.randint(1, 9))
+
+
+def sleep_ten_sec_more():
+    time.sleep(random.randint(10, 12))
+
 
 def main():
     w_log("MIUI-AUTO-TASK v1.5.1")
@@ -415,8 +422,10 @@ def main():
         time.sleep(5)
     s_log(config.get('logging'))
 
+
 def main_handler(event, context):
     main()
+
 
 if __name__ == "__main__":
     main()

@@ -6,3 +6,10 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+/inspectionProfiles/profiles_settings.xml
+/inspectionProfiles/Project_Default.xml
+/misc.xml
+/miui-auto-tasks.iml
+/modules.xml
+/other.xml
+/vcs.xml
