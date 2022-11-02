@@ -1,11 +1,11 @@
 import os
+import random
 import time
 import platform
 import dotenv, yaml
 
 from hashlib import md5
 from urllib.request import getproxies
-
 
 logs = ''
 
@@ -116,3 +116,11 @@ def format_config(config: dict) -> dict:
         else:
             i['device-id'] = None
     return config
+
+
+def random_sleep():
+    time.sleep(random.randint(1, 9))
+
+
+def sleep_ten_sec_more():
+    time.sleep(random.randint(10, 12))

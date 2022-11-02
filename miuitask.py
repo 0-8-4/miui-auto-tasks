@@ -8,7 +8,8 @@ import random
 from urllib import request
 from http import cookiejar
 
-from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config
+from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config, random_sleep, \
+    sleep_ten_sec_more
 
 
 class MIUITask:
@@ -386,14 +387,6 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
         random_sleep()
         miui_task.browse_user_page()
         sleep_ten_sec_more()
-
-
-def random_sleep():
-    time.sleep(random.randint(1, 9))
-
-
-def sleep_ten_sec_more():
-    time.sleep(random.randint(10, 12))
 
 
 def main():
