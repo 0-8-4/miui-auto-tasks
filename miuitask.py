@@ -179,7 +179,8 @@ class MIUITask:
         }
         try:
             response = requests.get(
-                'https://api.vip.miui.com/api/community/board/follow?boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
+                'https://api.vip.miui.com/api/community/board/follow?'
+                'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
                 headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
