@@ -11,13 +11,17 @@ accounts:
     check-in: false
     # 小米社区成长值签到，可能存在封号风险
     # 本脚本默认完成登录社区和三次点赞及三次浏览十秒帖子的成长值任务
+    browse-specialpage: false
+    # 小米社区在活动期间可能会出现限时的“浏览指定专题页”任务
+    # 考虑到安全问题，建议在存在该限时活动手动打开，活动结束时关闭
 # 若有多个小米账户，按照以下模板进行修改，使用时删除前端 #注释
 #  - uid: 100001
 #    password: abc123
 #    user-agent: 'Mozilla/5.0 (Android 11; Mobile; rv:95.0) Gecko/95.0 Firefox/95.0'
 #    carrot-pull: false
 #    check-in: false
+#    browse-specialpage: false
 logging: false
 # 归档日志到本地文件
-version: v1.5.1
+version: v1.5.2
 # config 文件版本号，debug用

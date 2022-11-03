@@ -8,7 +8,7 @@ from hashlib import md5
 from urllib.request import getproxies
 
 logs = ''
-CONFIG_VERSION_REQUIRE: str = 'v1.5.1'
+CONFIG_VERSION_REQUIRE: str = 'v1.5.2'
 
 
 def md5_crypto(passwd: str) -> str:
@@ -51,6 +51,10 @@ def get_config() -> dict:
             config['account'][0]['carrot-pull'] = True
         else:
             config['account'][0]['carrot-pull'] = False
+        if legacy_config.get('BROWSE_SPECIALPAGE') and legacy_config.get('BROWSE_SPECIALPAGE').upper() in ('Y', 'YES'):
+            config['account'][0]['browse-specialpage'] = True
+        else:
+            config['account'][0]['browse-specialpage'] = False
         if legacy_config.get('LOG_SAVE') and legacy_config.get('LOG_SAVE').upper() in ('Y', 'YES'):
             config['logging'] = True
         else:
@@ -110,6 +114,8 @@ def check_config(config: dict) -> bool:
             if not isinstance(i.get('check-in'), bool):
                 return False
             if not isinstance(i.get('carrot-pull'), bool):
+                return False
+            if not isinstance(i.get('browse-specialpage'), bool):
                 return False
     else:
         return False

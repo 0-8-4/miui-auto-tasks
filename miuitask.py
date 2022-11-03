@@ -3,7 +3,6 @@ import requests
 import time
 import json
 import hashlib
-import random
 
 from urllib import request
 from http import cookiejar
@@ -150,6 +149,29 @@ class MIUITask:
             w_log("浏览个人主页出错")
             w_log(e)
 
+    # 浏览指定专题页
+    def browse_specialpage(self):
+        headers = {
+            'cookie': str(self.cookie)
+        }
+        params = {
+            'userId': str(self.uid),
+            'action': 'BROWSE_SPECIAL_PAGES_SPECIAL_PAGE',
+        }
+        try:
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction', 
+                                    params=params, headers=headers)
+            r_json = response.json()
+            if r_json['status'] == 401:
+                return w_log("浏览专题页失败：Cookie无效")
+            elif r_json['status'] != 200:
+                return w_log("浏览专题页完成，但有错误：" + str(r_json['message']))
+            score = r_json['entity']['score']
+            w_log("浏览专题页完成，成长值+" + str(score))
+        except Exception as e:
+            w_log("浏览专题页出错")
+            w_log(e)
+
     # 加入小米圈子
     def board_follow(self):
         headers = {
@@ -157,7 +179,8 @@ class MIUITask:
         }
         try:
             response = requests.get(
-                'https://api.vip.miui.com/api/community/board/follow?boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
+                'https://api.vip.miui.com/api/community/board/follow?'
+                'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
                 headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
@@ -316,23 +339,23 @@ class MIUITask:
             w_log(e)
             return False
 
-    def get_score(self) -> int:
+    def get_point(self) -> int:
         """
         这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
-        :return: 当前的内测分值
+        :return: 当前的成长值
         """
         headers = {
             'cookie': str(self.cookie)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/betaTest/score', headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers)
             r_json = response.json()
-            your_score = r_json['entity']
-            w_log('成功获取内测分,当前内测分：' + str(your_score))
-            return your_score
+            your_point = r_json['entity']['userGrowLevelInfo']['point']
+            w_log('成功获取成长值,当前成长值：' + str(your_point))
+            return your_point
         except Exception as e:
-            w_log('内测分获取失败')
+            w_log('成长值获取失败')
             process_exception(e)
 
 
@@ -346,7 +369,7 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
+def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_specialpage: bool):
     if miui_task.mi_login():
         w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
@@ -359,6 +382,10 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
             w_log("风险功能提示：正在进行成长值签到")
             random_sleep()
             miui_task.check_in()
+        if browse_specialpage:
+            w_log("风险功能提示：正在完成浏览专题页10s任务")
+            sleep_ten_sec_more()
+            miui_task.browse_specialpage()
         w_log("正在完成浏览帖子10s任务，第一次")
         sleep_ten_sec_more()
         miui_task.browse_post()
@@ -386,10 +413,12 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool):
         miui_task.board_follow()
         random_sleep()
         miui_task.browse_user_page()
+        random_sleep()
+        miui_task.get_point()
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.5.1")
+    w_log("MIUI-AUTO-TASK v1.5.2")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
@@ -409,7 +438,7 @@ def main():
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('carrot-pull'),
+            i.get('check-in'), i.get('carrot-pull'), i.get('browse-specialpage'),
         )
         time.sleep(5)
     s_log(config.get('logging'))
