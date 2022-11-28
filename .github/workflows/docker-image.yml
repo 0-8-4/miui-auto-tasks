@@ -4,7 +4,7 @@
 # This script is used to automatically build docker image and
 # push to DockerHub when every new release is published
 
-name: Docker Image CI
+name: DockerHub CI
 
 on:
   release:
@@ -30,8 +30,8 @@ jobs:
         name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secret.DOCKERHUB_USERNAME }}
-          password: ${{ secret.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       -
         name: Build and push

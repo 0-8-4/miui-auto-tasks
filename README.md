@@ -1,14 +1,15 @@
 # MIUI Task
 一个适用于 小米社区 4.0 自动完成成长值任务的脚本
 
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) ![python](https://img.shields.io/badge/python-3.6+-blue)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) 
+![Python](https://img.shields.io/badge/python-3.7+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
 
 
 ## **关于项目**:
 
-  由 `東雲研究所` 的某位大佬编写  
-  由大佬授权 `0-8-4` 使用 `MIT` 开源   
-  `0-8-4` 和 `TardisLX` 会进行基础维护  
+  受`東雲研究所` 的某位大佬启发  
+  最初的源码由大佬授权 `0-8-4` 使用 `MIT` 开源   
+  项目初期由`0-8-4` 和 `TardisLX` 进行维护，现已逐渐转为社区驱动
   我们认为小米社区无权在无任何回报的情况下强制要求内测用户完成 KPI 任务，因此诞生了这个脚本
 
 
