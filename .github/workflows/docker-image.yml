@@ -4,7 +4,7 @@
 # This script is used to automatically build docker image and
 # push to DockerHub when every new release is published
 
-name: Docker Image CI
+name: DockerHub CI
 
 on:
   release:
