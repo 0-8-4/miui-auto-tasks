@@ -2,7 +2,7 @@
 一个适用于 小米社区 4.0 自动完成成长值任务的脚本
 
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) 
-![python](https://img.shields.io/badge/python-3.6+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.7+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
 
 
 ## **关于项目**:
