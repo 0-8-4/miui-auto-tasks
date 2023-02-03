@@ -111,6 +111,7 @@ class MIUITask:
         params = {
             'userId': str(self.uid),
             'action': 'BROWSE_POST_10S',
+            'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction',
@@ -134,6 +135,7 @@ class MIUITask:
         params = {
             'userId': str(self.uid),
             'action': 'BROWSE_SPECIAL_PAGES_USER_HOME',
+            'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction',
@@ -157,6 +159,7 @@ class MIUITask:
         params = {
             'userId': str(self.uid),
             'action': 'BROWSE_SPECIAL_PAGES_SPECIAL_PAGE',
+            'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction', 
@@ -240,10 +243,13 @@ class MIUITask:
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
             'cookie': str(self.cookie)
         }
+        params = {
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
         try:
             response = requests.get(
                 'https://api.vip.miui.com/mtop/planet/vip/user/checkin?pathname=/mio/checkIn&version=dev.1144',
-                headers=headers)
+                headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("社区成长值签到失败：Cookie无效")
@@ -260,8 +266,11 @@ class MIUITask:
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
             'cookie': str(self.cookie)
         }
+        params = {
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers,params=params)
             r_code = response.status_code
             if r_code == 401:
                 return w_log("登录社区App失败：Cookie无效")
@@ -348,8 +357,11 @@ class MIUITask:
         headers = {
             'cookie': str(self.cookie)
         }
+        params = {
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers,params=params)
             r_json = response.json()
             your_point = r_json['entity']['userGrowLevelInfo']['point']
             w_log('成功获取成长值,当前成长值：' + str(your_point))
