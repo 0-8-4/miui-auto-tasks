@@ -358,12 +358,13 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
+            'userId': str(self.uid),
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers,params=params)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData', headers=headers,params=params)
             r_json = response.json()
-            your_point = r_json['entity']['userGrowLevelInfo']['point']
+            your_point = r_json['entity'][1]['data'][0]['title']
             w_log('成功获取成长值,当前成长值：' + str(your_point))
             return your_point
         except Exception as e:
@@ -386,6 +387,7 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
         w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
         miui_task.login_app()
+        '''
         if carrot_pull:
             w_log("风险功能提示：正在进行社区拔萝卜")
             random_sleep()
@@ -426,6 +428,7 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
         random_sleep()
         miui_task.browse_user_page()
         random_sleep()
+        '''
         miui_task.get_point()
 
 
