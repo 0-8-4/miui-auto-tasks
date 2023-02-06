@@ -387,7 +387,6 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
         w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
         w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
         miui_task.login_app()
-        '''
         if carrot_pull:
             w_log("风险功能提示：正在进行社区拔萝卜")
             random_sleep()
@@ -428,7 +427,6 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
         random_sleep()
         miui_task.browse_user_page()
         random_sleep()
-        '''
         miui_task.get_point()
 
 
