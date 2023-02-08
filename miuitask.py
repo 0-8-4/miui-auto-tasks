@@ -1,8 +1,9 @@
 # -- coding:UTF-8 --
-import requests
+import re
 import time
 import json
 import hashlib
+import requests
 
 from urllib import request
 from http import cookiejar
@@ -358,12 +359,13 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
+            'userId': str(self.uid),
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/pc/post/userInfo', headers=headers,params=params)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData', headers=headers,params=params)
             r_json = response.json()
-            your_point = r_json['entity']['userGrowLevelInfo']['point']
+            your_point = re.findall(r"'title': '成长值'.*'title': '(\d+)'.*'title': '/'", str(r_json['entity']))[0]
             w_log('成功获取成长值,当前成长值：' + str(your_point))
             return your_point
         except Exception as e:
