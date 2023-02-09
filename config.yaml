@@ -21,6 +21,14 @@ accounts:
 #    carrot-pull: false
 #    check-in: false
 #    browse-specialpage: false
+ONEPUSH:
+  notifier: telegram
+  params:
+    title: 
+    markdown: false
+    token: 123456789:XXXXXXXXXXXXXXXXXXXXXXXX
+    userid: 114514
+    
 logging: false
 # 归档日志到本地文件
 version: v1.5.2
