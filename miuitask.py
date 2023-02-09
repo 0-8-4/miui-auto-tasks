@@ -9,7 +9,7 @@ from urllib import request
 from http import cookiejar
 
 from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config, random_sleep, \
-    sleep_ten_sec_more
+    sleep_ten_sec_more, notify_me
 
 
 class MIUITask:
@@ -447,7 +447,7 @@ def main():
         exit(1)
     else:
         config = format_config(config)
-
+        
     for i in config.get('accounts'):
         w_log('---------- EXECUTING -------------')
         start(
@@ -456,11 +456,10 @@ def main():
         )
         time.sleep(5)
     s_log(config.get('logging'))
-
+    notify_me()
 
 def main_handler(event, context):
     main()
-
 
 if __name__ == "__main__":
     main()
