@@ -56,6 +56,82 @@
 &#x26A0; 请注意，修改配置文件开启完成限时专题任务后 MIUI Task 不会检测当前是否可完成限时专题任务而会直接发送请求，根据社区相关规则，启用完成限时专题任务、拔萝卜及签到等可能存在风险。您需要自行承担使用本脚本的后果
 
 
+### **配置推送**：
+推送基于[onepush](https://github.com/y1ndan/onepush)
+- 推送名称 / notifier: bark
+
+  参数大全 / params:
+  {'required': ['key'], 'optional': ['title', 'sound', 'isarchive', 'icon', 'group', 'url', 'copy', 'autocopy']}
+
+- 推送名称 / notifier: custom
+
+  参数大全 / params:
+  {'required': ['url'], 'optional': ['method', 'datatype', 'data']}
+
+- 推送名称 / notifier: dingtalk
+
+  参数大全 / params:
+  {'required': ['token'], 'optional': ['title', 'secret', 'markdown']}
+
+- 推送名称 / notifier: discord
+
+  参数大全 / params:
+  {'required': ['webhook'], 'optional': ['title', 'username', 'avatar_url', 'color']}
+
+- 推送名称 / notifier: pushplus
+
+  参数大全 / params:
+  {'required': ['token'], 'optional': ['title', 'topic', 'markdown']}
+
+- 推送名称 / notifier: qmsg
+
+  参数大全 / params:
+  {'required': ['key'], 'optional': ['title', 'mode', 'qq']}
+
+- 推送名称 / notifier: serverchan
+
+  参数大全 / params:
+  {'required': ['sckey', 'title'], 'optional': []}
+
+- 推送名称 / notifier: serverchanturbo
+
+  参数大全 / params:
+  {'required': ['sctkey', 'title'], 'optional': ['channel', 'openid']}
+
+- 推送名称 / notifier: telegram
+
+  参数大全 / params:
+  {'required': ['token', 'userid'], 'optional': ['title', 'api_url']}
+
+- 推送名称 / notifier: wechatworkapp
+
+  参数大全 / params:
+  {'required': ['corpid', 'corpsecret', 'agentid'], 'optional': ['title', 'touser', 'markdown']}
+
+- 推送名称 / notifier: wechatworkbot
+
+  参数大全 / params:
+  {'required': ['key'], 'optional': ['title', 'markdown']}
+* **required为必填参数，optional为选填参数**
+
+配置参考：
+```yaml
+ONEPUSH:
+  notifier: telegram
+  params:
+    title: 
+    markdown: false
+    token: 123456789:XXXXXXXXXXXXXXXXXXXXXXXX
+    userid: 114514
+```
+```yaml
+ONEPUSH:
+  notifier: pushplus
+  params:
+    title: 
+    token: XXXXXXXXXXXXXXXXXXXXXXXX
+    markdown: false
+```
 #### **其他**：  
 * 在使用本脚本时请临时关闭网络代理工具及广告拦截程序  
 * 在服务器上使用前建议先使用服务器IP登录 `https://account.xiaomi.com`  
