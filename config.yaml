@@ -24,11 +24,11 @@ accounts:
 ONEPUSH:
   notifier: telegram
   params:
-    title: 
+    title:
     markdown: false
-    token: 
-    userid: 
-    
+    token:
+    userid:
+
 logging: false
 # 归档日志到本地文件
 version: v1.5.2
