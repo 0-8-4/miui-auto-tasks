@@ -2,7 +2,8 @@ import os
 import random
 import time
 import platform
-import dotenv, yaml
+import dotenv
+import yaml
 
 from hashlib import md5
 from onepush import notify
@@ -151,19 +152,20 @@ def random_sleep():
 def sleep_ten_sec_more():
     time.sleep(random.randint(10, 12))
 
-def notify_me(content = None):
-    '''
+
+def notify_me(content=None):
+    """
     默认推送日志
-    '''
+    """
     global message
     global config
     if not content:
         content = message
-    notifier = config.get('ONEPUSH',{}).get('notifier','')
-    params = config.get('ONEPUSH',{}).get('params','')
+    notifier = config.get('ONEPUSH', {}).get('notifier', '')
+    params = config.get('ONEPUSH', {}).get('params', '')
     if not notifier or not params:
         s_log('未配置推送或未正确配置推送')
         return
-    if not config.get('ONEPUSH',{}).get('title',''):
+    if not config.get('ONEPUSH', {}).get('title', ''):
         config['ONEPUSH']['title'] = ''
     return notify(notifier, content=content, **params)

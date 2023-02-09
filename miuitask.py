@@ -458,8 +458,10 @@ def main():
     s_log(config.get('logging'))
     notify_me()
 
+
 def main_handler(event, context):
     main()
+
 
 if __name__ == "__main__":
     main()
