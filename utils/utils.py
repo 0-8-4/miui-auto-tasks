@@ -5,9 +5,12 @@ import platform
 import dotenv, yaml
 
 from hashlib import md5
+from onepush import notify
 from urllib.request import getproxies
 
 logs = ''
+message = ''
+config = {'account': []}
 CONFIG_VERSION_REQUIRE: str = 'v1.5.2'
 
 
@@ -32,7 +35,7 @@ def system_info():
 
 
 def get_config() -> dict:
-    config = {'account': []}
+    global config
     config_path_legacy = dotenv.find_dotenv(filename='config.env')
     config_path_yaml = dotenv.find_dotenv(filename='config.yaml')
 
@@ -89,8 +92,10 @@ def get_config() -> dict:
 
 def w_log(text):
     global logs
+    global message
     now_localtime = time.strftime("%H:%M:%S", time.localtime())
     logs += now_localtime + ' | ' + str(text) + '\n'
+    message += str(text) + '\n'
     print(now_localtime + ' | ' + str(text))
 
 
@@ -145,3 +150,20 @@ def random_sleep():
 
 def sleep_ten_sec_more():
     time.sleep(random.randint(10, 12))
+
+def notify_me(content = None):
+    '''
+    默认推送日志
+    '''
+    global message
+    global config
+    if not content:
+        content = message
+    notifier = config.get('ONEPUSH',{}).get('notifier','')
+    params = config.get('ONEPUSH',{}).get('params','')
+    if not notifier or not params:
+        s_log('未配置推送或未正确配置推送')
+        return
+    if not config.get('ONEPUSH',{}).get('title',''):
+        config['ONEPUSH']['title'] = ''
+    return notify(notifier, content=content, **params)
