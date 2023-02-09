@@ -26,8 +26,8 @@ ONEPUSH:
   params:
     title: 
     markdown: false
-    token: 123456789:XXXXXXXXXXXXXXXXXXXXXXXX
-    userid: 114514
+    token: 
+    userid: 
     
 logging: false
 # 归档日志到本地文件
