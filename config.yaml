@@ -31,5 +31,5 @@ ONEPUSH:
 
 logging: false
 # 归档日志到本地文件
-version: v1.5.2
+version: v1.5.3
 # config 文件版本号，debug用
