@@ -432,7 +432,7 @@ def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_special
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.5.2")
+    w_log("MIUI-AUTO-TASK v1.5.3")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
