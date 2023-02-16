@@ -71,7 +71,7 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/api/community/post/cancelThumbUp?postId=36625780',
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp?postId=36625780',
                                     headers=headers)
             r_json = response.json()
             if r_json['code'] == 401:
