@@ -4,6 +4,7 @@
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) 
 ![Python](https://img.shields.io/badge/python-3.7+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
 
+## 我们收到反馈，部分用户已收到通知要求不得继续随意调用社区接口，否则社区账户将被永久封禁。<br/>鉴于以上情况，我们作为项目维护者建议停用脚本。<br/>感谢大家的支持，谢谢所有Star和Fork的人。
 
 ## **关于项目**:
 
