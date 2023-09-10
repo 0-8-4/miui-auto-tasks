@@ -12,7 +12,7 @@ from urllib.request import getproxies
 logs = ''
 message = ''
 config = {'account': []}
-CONFIG_VERSION_REQUIRE: str = 'v1.5.3'
+CONFIG_VERSION_REQUIRE: str = 'v1.6.0'
 
 
 def md5_crypto(passwd: str) -> str:
@@ -119,9 +119,17 @@ def check_config(config: dict) -> bool:
                 return False
             if not isinstance(i.get('check-in'), bool):
                 return False
-            if not isinstance(i.get('carrot-pull'), bool):
+            if not isinstance(i.get('browse-user-page'), bool):
+                return False
+            if not isinstance(i.get('browse-post'), bool):
+                return False
+            if not isinstance(i.get('thumb-up'), bool):
                 return False
             if not isinstance(i.get('browse-specialpage'), bool):
+                return False
+            if not isinstance(i.get('board-follow'), bool):
+                return False
+            if not isinstance(i.get('carrot-pull'), bool):
                 return False
     else:
         return False
