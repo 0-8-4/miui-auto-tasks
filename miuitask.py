@@ -1,12 +1,13 @@
 # -- coding:UTF-8 --
 import re
+import requests
 import time
 import json
 import hashlib
-import requests
 
 from urllib import request
 from http import cookiejar
+from typing import Any
 
 from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config, random_sleep, \
     sleep_ten_sec_more, notify_me
@@ -53,8 +54,7 @@ class MIUITask:
             'timestamp': sign[1]
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp', headers=headers,
-                                    params=data)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp', headers=headers,params=data)
             r_json = response.json()
             if r_json['code'] == 401:
                 return w_log("点赞失败：Cookie无效")
@@ -70,9 +70,11 @@ class MIUITask:
         headers = {
             'cookie': str(self.cookie)
         }
+        data = {
+            'postId': '36625780'
+        }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp?postId=36625780',
-                                    headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp', headers=headers,params=data)
             r_json = response.json()
             if r_json['code'] == 401:
                 return w_log("取消点赞失败：Cookie无效")
@@ -181,11 +183,15 @@ class MIUITask:
         headers = {
             'cookie': str(self.cookie)
         }
+        params = {
+            'boardId': '558495',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
         try:
-            response = requests.get(
+            response = requests.post(
                 'https://api.vip.miui.com/api/community/board/follow?'
-                'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144',
-                headers=headers)
+                '&pathname=/mio/allboard&version=dev.20051',
+                headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("加入小米圈子失败：Cookie无效")
@@ -201,9 +207,13 @@ class MIUITask:
         headers = {
             'cookie': str(self.cookie)
         }
+        params = {
+            'boardId': '558495',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
         try:
-            response = requests.get('https://api.vip.miui.com/api/community/board/unfollow?'
-                                    'boardId=5462662&pathname=/mio/singleBoard&version=dev.1144', headers=headers)
+            response = requests.post('https://api.vip.miui.com/api/community/board/unfollow?'
+                                    '&pathname=/mio/allboard&version=dev.20051', headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("退出小米圈子失败：Cookie无效")
@@ -238,7 +248,7 @@ class MIUITask:
             w_log("社区拔萝卜出错")
             w_log(e)
 
-    # 社区4.0签到
+    # 每日签到
     def check_in(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -253,15 +263,15 @@ class MIUITask:
                 headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
-                return w_log("社区成长值签到失败：Cookie无效")
+                return w_log("每日签到失败：Cookie无效")
             elif r_json['status'] != 200:
-                return w_log("社区成长值签到失败：" + str(r_json['message']))
-            w_log("社区成长值签到结果：成长值+" + str(r_json['entity']))
+                return w_log("每日签到失败：" + str(r_json['message']))
+            w_log("每日签到结果：成长值+" + str(r_json['entity']))
         except Exception as e:
-            w_log("社区成长值签到出错")
+            w_log("每日签到出错")
             w_log(e)
 
-    # 登录社区App
+    # 登录社区
     def login_app(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -274,12 +284,12 @@ class MIUITask:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers,params=params)
             r_code = response.status_code
             if r_code == 401:
-                return w_log("登录社区App失败：Cookie无效")
+                return w_log("登录社区失败：Cookie无效")
             elif r_code != 200:
-                return w_log("登录社区App失败")
-            w_log("登录社区App成功")
+                return w_log("登录社区失败")
+            w_log("登录社区成功")
         except Exception as e:
-            w_log("登录社区App出错")
+            w_log("登录社区出错")
             w_log(e)
 
     def mi_login(self):
@@ -349,7 +359,35 @@ class MIUITask:
             w_log(e)
             return False
 
-    def get_point(self) -> int:
+    def check_daily_tasks(self):
+        headers = {
+        'cookie': str(self.cookie)
+        }
+        try:
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList', headers=headers)
+            r_json = response.json()
+            if r_json['status'] != 200:
+                w_log("获取每日任务状态失败：" + str(r_json['message']))
+                return None
+
+            tasks = r_json['entity']
+            task_status = {}
+            for task in tasks:
+                if task['head']['title'] == "每日任务":
+                    for daily_task in task['data']:
+                        task_status[daily_task['title']] = daily_task['showType']
+                        task_name = daily_task['title']
+                        task_completion_status = "完成" if daily_task['showType'] == 0 else "未完成"
+                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status))
+
+            return task_status
+
+        except Exception as e:
+            w_log("获取信息出错")
+            w_log(e)
+            return None
+
+    def get_point(self) -> tuple[Any, Any]:
         """
         这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
@@ -363,13 +401,18 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData', headers=headers,params=params)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData', headers=headers, params=params)
             r_json = response.json()
+        
             your_point = re.findall(r"'title': '成长值'.*'title': '(\d+)'.*'title': '/'", str(r_json['entity']))[0]
-            w_log('成功获取成长值,当前成长值：' + str(your_point))
-            return your_point
+            your_level = re.findall(r"'title': '(\d+段)', 'desc': '当前等级'", str(r_json['entity']))[0]
+        
+            w_log('当前等级：' + str(your_level) + ', 当前成长值：' + str(your_point))
+        
+            return your_point, your_level
         except Exception as e:
-            w_log('成长值获取失败')
+            w_log('成长值和等级获取失败')
+            w_log(e)
             process_exception(e)
 
 
@@ -383,59 +426,76 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool, carrot_pull: bool, browse_specialpage: bool):
+def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_page: bool, thumb_up: bool, browse_specialpage: bool, board_follow: bool, carrot_pull: bool):
     if miui_task.mi_login():
-        w_log("本脚本支持社区拔萝卜及成长值签到，因该功能存在风险默认禁用")
-        w_log("如您愿意承担一切可能的后果，可编辑配置文件手动打开该功能")
+        w_log("本脚本用于模拟网络请求测试，仅供测试学习使用，禁止用于其他用途")
+        w_log("本脚本默认不做任何操作，如您愿意承担一切可能的后果，可编辑配置文件手动打开需要的功能")
+        w_log("为避免重复模拟请求，脚本将自动获取状态并决定是否继续模拟网络请求")
         miui_task.login_app()
+        task_status = miui_task.check_daily_tasks()
+        if task_status is None:
+            w_log("无法获取状态，将跳过多数模拟请求功能")
+        else:
+            if "每日签到" in task_status and task_status.get("每日签到", 1) == 1 and check_in:
+                w_log("模拟请求「每日签到」")
+                random_sleep()
+                miui_task.check_in()
+            else:
+                w_log("自动跳过模拟请求「每日签到」")
+
+            if "浏览帖子超过10秒" in task_status and task_status.get("浏览帖子超过10秒", 1) == 1 and browse_post:
+                w_log("模拟请求「浏览帖子超过10秒」")
+                sleep_ten_sec_more()
+                miui_task.browse_post()
+            else:
+                w_log("自动跳过模拟请求「浏览帖子超过10秒」")
+
+            if "浏览个人/他人主页超过10秒" in task_status and task_status.get("浏览个人/他人主页超过10秒", 1) == 1 and browse_user_page:
+                w_log("模拟请求「浏览个人/他人主页超过10秒」")
+                sleep_ten_sec_more()
+                miui_task.browse_user_page()
+            else:
+                w_log("自动跳过模拟请求「浏览个人/他人主页超过10秒」")
+
+            if "点赞他人帖子" in task_status and task_status.get("点赞他人帖子", 1) == 1 and thumb_up:
+                w_log("模拟请求「点赞他人帖子」")
+                random_sleep()
+                miui_task.thumb_up()
+                random_sleep()
+                miui_task.cancel_thumb_up()
+            else:
+                w_log("自动跳过模拟请求「点赞他人帖子」")
+
+            if "浏览指定专题页" in task_status and task_status.get("浏览指定专题页", 1) == 1 and browse_specialpage:
+                w_log("模拟请求「浏览指定专题页」")
+                sleep_ten_sec_more()
+                miui_task.browse_specialpage()
+            else:
+                w_log("自动跳过模拟请求「浏览指定专题页」")
+
+            if "加入小米社区圈子" in task_status and task_status.get("加入小米社区圈子", 1) == 1 and board_follow:
+                w_log("模拟请求「加入小米社区圈子」")
+                random_sleep()
+                miui_task.board_follow()
+                random_sleep()
+                miui_task.board_unfollow()
+            else:
+                w_log("自动跳过模拟请求「加入小米社区圈子」")
+        w_log("请注意，未在配置文件启用或不需要执行的功能请求将被自动跳过，且不会支持“灌水”的功能")
         if carrot_pull:
-            w_log("风险功能提示：正在进行社区拔萝卜")
+            w_log("模拟请求「社区拔萝卜」")
             random_sleep()
             miui_task.carrot_pull()
-        if check_in:
-            w_log("风险功能提示：正在进行成长值签到")
-            random_sleep()
-            miui_task.check_in()
-        if browse_specialpage:
-            w_log("风险功能提示：正在完成浏览专题页10s任务")
-            sleep_ten_sec_more()
-            miui_task.browse_specialpage()
-        w_log("正在完成浏览帖子10s任务，第一次")
-        sleep_ten_sec_more()
-        miui_task.browse_post()
-        w_log("正在完成浏览帖子10s任务，第二次")
-        sleep_ten_sec_more()
-        miui_task.browse_post()
-        w_log("正在完成浏览帖子10s任务，第三次")
-        sleep_ten_sec_more()
-        miui_task.browse_post()
-        w_log("正在完成点赞任务")
-        miui_task.thumb_up()
-        random_sleep()
-        miui_task.cancel_thumb_up()
-        random_sleep()
-        miui_task.thumb_up()
-        random_sleep()
-        miui_task.cancel_thumb_up()
-        random_sleep()
-        miui_task.thumb_up()
-        random_sleep()
-        miui_task.cancel_thumb_up()
-        random_sleep()
-        miui_task.board_unfollow()
-        random_sleep()
-        miui_task.board_follow()
-        random_sleep()
-        miui_task.browse_user_page()
         random_sleep()
         miui_task.get_point()
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.5.3")
+    w_log("MIUI-AUTO-TASK v1.6.0")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
+    w_log("这是一个免费且开源的项目，如果你是付费购买获得请务必退款")
     w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     w_log("欢迎 star，感谢東雲研究所中的大佬")
     w_log('---------- 配置检测 -------------')
@@ -452,7 +512,7 @@ def main():
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('carrot-pull'), i.get('browse-specialpage'),
+            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'), i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
         )
         time.sleep(5)
     s_log(config.get('logging'))
