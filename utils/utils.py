@@ -40,33 +40,8 @@ def get_config() -> dict:
     config_path_legacy = dotenv.find_dotenv(filename='config.env')
     config_path_yaml = dotenv.find_dotenv(filename='config.yaml')
 
-    # the old legacy config
-    if config_path_legacy:
-        w_log('正在使用 ' + config_path_legacy + ' 作为配置文件')
-        legacy_config = dotenv.dotenv_values(config_path_legacy)
-        config['account'].append({'uid': legacy_config.get('MI_ID')})
-        config['account'][0]['password'] = legacy_config.get('MI_PASSWORD')
-        config['account'][0]['user-agent'] = legacy_config.get('USER_AGENT')
-        if legacy_config.get('SIGN_IN') and legacy_config.get('SIGN_IN').upper() in ('Y', 'YES'):
-            config['account'][0]['check-in'] = True
-        else:
-            config['account'][0]['check-in'] = False
-        if legacy_config.get('CARROT_PULL') and legacy_config.get('CARROT_PULL').upper() in ('Y', 'YES'):
-            config['account'][0]['carrot-pull'] = True
-        else:
-            config['account'][0]['carrot-pull'] = False
-        if legacy_config.get('BROWSE_SPECIALPAGE') and legacy_config.get('BROWSE_SPECIALPAGE').upper() in ('Y', 'YES'):
-            config['account'][0]['browse-specialpage'] = True
-        else:
-            config['account'][0]['browse-specialpage'] = False
-        if legacy_config.get('LOG_SAVE') and legacy_config.get('LOG_SAVE').upper() in ('Y', 'YES'):
-            config['logging'] = True
-        else:
-            config['logging'] = False
-        return config
-
-    # the new version yaml config
-    elif config_path_yaml:
+    # yaml config
+    if config_path_yaml:
         w_log('正在加载 ' + config_path_yaml + ' 配置文件')
         with open(config_path_yaml, "rb") as stream:
             try:

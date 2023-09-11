@@ -7,6 +7,7 @@ import hashlib
 
 from urllib import request
 from http import cookiejar
+from typing import Any
 
 from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config, random_sleep, \
     sleep_ten_sec_more, notify_me
@@ -187,7 +188,7 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get(
+            response = requests.post(
                 'https://api.vip.miui.com/api/community/board/follow?'
                 '&pathname=/mio/allboard&version=dev.20051',
                 headers=headers,params=params)
@@ -211,7 +212,7 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/api/community/board/unfollow?'
+            response = requests.post('https://api.vip.miui.com/api/community/board/unfollow?'
                                     '&pathname=/mio/allboard&version=dev.20051', headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
@@ -247,7 +248,7 @@ class MIUITask:
             w_log("社区拔萝卜出错")
             w_log(e)
 
-    # 社区4.0签到
+    # 每日签到
     def check_in(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -262,15 +263,15 @@ class MIUITask:
                 headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
-                return w_log("社区成长值签到失败：Cookie无效")
+                return w_log("每日签到失败：Cookie无效")
             elif r_json['status'] != 200:
-                return w_log("社区成长值签到失败：" + str(r_json['message']))
-            w_log("社区成长值签到结果：成长值+" + str(r_json['entity']))
+                return w_log("每日签到失败：" + str(r_json['message']))
+            w_log("每日签到结果：成长值+" + str(r_json['entity']))
         except Exception as e:
-            w_log("社区成长值签到出错")
+            w_log("每日签到出错")
             w_log(e)
 
-    # 登录社区App
+    # 登录社区
     def login_app(self):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -283,12 +284,12 @@ class MIUITask:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers,params=params)
             r_code = response.status_code
             if r_code == 401:
-                return w_log("登录社区App失败：Cookie无效")
+                return w_log("登录社区失败：Cookie无效")
             elif r_code != 200:
-                return w_log("登录社区App失败")
-            w_log("登录社区App成功")
+                return w_log("登录社区失败")
+            w_log("登录社区成功")
         except Exception as e:
-            w_log("登录社区App出错")
+            w_log("登录社区出错")
             w_log(e)
 
     def mi_login(self):
@@ -377,17 +378,16 @@ class MIUITask:
                         task_status[daily_task['title']] = daily_task['showType']
                         task_name = daily_task['title']
                         task_completion_status = "完成" if daily_task['showType'] == 0 else "未完成"
-                        w_log("成功获取任务状态: 任务：" + str(task_name) + ", 状态：" + str(task_completion_status))
+                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status))
 
             return task_status
 
         except Exception as e:
-            w_log("获取每日任务状态出错")
+            w_log("获取信息出错")
             w_log(e)
             return None
 
-
-    def get_point(self) -> int:
+    def get_point(self) -> tuple[Any, Any]:
         """
         这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
@@ -407,7 +407,7 @@ class MIUITask:
             your_point = re.findall(r"'title': '成长值'.*'title': '(\d+)'.*'title': '/'", str(r_json['entity']))[0]
             your_level = re.findall(r"'title': '(\d+段)', 'desc': '当前等级'", str(r_json['entity']))[0]
         
-            w_log('成功获取信息, 当前等级：' + str(your_level) + ', 当前成长值：' + str(your_point))
+            w_log('当前等级：' + str(your_level) + ', 当前成长值：' + str(your_point))
         
             return your_point, your_level
         except Exception as e:
@@ -434,55 +434,56 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
         miui_task.login_app()
         task_status = miui_task.check_daily_tasks()
         if task_status is None:
-            w_log("无法获取状态，跳过多数模拟请求功能")
+            w_log("无法获取状态，将跳过多数模拟请求功能")
         else:
             if "每日签到" in task_status and task_status.get("每日签到", 1) == 1 and check_in:
-                w_log("风险功能提示：正在模拟请求成长值签到")
+                w_log("模拟请求「每日签到」")
                 random_sleep()
                 miui_task.check_in()
             else:
-                w_log("每日签到任务不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「每日签到」")
 
             if "浏览帖子超过10秒" in task_status and task_status.get("浏览帖子超过10秒", 1) == 1 and browse_post:
-                w_log("正在模拟请求浏览帖子超过10秒")
+                w_log("模拟请求「浏览帖子超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_post()
             else:
-                w_log("浏览帖子超过10秒任务不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「浏览帖子超过10秒」")
 
             if "浏览个人/他人主页超过10秒" in task_status and task_status.get("浏览个人/他人主页超过10秒", 1) == 1 and browse_user_page:
-                w_log("正在模拟请求浏览个人/他人主页超过10秒")
+                w_log("模拟请求「浏览个人/他人主页超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_user_page()
             else:
-                w_log("浏览个人/他人主页超过10秒任务不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「浏览个人/他人主页超过10秒」")
 
             if "点赞他人帖子" in task_status and task_status.get("点赞他人帖子", 1) == 1 and thumb_up:
-                w_log("正在模拟请求点赞")
+                w_log("模拟请求「点赞他人帖子」")
                 random_sleep()
                 miui_task.thumb_up()
                 random_sleep()
                 miui_task.cancel_thumb_up()
             else:
-                w_log("点赞他人帖子不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「点赞他人帖子」")
 
             if "浏览指定专题页" in task_status and task_status.get("浏览指定专题页", 1) == 1 and browse_specialpage:
-                w_log("正在模拟请求浏览指定专题页")
+                w_log("模拟请求「浏览指定专题页」")
                 sleep_ten_sec_more()
                 miui_task.browse_specialpage()
             else:
-                w_log("浏览指定专题页任务不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「浏览指定专题页」")
 
             if "加入小米社区圈子" in task_status and task_status.get("加入小米社区圈子", 1) == 1 and board_follow:
-                w_log("正在模拟请求加入小米社区圈子")
+                w_log("模拟请求「加入小米社区圈子」")
                 random_sleep()
                 miui_task.board_follow()
                 random_sleep()
                 miui_task.board_unfollow()
             else:
-                w_log("加入小米社区圈子任务不存在、已模拟过请求或配置文件中功能未启用，跳过")
+                w_log("自动跳过模拟请求「加入小米社区圈子」")
+        w_log("请注意，未在配置文件启用或不需要执行的功能请求将被自动跳过，且不会支持“灌水”的功能")
         if carrot_pull:
-            w_log("风险功能提示：正在模拟请求进行社区拔萝卜")
+            w_log("模拟请求「社区拔萝卜」")
             random_sleep()
             miui_task.carrot_pull()
         random_sleep()
@@ -494,6 +495,7 @@ def main():
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
+    w_log("这是一个免费且开源的项目，如果你是付费购买获得请务必退款")
     w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
     w_log("欢迎 star，感谢東雲研究所中的大佬")
     w_log('---------- 配置检测 -------------')
