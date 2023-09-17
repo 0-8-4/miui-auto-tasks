@@ -7,7 +7,7 @@ import hashlib
 
 from urllib import request
 from http import cookiejar
-from typing import Any
+from typing import Any, Tuple
 
 from utils.utils import system_info, get_config, w_log, s_log, check_config, format_config, random_sleep, \
     sleep_ten_sec_more, notify_me
@@ -387,7 +387,7 @@ class MIUITask:
             w_log(e)
             return None
 
-    def get_point(self) -> tuple[Any, Any]:
+    def get_point(self) -> Tuple[Any, Any]:
         """
         这个方法带返回值的原因是，可以调用这个方法获取返回值，可根据这个方法定制自己的“消息提示功能”。
         如：Qmsg发送到QQ 或者 发送邮件提醒
@@ -491,7 +491,7 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.6.0")
+    w_log("MIUI-AUTO-TASK v1.6.0.1")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
