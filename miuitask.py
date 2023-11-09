@@ -151,7 +151,7 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
                                     params=params, headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
