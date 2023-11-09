@@ -259,7 +259,7 @@ class MIUITask:
         }
         try:
             response = requests.post(
-                'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2?ref=vipAccountShortcut&pathname=/mio/checkIn&version=dev.231107&device=2206122SC',
+                'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2?ref=vipAccountShortcut&pathname=/mio/checkIn&version=dev.231107',
                 headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
