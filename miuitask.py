@@ -54,7 +54,8 @@ class MIUITask:
             'timestamp': sign[1]
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp', headers=headers,params=data)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp', headers=headers,
+                                    params=data)
             r_json = response.json()
             if r_json['code'] == 401:
                 return w_log("点赞失败：Cookie无效")
@@ -74,7 +75,8 @@ class MIUITask:
             'postId': '36625780'
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp', headers=headers,params=data)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp',
+                                    headers=headers, params=data)
             r_json = response.json()
             if r_json['code'] == 401:
                 return w_log("取消点赞失败：Cookie无效")
@@ -122,8 +124,9 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
-                                    params=params, headers=headers, data=data)
+            response = requests.post(
+                'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+                params=params, headers=headers, data=data)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("浏览帖子失败：Cookie无效")
@@ -151,8 +154,9 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
-                                    params=params, headers=headers)
+            response = requests.post(
+                'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+                params=params, headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("浏览个人主页失败：Cookie无效")
@@ -180,8 +184,9 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2', 
-                                    params=params, headers=headers, data=data)
+            response = requests.post(
+                'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+                params=params, headers=headers, data=data)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("浏览专题页失败：Cookie无效")
@@ -206,7 +211,7 @@ class MIUITask:
             response = requests.post(
                 'https://api.vip.miui.com/api/community/board/follow?'
                 '&pathname=/mio/allboard&version=dev.20051',
-                headers=headers,params=params)
+                headers=headers, params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("加入小米圈子失败：Cookie无效")
@@ -228,7 +233,7 @@ class MIUITask:
         }
         try:
             response = requests.post('https://api.vip.miui.com/api/community/board/unfollow?'
-                                    '&pathname=/mio/allboard&version=dev.20051', headers=headers,params=params)
+                                     '&pathname=/mio/allboard&version=dev.20051', headers=headers, params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("退出小米圈子失败：Cookie无效")
@@ -278,7 +283,7 @@ class MIUITask:
         try:
             response = requests.post(
                 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2',
-                headers=headers,params=params)
+                headers=headers, params=params)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("每日签到失败：Cookie无效")
@@ -299,7 +304,8 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers,params=params)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/app/init/start/infos', headers=headers,
+                                    params=params)
             r_code = response.status_code
             if r_code == 401:
                 return w_log("登录社区失败：Cookie无效")
@@ -379,10 +385,11 @@ class MIUITask:
 
     def check_daily_tasks(self):
         headers = {
-        'cookie': str(self.cookie)
+            'cookie': str(self.cookie)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList', headers=headers)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
+                                    headers=headers)
             r_json = response.json()
             if r_json['status'] != 200:
                 w_log("获取每日任务状态失败：" + str(r_json['message']))
@@ -398,7 +405,8 @@ class MIUITask:
                         task_desc = daily_task.get('desc', '')
                         task_completion_status = "完成" if daily_task['showType'] == 0 else "未完成"
                         task_status[task_name] = {'showType': daily_task['showType'], 'desc': task_desc}
-                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status) + ", 描述: " + str(task_desc))
+                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status) + ", 描述: " + str(
+                            task_desc))
 
             return task_status
 
@@ -421,14 +429,15 @@ class MIUITask:
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData', headers=headers, params=params)
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/getGrowUpPageData',
+                                    headers=headers, params=params)
             r_json = response.json()
-        
+
             your_point = re.findall(r"'title': '成长值'.*'title': '(\d+)'.*'title': '/'", str(r_json['entity']))[0]
             your_level = re.findall(r"'title': '(\d+段)', 'desc': '当前等级'", str(r_json['entity']))[0]
-        
+
             w_log('当前等级：' + str(your_level) + ', 当前成长值：' + str(your_point))
-        
+
             return your_point, your_level
         except Exception as e:
             w_log('成长值和等级获取失败')
@@ -446,7 +455,8 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_page: bool, thumb_up: bool, browse_specialpage: bool, board_follow: bool, carrot_pull: bool):
+def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_page: bool, thumb_up: bool,
+          browse_specialpage: bool, board_follow: bool, carrot_pull: bool):
     if miui_task.mi_login():
         w_log("本脚本用于模拟网络请求测试，仅供测试学习使用，禁止用于其他用途")
         w_log("本脚本默认不做任何操作，如您愿意承担一切可能的后果，可编辑配置文件手动打开需要的功能")
@@ -463,14 +473,16 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
             else:
                 w_log("自动跳过模拟请求「每日签到」")
 
-            if "浏览帖子超过10秒" in task_status and task_status["浏览帖子超过10秒"].get("showType", 0) == 1 and browse_post:
+            if "浏览帖子超过10秒" in task_status and task_status["浏览帖子超过10秒"].get("showType",
+                                                                                         0) == 1 and browse_post:
                 w_log("模拟请求「浏览帖子超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_post()
             else:
                 w_log("自动跳过模拟请求「浏览帖子超过10秒」")
 
-            if "浏览个人/他人主页超过10秒" in task_status and task_status["浏览个人/他人主页超过10秒"].get("showType", 0) == 1 and browse_user_page:
+            if "浏览个人/他人主页超过10秒" in task_status and task_status["浏览个人/他人主页超过10秒"].get("showType",
+                                                                                                           0) == 1 and browse_user_page:
                 w_log("模拟请求「浏览个人/他人主页超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_user_page()
@@ -501,7 +513,8 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
             else:
                 w_log("自动跳过模拟请求「" + str(special_page_task) + "」")
 
-            if "加入小米社区圈子" in task_status and task_status["加入小米社区圈子"].get("showType", 0) == 1 and board_follow:
+            if "加入小米社区圈子" in task_status and task_status["加入小米社区圈子"].get("showType",
+                                                                                         0) == 1 and board_follow:
                 w_log("模拟请求「加入小米社区圈子」")
                 random_sleep()
                 miui_task.board_follow()
@@ -535,12 +548,13 @@ def main():
         exit(1)
     else:
         config = format_config(config)
-        
+
     for i in config.get('accounts'):
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'), i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
+            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'),
+            i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
         )
         time.sleep(5)
     s_log(config.get('logging'))
