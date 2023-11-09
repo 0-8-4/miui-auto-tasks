@@ -16,6 +16,8 @@ accounts:
     # 社区浏览帖子10秒，启用功能意味着你愿意自行承担相关风险
     thumb-up: false
     # 点赞帖子，启用功能意味着你愿意自行承担相关风险
+    browse-hyperos-page: false
+    # 社区在活动期间可能会出现限时的“了解小米澎湃OS新特性”任务，启用功能意味着你愿意自行承担相关风险
     browse-specialpage: false
     # 社区在活动期间可能会出现限时的“浏览指定专题页”任务，启用功能意味着你愿意自行承担相关风险
     board-follow: false

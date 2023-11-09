@@ -154,6 +154,33 @@ class MIUITask:
             w_log("浏览个人主页出错")
             w_log(e)
 
+    # 了解小米澎湃OS新特性
+    def browse_hyperos_page(self):
+        headers = {
+            'cookie': str(self.cookie),
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        }
+        params = {
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        data = {
+            'action': 'BROWSE_SPECIAL_PAGES_SPECIAL_PAGE',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        try:
+            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+                                    params=params, headers=headers, data=data)
+            r_json = response.json()
+            if r_json['status'] == 401:
+                return w_log("了解小米澎湃OS新特性失败：Cookie无效")
+            elif r_json['status'] != 200:
+                return w_log("了解小米澎湃OS新特性完成，但有错误：" + str(r_json['message']))
+            score = r_json['entity']['score']
+            w_log("了解小米澎湃OS新特性完成，成长值+" + str(score))
+        except Exception as e:
+            w_log("了解小米澎湃OS新特性出错")
+            w_log(e)
+
     # 浏览指定专题页
     def browse_specialpage(self):
         headers = {
@@ -426,7 +453,7 @@ def process_exception(e: Exception):
         w_log('系统设置了代理，出现异常')
 
 
-def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_page: bool, thumb_up: bool, browse_specialpage: bool, board_follow: bool, carrot_pull: bool):
+def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_page: bool, thumb_up: bool, browse_hyperos_page: bool, browse_specialpage: bool, board_follow: bool, carrot_pull: bool):
     if miui_task.mi_login():
         w_log("本脚本用于模拟网络请求测试，仅供测试学习使用，禁止用于其他用途")
         w_log("本脚本默认不做任何操作，如您愿意承担一切可能的后果，可编辑配置文件手动打开需要的功能")
@@ -465,6 +492,13 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
                 miui_task.cancel_thumb_up()
             else:
                 w_log("自动跳过模拟请求「点赞他人帖子」")
+
+            if "了解小米澎湃OS新特性" in task_status and task_status.get("了解小米澎湃OS新特性", 1) == 1 and browse_hyperos_page:
+                w_log("模拟请求「了解小米澎湃OS新特性」")
+                sleep_ten_sec_more()
+                miui_task.browse_hyperos_page()
+            else:
+                w_log("自动跳过模拟请求「了解小米澎湃OS新特性」")
 
             if "浏览指定专题页" in task_status and task_status.get("浏览指定专题页", 1) == 1 and browse_specialpage:
                 w_log("模拟请求「浏览指定专题页」")
@@ -512,7 +546,7 @@ def main():
         w_log('---------- EXECUTING -------------')
         start(
             MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'), i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
+            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'), i.get('browse-hyperos-page'), i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
         )
         time.sleep(5)
     s_log(config.get('logging'))
