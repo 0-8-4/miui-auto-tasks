@@ -112,13 +112,18 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
-            'userId': str(self.uid),
+            'ref': 'vipAccountShortcut',
+            'pathname': '/mio/detail',
+            'version': 'dev.231026',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        data = {
             'action': 'BROWSE_POST_10S',
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction',
-                                    params=params, headers=headers)
+            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
+                                    params=params, headers=headers, data=data)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("浏览帖子失败：Cookie无效")
@@ -136,12 +141,17 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
-            'userId': str(self.uid),
+            'ref': 'vipAccountShortcut',
+            'pathname': '/mio/detail',
+            'version': 'dev.231026',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        data = {
             'action': 'BROWSE_SPECIAL_PAGES_USER_HOME',
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction',
+            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2',
                                     params=params, headers=headers)
             r_json = response.json()
             if r_json['status'] == 401:
@@ -160,13 +170,18 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
-            'userId': str(self.uid),
+            'ref': 'vipAccountShortcut',
+            'pathname': '/mio/detail',
+            'version': 'dev.231026',
+            'miui_vip_ph': str(self.miui_vip_ph)
+        }
+        data = {
             'action': 'BROWSE_SPECIAL_PAGES_SPECIAL_PAGE',
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
-            response = requests.get('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByAction', 
-                                    params=params, headers=headers)
+            response = requests.post('https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2', 
+                                    params=params, headers=headers, data=data)
             r_json = response.json()
             if r_json['status'] == 401:
                 return w_log("浏览专题页失败：Cookie无效")
@@ -255,11 +270,14 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         params = {
+            'ref': 'vipAccountShortcut',
+            'pathname': '/mio/checkIn',
+            'version': 'dev.231026',
             'miui_vip_ph': str(self.miui_vip_ph)
         }
         try:
             response = requests.post(
-                'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2?ref=vipAccountShortcut&pathname=/mio/checkIn&version=dev.231107',
+                'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2',
                 headers=headers,params=params)
             r_json = response.json()
             if r_json['status'] == 401:
@@ -377,13 +395,15 @@ class MIUITask:
                     for daily_task in task['data']:
                         task_status[daily_task['title']] = daily_task['showType']
                         task_name = daily_task['title']
+                        task_desc = daily_task.get('desc', '')
                         task_completion_status = "完成" if daily_task['showType'] == 0 else "未完成"
-                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status))
+                        task_status[task_name] = {'showType': daily_task['showType'], 'desc': task_desc}
+                        w_log("获取到信息: " + str(task_name) + ", " + str(task_completion_status) + ", 描述: " + str(task_desc))
 
             return task_status
 
         except Exception as e:
-            w_log("获取信息出错")
+            w_log("获取每日任务信息出错")
             w_log(e)
             return None
 
@@ -436,28 +456,28 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
         if task_status is None:
             w_log("无法获取状态，将跳过多数模拟请求功能")
         else:
-            if "每日签到" in task_status and task_status.get("每日签到", 1) == 1 and check_in:
+            if "每日签到" in task_status and task_status["每日签到"].get("showType", 0) == 1 and check_in:
                 w_log("模拟请求「每日签到」")
                 random_sleep()
                 miui_task.check_in()
             else:
                 w_log("自动跳过模拟请求「每日签到」")
 
-            if "浏览帖子超过10秒" in task_status and task_status.get("浏览帖子超过10秒", 1) == 1 and browse_post:
+            if "浏览帖子超过10秒" in task_status and task_status["浏览帖子超过10秒"].get("showType", 0) == 1 and browse_post:
                 w_log("模拟请求「浏览帖子超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_post()
             else:
                 w_log("自动跳过模拟请求「浏览帖子超过10秒」")
 
-            if "浏览个人/他人主页超过10秒" in task_status and task_status.get("浏览个人/他人主页超过10秒", 1) == 1 and browse_user_page:
+            if "浏览个人/他人主页超过10秒" in task_status and task_status["浏览个人/他人主页超过10秒"].get("showType", 0) == 1 and browse_user_page:
                 w_log("模拟请求「浏览个人/他人主页超过10秒」")
                 sleep_ten_sec_more()
                 miui_task.browse_user_page()
             else:
                 w_log("自动跳过模拟请求「浏览个人/他人主页超过10秒」")
 
-            if "点赞他人帖子" in task_status and task_status.get("点赞他人帖子", 1) == 1 and thumb_up:
+            if "点赞他人帖子" in task_status and task_status["点赞他人帖子"].get("showType", 0) == 1 and thumb_up:
                 w_log("模拟请求「点赞他人帖子」")
                 random_sleep()
                 miui_task.thumb_up()
@@ -466,14 +486,22 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
             else:
                 w_log("自动跳过模拟请求「点赞他人帖子」")
 
-            if "浏览指定专题页" in task_status and task_status.get("浏览指定专题页", 1) == 1 and browse_specialpage:
-                w_log("模拟请求「浏览指定专题页」")
+            special_page_desc = "浏览超过10秒成长值+1，每日上限1分"
+            special_page_task = None
+
+            for task, details in task_status.items():
+                if special_page_desc in details.get('desc', '') and details.get('showType', 1) == 1:
+                    special_page_task = task
+                    break
+
+            if special_page_task and browse_specialpage:
+                w_log("模拟请求「" + str(special_page_task) + "」")
                 sleep_ten_sec_more()
                 miui_task.browse_specialpage()
             else:
-                w_log("自动跳过模拟请求「浏览指定专题页」")
+                w_log("自动跳过模拟请求「" + str(special_page_task) + "」")
 
-            if "加入小米社区圈子" in task_status and task_status.get("加入小米社区圈子", 1) == 1 and board_follow:
+            if "加入小米社区圈子" in task_status and task_status["加入小米社区圈子"].get("showType", 0) == 1 and board_follow:
                 w_log("模拟请求「加入小米社区圈子」")
                 random_sleep()
                 miui_task.board_follow()
@@ -491,7 +519,7 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.6.0.1")
+    w_log("MIUI-AUTO-TASK v1.6.0.2")
     w_log('---------- 系统信息 -------------')
     system_info()
     w_log('---------- 项目信息 -------------')
