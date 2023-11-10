@@ -564,7 +564,7 @@ def main():
     except KeyboardInterrupt:
         pass
     except Exception as err:
-        w_log("重新出现异常!\n:".err)
+        w_log("程序出现异常!\n:".err)
 
 def main_handler(event, context):
     main()
