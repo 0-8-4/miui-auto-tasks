@@ -1,15 +1,15 @@
-FROM python:3.9-alpine
+FROM python:3.11.6-alpine
 
 COPY ./utils /srv/utils/
 
 COPY ./requirements.txt /tmp
 
-COPY ./config.yaml ./miuitask.py /srv/
+COPY ./config.template.yaml ./miuitask.py ./main.py /srv/
 
+COPY /srv/config.template.yaml /srv/config.yaml
 RUN pip install --no-cache-dir -i https://mirrors.bfsu.edu.cn/pypi/web/simple -r /tmp/requirements.txt && \
-    rm -rf /tmp/* && \
-    echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
+    rm -rf /tmp/* 
 
 WORKDIR /srv
 
-CMD ["/usr/sbin/crond", "-f"]
+CMD ["python", "main.py"]

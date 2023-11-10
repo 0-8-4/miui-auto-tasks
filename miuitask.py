@@ -15,10 +15,11 @@ from utils.utils import system_info, get_config, w_log, s_log, check_config, for
 
 class MIUITask:
 
-    def __init__(self, uid, password, user_agent, device_id):
+    def __init__(self, uid, password, user_agent, postid, device_id):
         self.uid = uid
         self.password = password
         self.user_agent = user_agent
+        self.postid = postid
         self.device_id = device_id
 
         # 留空
@@ -44,12 +45,12 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         sign_data = {
-            'postId': '36625780',
+            'postId': self.postid,
             'timestamp': int(round(time.time() * 1000))
         }
         sign = self.post_sign(sign_data)
         data = {
-            'postId': '36625780',
+            'postId': self.postid,
             'sign': sign[0],
             'timestamp': sign[1]
         }
@@ -72,7 +73,7 @@ class MIUITask:
             'cookie': str(self.cookie)
         }
         data = {
-            'postId': '36625780'
+            'postId': self.postid
         }
         try:
             response = requests.get('https://api.vip.miui.com/mtop/planet/vip/content/announceCancelThumbUp',
@@ -553,7 +554,7 @@ def main():
         for i in config.get('accounts'):
             w_log('---------- EXECUTING -------------')
             start(
-                MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
+                MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), i.get('postid'), device_id=i.get('device-id')),
                 i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'),
                 i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
             )

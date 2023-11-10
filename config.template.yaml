@@ -6,7 +6,9 @@ accounts:
     user-agent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
     # 登录社区时所用浏览器的 User-Agent
     # 可在此工具查看：https://tool.chinaz.com/useragent
-    
+    postid: 41559680
+    # 例如:https://web.vip.miui.com/page/info/mio/mio/detail?postId=41559680
+    # postid就是41559680
     # 功能开关
     check-in: false
     # 社区成长值签到，启用功能意味着你愿意自行承担相关风险
