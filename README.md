@@ -22,11 +22,11 @@
 
 
 ### **使用说明**：
-关于项目的详细使用方法请阅览 **[WiKi](https://github.com/0-8-4/miui-auto-tasks/wiki)**
+项目支持本地、Docker、青龙面板等部署方式，详细使用说明请参见 **[WiKi](https://github.com/0-8-4/miui-auto-tasks/wiki)**
 
 
 ### **项目依赖**：
-  1. 需要前往 Python 官网自行下载自己系统对应的 Python 版本，或使用自己系统对应的包管理安装，推荐至少 Python 3.6 以上
+  1. 需要前往 Python 官网自行下载自己系统对应的 Python 版本，或使用自己系统对应的包管理安装，推荐至少 Python 3.7 以上
 
   ```
   https://www.python.org/downloads/
@@ -39,92 +39,25 @@
   注意：你可能需要使用管理员权限运行命令行
 
 
+### **快速上手**：
+
+1. 配置好 `config.yaml` 文件，并与 `miuitask.py` 文件放在同一个目录下 
+2. 使用终端 在 `miuitask.py` 所在目录下运行如下命令：
+
+  ```bash
+  python3 miuitask.py
+  ```
+
+
 ### **项目介绍**：  
 - [x] 支持 多账号 配置
 - [x] 支持 Docker 部署
-- [x] 支持 腾讯云函数 部署
+- [x] 支持 青龙面板 部署
 - [x] 支持 自动登录账号刷新社区 Cookie 以便于实现自动化   
 - [x] 绝大多数功能均可在配置文件中自行开关启用   
 
 &#x26A0; 请注意，配置文件默认禁用了 MIUI Task 绝大多数模拟网络请求的功能能力，请注意修改配置文件按需启用。根据社区相关规则，模拟这些功能的网络请求可能存在一定风险。您需要自行承担使用本脚本的后果
 
-
-### **配置推送**：
-推送基于[onepush](https://github.com/y1ndan/onepush)
-- 推送名称 / notifier: bark
-
-  参数大全 / params:
-  {'required': ['key'], 'optional': ['title', 'sound', 'isarchive', 'icon', 'group', 'url', 'copy', 'autocopy']}
-
-- 推送名称 / notifier: custom
-
-  参数大全 / params:
-  {'required': ['url'], 'optional': ['method', 'datatype', 'data']}
-
-- 推送名称 / notifier: dingtalk
-
-  参数大全 / params:
-  {'required': ['token'], 'optional': ['title', 'secret', 'markdown']}
-
-- 推送名称 / notifier: discord
-
-  参数大全 / params:
-  {'required': ['webhook'], 'optional': ['title', 'username', 'avatar_url', 'color']}
-
-- 推送名称 / notifier: pushplus
-
-  参数大全 / params:
-  {'required': ['token'], 'optional': ['title', 'topic', 'markdown']}
-
-- 推送名称 / notifier: qmsg
-
-  参数大全 / params:
-  {'required': ['key'], 'optional': ['title', 'mode', 'qq']}
-
-- 推送名称 / notifier: serverchan
-
-  参数大全 / params:
-  {'required': ['sckey', 'title'], 'optional': []}
-
-- 推送名称 / notifier: serverchanturbo
-
-  参数大全 / params:
-  {'required': ['sctkey', 'title'], 'optional': ['channel', 'openid']}
-
-- 推送名称 / notifier: telegram
-
-  参数大全 / params:
-  {'required': ['token', 'userid'], 'optional': ['title', 'api_url']}
-
-- 推送名称 / notifier: wechatworkapp
-
-  参数大全 / params:
-  {'required': ['corpid', 'corpsecret', 'agentid'], 'optional': ['title', 'touser', 'markdown']}
-
-- 推送名称 / notifier: wechatworkbot
-
-  参数大全 / params:
-  {'required': ['key'], 'optional': ['title', 'markdown']}
-* **required为必填参数，optional为选填参数**
-
-配置参考：
-```yaml
-ONEPUSH:
-  notifier: telegram
-  params:
-    title: 
-    markdown: false
-    token: 123456789:XXXXXXXXXXXXXXXXXXXXXXXX
-    userid: 114514
-```
-```yaml
-ONEPUSH:
-  notifier: pushplus
-  params:
-    title: 
-    token: XXXXXXXXXXXXXXXXXXXXXXXX
-    markdown: false
-```
 #### **其他**：  
 * 在使用本脚本时请临时关闭网络代理工具及广告拦截程序  
 * 在服务器上使用前建议先使用服务器IP登录 `https://account.xiaomi.com`  
@@ -134,7 +67,7 @@ ONEPUSH:
 
 #### **贡献**：
 
-如果你在使用过程中发现任何问题，可以 [提交 issue](https://github.com/0-8-4/miui-auto-tasks/issues/new) 或自行 Fork 修改后提交 Pull request
+如果你在使用过程中发现任何问题，可以使用模板 [提交 issue](https://github.com/0-8-4/miui-auto-tasks/issues/new) 或自行 Fork 修改后提交 Pull request
 
 如果你要提交 Pull request，请确保你的代码风格和项目已有的代码保持一致，遵循 [PEP 8](https://www.python.org/dev/peps/pep-0008) ，变量命名清晰，有适当的注释
 
@@ -163,3 +96,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+# **鸣谢**
+## 社区
+
+本项目所有贡献者感谢所有Star了本项目的人
+
+[![Star History Chart](https://api.star-history.com/svg?repos=0-8-4/miui-auto-tasks&type=Date)](https://star-history.com/#0-8-4/miui-auto-tasks&Date)
+
+## JetBrains 
+
+特别感谢 [JetBrains](https://www.jetbrains.com/) 为开源项目提供免费的 [PyCharm](https://www.jetbrains.com/pycharm/) 等 IDE 的授权  
+[<img src=".github/md_pic/jetbrains-variant-3.png" width="200"/>](https://www.jetbrains.com/)
