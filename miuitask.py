@@ -532,34 +532,38 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
 
 
 def main():
-    w_log("MIUI-AUTO-TASK v1.6.0.2")
-    w_log('---------- 系统信息 -------------')
-    system_info()
-    w_log('---------- 项目信息 -------------')
-    w_log("这是一个免费且开源的项目，如果你是付费购买获得请务必退款")
-    w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
-    w_log("欢迎 star，感谢東雲研究所中的大佬")
-    w_log('---------- 配置检测 -------------')
-
-    config = get_config()
-
-    if not check_config(config):
-        w_log('配置文件没有正确配置')
-        exit(1)
-    else:
-        config = format_config(config)
-
-    for i in config.get('accounts'):
-        w_log('---------- EXECUTING -------------')
-        start(
-            MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
-            i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'),
-            i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
-        )
-        time.sleep(5)
-    s_log(config.get('logging'))
-    notify_me()
-
+    try:
+        if __name__ != "main.py":
+            config = get_config()
+        w_log("MIUI-AUTO-TASK v1.6.1")
+        w_log('---------- 系统信息 -------------')
+        system_info()
+        w_log('---------- 项目信息 -------------')
+        w_log("这是一个免费且开源的项目，如果你是付费购买获得请务必退款")
+        w_log("项目地址：https://github.com/0-8-4/miui-auto-tasks")
+        w_log("欢迎 star，感谢東雲研究所中的大佬")
+        w_log('---------- 配置检测 -------------')
+    
+        if not check_config(config):
+            w_log('配置文件没有正确配置')
+            exit(1)
+        else:
+            config = format_config(config)
+    
+        for i in config.get('accounts'):
+            w_log('---------- EXECUTING -------------')
+            start(
+                MIUITask(i.get('uid'), i.get('password'), i.get('user-agent'), device_id=i.get('device-id')),
+                i.get('check-in'), i.get('browse-post'), i.get('browse-user-page'), i.get('thumb-up'),
+                i.get('browse-specialpage'), i.get('board-follow'), i.get('carrot-pull')
+            )
+            time.sleep(5)
+        s_log(config.get('logging'))
+        notify_me()
+    except KeyboardInterrupt:
+        pass
+    except Exception as err:
+        w_log("重新出现异常!\n:".err)
 
 def main_handler(event, context):
     main()

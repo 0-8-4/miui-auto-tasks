@@ -12,7 +12,7 @@ from urllib.request import getproxies
 logs = ''
 message = ''
 config = {'account': []}
-CONFIG_VERSION_REQUIRE: str = 'v1.6.0'
+CONFIG_VERSION_REQUIRE: str = 'v1.6.1'
 
 
 def md5_crypto(passwd: str) -> str:

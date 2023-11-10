@@ -28,7 +28,7 @@ body:
       label: MIUITask Version
       description: |
         MIUITask 版本号
-      placeholder: "v1.6.0.1"
+      placeholder: "v1.6.1"
     validations:
       required: true
   - type: dropdown
