@@ -53,7 +53,24 @@
   ```bash
   python3 main.py
   ```
-  
+进程守护:
+假设目录为:`/root/miui-auto-tasks`
+  ```bash
+sudo cat <<'TEXT' > /etc/systemd/system/miuitask.service
+[Unit]
+Description=miuitask Daemon
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/miui-auto-tasks
+ExecStart=/usr/bin/python3 main.py
+Restart=always
+TEXT
+  ```
 
 ### **项目介绍**：  
 - [x] 支持 多账号 配置
