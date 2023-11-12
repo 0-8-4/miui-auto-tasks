@@ -106,7 +106,7 @@ class ConfigManager:
             except (ValidationError, JSONDecodeError):
                 log.exception(f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 格式是否正确")
                 raise
-            except:
+            except Exception:
                 log.exception(
                     f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 是否存在且有权限读取和写入")
                 raise
