@@ -112,7 +112,7 @@ SOFTWARE.
 
 </a>
 
-![Alt](https://repobeats.axiom.co/ "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/073d4816527b3720a03cb44fa876fe0de0216124.svg "Repobeats analytics image")
 
 ## 社区
 
