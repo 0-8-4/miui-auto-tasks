@@ -25,8 +25,9 @@ class BaseSign:
     AVAILABLE_SIGNS: Dict[str, Type["BaseSign"]] = {}
     """可用的子类"""
 
-    def __init__(self, cookie):
+    def __init__(self, cookie, token):
         self.cookie = cookie
+        self.token = token
         self.headers = {
         }
 
@@ -60,6 +61,7 @@ class BaseSign:
         try:
             params = self.PARAMS.copy()
             params['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else params
+            params['token'] = self.token if 'token' in params else params
             data = self.DATA.copy()
             data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
             response = await post(self.URL_SIGN, 
@@ -91,7 +93,8 @@ class Check_In(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/checkIn',
         'version': 'dev.231026',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_ph': "{miui_vip_ph}",
+        "token": ""
     }
     URL_SIGN ='https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
