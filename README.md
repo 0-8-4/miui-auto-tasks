@@ -36,6 +36,11 @@
   ```bash
   pip install -r requirements.txt
   ```
+  **推荐**
+  ```bash
+  pip install pdm
+  pdm install
+  ```
   注意：你可能需要使用管理员权限运行命令行
 
 
@@ -98,6 +103,17 @@ SOFTWARE.
 ```
 
 # **鸣谢**
+
+感谢以下贡献者对本项目做出的贡献
+
+<a href="https://github.com/0-8-4/miui-auto-tasks/graphs/contributors">
+
+  <img src="https://contrib.rocks/image?repo=0-8-4/miui-auto-tasks" />
+
+</a>
+
+![Alt](https://repobeats.axiom.co/ "Repobeats analytics image")
+
 ## 社区
 
 本项目所有贡献者感谢所有Star了本项目的人

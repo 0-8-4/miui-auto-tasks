@@ -1,0 +1,21 @@
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Night-stars-1", email = "nujj1042633805@gmail.com"},
+]
+dependencies = [
+    "onepush",
+    "orjson>=3.9.10",
+    "loguru>=0.7.2",
+    "pydantic>=2.4.2",
+    "httpx>=0.25.1",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
