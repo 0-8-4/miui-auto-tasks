@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 在 GitHub Discussions 讨论获得帮助
+    url: https://github.com/0-8-4/miui-auto-tasks/discussions
+    about: Have a question? Not sure if your issue affects everyone reproducibly? The quickest way to get help is on GitHub Discussions!
