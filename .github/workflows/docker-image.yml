@@ -1,5 +1,6 @@
 # author: 0-8-4
 # date： 24-11-2022 18：34 AEDT
+# last_update: 13-11-2023 22:57 AEDT
 #
 # This script is used to automatically build docker image and
 # push to DockerHub when every new release is published
@@ -18,6 +19,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      -
+        name: run the program once to create the `/data`
+        uses: actions/setup-python@v4
+        with:
+            python-version: '3.11'
+        run: python3 miuitask.py
+
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
