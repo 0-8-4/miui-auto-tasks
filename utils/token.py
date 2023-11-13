@@ -153,7 +153,11 @@ async def get_token_data(uid: str) -> str:
         api_data = TokenResultHandler(result)
         if api_data.success:
             return api_data.token
+        elif api_data.need_verify:
+            log.error("遇到人机验证码")
+            return False
         else:
-            exit("TOKEN获取失败")
+            return False
     except Exception:
         log.exception("获取TOKEN异常")
+        return False

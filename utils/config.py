@@ -51,7 +51,7 @@ class Account(BaseModel):
         return md5_crypto(v)
     
 class OnePush(BaseModel):
-    notifier: bool = False
+    notifier: str = ""
     """是否开启消息推送"""
     params: Dict = {
             "title": "",
@@ -78,7 +78,7 @@ def write_plugin_data(data: Config = None):
             data = ConfigManager.data_obj
         try:
             #str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
-            str_data = yaml.dump(data.model_dump(), indent=2, allow_unicode=True, sort_keys=False)
+            str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False

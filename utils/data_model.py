@@ -110,9 +110,20 @@ class TokenResultHandler(ApiResultHandler):
     """
     TOKEN数据处理器
     """
-    token: Optional[str] = None
+    token: str = ""
 
     def __init__(self, content: Dict[str, Any]):
         super().__init__(content=content)
         
-        self.token = self.data.get("token")
+        self.token = self.data.get("token", "")
+    
+    @property
+    def need_verify(self):
+        """需要验证码"""
+        return self.data.get("result") == False and self.data.get("url")
+
+    @property
+    def success(self):
+        """是否成功获取TOKEN"""
+        return self.token != ""
+    
