@@ -92,8 +92,13 @@ class SignResultHandler(ApiResultHandler):
 
     def __init__(self, content: Dict[str, Any]):
         super().__init__(content=content)
-
-        self.growth = self.content.get("entity", {}).get("score", "未知")
+        
+        self.growth = self.content.get("entity", {})
+        if type(self.growth) == dict:
+            self.growth = self.growth.get("score", "未知")
+        elif type(self.growth) == int:
+            self.growth = str(self.growth)
+        
 
     def __bool__(self):
         """
