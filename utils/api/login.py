@@ -11,6 +11,7 @@ from ..config import Account
 from ..request import get, post
 from ..logger import log
 from ..data_model import LoginResultHandler
+from .sign import BaseSign
 
 
 class Login:
@@ -18,6 +19,7 @@ class Login:
         self.user_agent = account.user_agent
         self.uid = account.uid
         self.password = account.password
+        self.cookies = account.cookies
 
     async def login(self) -> Union[Dict[str, str], bool]:
         headers = {
@@ -59,6 +61,9 @@ class Login:
             '_json': 'true'
         }
         try:
+            if self.cookies != {} and await BaseSign(self.cookies).check_daily_tasks(nolog=True) != []:
+                log.info("Cookie有效，跳过登录")
+                return self.cookies
             response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2', headers=headers, data=data)
             log.debug(response.text)
             result = response.text.lstrip('&').lstrip('START').lstrip('&')
