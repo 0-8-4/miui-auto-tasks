@@ -1,7 +1,7 @@
 import os
 import orjson
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from hashlib import md5
 
 import yaml
@@ -21,12 +21,20 @@ CONFIG_PATH = DATA_PATH / "config.yaml"
 def md5_crypto(passwd: str) -> str:
     return md5(passwd.encode('utf8')).hexdigest().upper()
 
+def cookies_to_dict(cookies):
+    cookies_dict = {}
+    for cookie in cookies.split(';'):
+        key, value = cookie.strip().split('=', 1)  # 分割键和值
+        cookies_dict[key] = value
+    return cookies_dict
 
 class Account(BaseModel):
     uid: str = "100000"
     """账户ID 非账户用户名或手机号"""
     password: str = ""
     """账户密码或其MD5哈希"""
+    cookies: Union[dict, str] = {}
+    """账户登录后的cookies"""
     user_agent: str = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
     """登录社区时所用浏览器的 User-Agent"""
 
@@ -47,14 +55,20 @@ class Account(BaseModel):
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _(cls, v: Optional[str]):
+    def _password(cls, v: Optional[str]):
         if len(v) == 32:
             return v
         return md5_crypto(v)
+    
+    @validator("cookies", allow_reuse=True)
+    def _cookies(cls, v: Union[dict, str]):
+        if type(v) == str:
+            return cookies_to_dict(v)
+        return v
 
 
 class OnePush(BaseModel):
-    notifier: str = ""
+    notifier: Union[str, bool] = ""
     """是否开启消息推送"""
     params: Dict = {
         "title": "",
