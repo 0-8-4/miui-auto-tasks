@@ -33,4 +33,5 @@ async def main():
     notify_me(get_message())
 
 if __name__ == "__main__":
+    print_info()
     asyncio.run(main())
