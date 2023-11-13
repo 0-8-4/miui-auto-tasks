@@ -20,10 +20,12 @@ R0nw3cpYF7GZg13QicS/ZwEsSd4HyboAruMxJBPvK3Jdr4ZS23bpN0cavWOJsBqZ
 VwIDAQAB
 -----END PUBLIC KEY-----'''
 
+
 def get_random_chars_as_string(count: int) -> str:
     characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
     selected_chars = random.sample(characters, count)
     return ''.join(selected_chars)
+
 
 def aes_encrypt(key, data):
     iv = b'0102030405060708'
@@ -33,6 +35,7 @@ def aes_encrypt(key, data):
     padded_data = padder.update(data.encode('utf-8')) + padder.finalize()
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
     return base64.b64encode(ciphertext).decode('utf-8')
+
 
 def rsa_encrypt(public_key_pem, data: str) -> str:
     public_key = serialization.load_pem_public_key(
@@ -47,12 +50,13 @@ def rsa_encrypt(public_key_pem, data: str) -> str:
 
     return base64.b64encode(ciphertext).decode('utf-8')
 
+
 async def get_token_data(uid: str) -> str:
     try:
         data = {
             "type": 0,
-            "startTs": round(time.time()*1000),
-            "endTs": round(time.time()*1000),
+            "startTs": round(time.time() * 1000),
+            "endTs": round(time.time() * 1000),
             "env": {
                 "p1": "",
                 "p2": "",
@@ -129,7 +133,8 @@ async def get_token_data(uid: str) -> str:
             'Sec-Fetch-Dest': 'empty',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'cross-site',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
             'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
@@ -138,16 +143,16 @@ async def get_token_data(uid: str) -> str:
         params = {
             'k': '3dc42a135a8d45118034d1ab68213073',
             'locale': 'zh_CN',
-            '_t': round(time.time()*1000),
+            '_t': round(time.time() * 1000),
         }
-
 
         data = {
             's': rsa_encrypt(public_key_pem, key),
             'd': aes_encrypt(key, str(data)),
             'a': 'GROW_UP_CHECKIN',
         }
-        response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
+        response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers,
+                              data=data)
         log.debug(response.text)
         result = response.json()
         api_data = TokenResultHandler(result)

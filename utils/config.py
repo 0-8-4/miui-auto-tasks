@@ -17,8 +17,10 @@ DATA_PATH = ROOT_PATH / "data"
 CONFIG_PATH = DATA_PATH / "config.yaml"
 """数据文件默认路径"""
 
+
 def md5_crypto(passwd: str) -> str:
     return md5(passwd.encode('utf8')).hexdigest().upper()
+
 
 class Account(BaseModel):
     uid: str = "100000"
@@ -49,23 +51,26 @@ class Account(BaseModel):
         if len(v) == 32:
             return v
         return md5_crypto(v)
-    
+
+
 class OnePush(BaseModel):
     notifier: str = ""
     """是否开启消息推送"""
     params: Dict = {
-            "title": "",
-            "markdown": False,
-            "token": "",
-            "userid": ""
-        }
+        "title": "",
+        "markdown": False,
+        "token": "",
+        "userid": ""
+    }
     """推送参数"""
+
 
 class Config(BaseModel):
     accounts: List[Account] = [Account()]
     """偏好设置"""
     ONEPUSH: OnePush = OnePush()
     """消息推送"""
+
 
 def write_plugin_data(data: Config = None):
     """
@@ -77,7 +82,7 @@ def write_plugin_data(data: Config = None):
         if data is None:
             data = ConfigManager.data_obj
         try:
-            #str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+            # str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
             str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
@@ -87,6 +92,7 @@ def write_plugin_data(data: Config = None):
         return True
     except OSError:
         return False
+
 
 class ConfigManager:
     data_obj = Config()
@@ -106,7 +112,7 @@ class ConfigManager:
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
                     ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
-                write_plugin_data(ConfigManager.data_obj) # 同步配置
+                write_plugin_data(ConfigManager.data_obj)  # 同步配置
             except (ValidationError, JSONDecodeError):
                 log.exception(f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 格式是否正确")
                 raise
@@ -123,5 +129,6 @@ class ConfigManager:
                 log.exception(f"创建数据文件失败，请检查是否有权限读取和写入 {CONFIG_PATH}")
                 raise
             log.info(f"数据文件 {CONFIG_PATH} 不存在，已创建默认数据文件。")
+
 
 ConfigManager.load_config()
