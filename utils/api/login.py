@@ -1,8 +1,8 @@
-'''
+"""
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 LastEditTime: 2023-11-13 12:32:26
-'''
+"""
 import orjson
 
 from typing import Dict, List, Optional, Union
