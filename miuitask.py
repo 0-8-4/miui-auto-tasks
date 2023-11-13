@@ -521,7 +521,7 @@ def start(miui_task: MIUITask, check_in: bool, browse_post: bool, browse_user_pa
                 sleep_ten_sec_more()
                 miui_task.browse_specialpage()
             else:
-                w_log("自动跳过模拟请求「" + str(special_page_task) + "」")
+                w_log("自动跳过模拟请求「浏览指定专题页」")
 
             if "加入小米社区圈子" in task_status and task_status["加入小米社区圈子"].get("showType",
                                                                                          0) == 1 and board_follow:
