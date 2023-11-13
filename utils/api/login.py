@@ -7,7 +7,7 @@ import orjson
 
 from typing import Dict, List, Optional, Union
 
-from ..config import Account
+from ..config import Account, write_plugin_data
 from ..request import get, post
 from ..logger import log
 from ..data_model import LoginResultHandler
@@ -16,6 +16,7 @@ from .sign import BaseSign
 
 class Login:
     def __init__(self, account: Account) -> None:
+        self.account = account
         self.user_agent = account.user_agent
         self.uid = account.uid
         self.password = account.password
@@ -72,6 +73,8 @@ class Login:
             if api_data.success:
                 log.success('小米账号登录成功')
                 cookies = await self.get_cookie(api_data.location)
+                self.account.cookies = cookies
+                write_plugin_data()
                 return cookies
             elif not api_data.pwd_wrong:
                 log.error('小米账号登录失败：' + api_data.message)
