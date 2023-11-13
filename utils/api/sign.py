@@ -65,6 +65,7 @@ class BaseSign:
             params['token'] = self.token if 'token' in params else params
             data = self.DATA.copy()
             data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
+            data['token'] = self.token if 'token' in data else data
             response = await post(self.URL_SIGN,
                                   params=params, data=data,
                                   cookies=self.cookie, headers=self.headers)
