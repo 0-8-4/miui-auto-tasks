@@ -25,9 +25,24 @@ jobs:
         with:
             python-version: '3.11'
 
+      - name: Install PDM
+        run: |
+          pip install pdm
+
+      - name: Export requirements.txt
+        run: |
+          pdm export -f requirements --without-hashes -o requirements.txt
+
+      - name: Upload requirements.txt
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: requirements.txt
+          path: requirements.txt
+
       -
         name: run the program once to create the `/data`
-        run: python3 miuitask.py
+        run: |
+          python3 miuitask.py
 
       -
         name: Set up QEMU

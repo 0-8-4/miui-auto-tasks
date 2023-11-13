@@ -32,7 +32,7 @@ class BaseSign:
         self.headers = {
         }
 
-    async def check_daily_tasks(self) -> Union[List[DailyTasksResult], List[None]]:
+    async def check_daily_tasks(self, nolog: bool=False) -> Union[List[DailyTasksResult], List[None]]:
         try:
             response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
                                  cookies=self.cookie)
@@ -49,10 +49,10 @@ class BaseSign:
                     task_status.append(DailyTasksResult(name=task_name, showType=showType, desc=task_desc))
                 return task_status
             else:
-                log.error("获取每日任务状态失败：" + api_data.message)
+                log.error("获取每日任务状态失败：" + api_data.message) if not nolog else None
                 return []
-        except Exception as e:
-            log.exception("获取每日任务异常")
+        except Exception:
+            log.exception("获取每日任务异常") if not nolog else None
             return []
 
     async def sign(self) -> bool:

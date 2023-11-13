@@ -7,17 +7,20 @@ import orjson
 
 from typing import Dict, List, Optional, Union
 
-from ..config import Account
+from ..config import Account, write_plugin_data
 from ..request import get, post
 from ..logger import log
 from ..data_model import LoginResultHandler
+from .sign import BaseSign
 
 
 class Login:
     def __init__(self, account: Account) -> None:
+        self.account = account
         self.user_agent = account.user_agent
         self.uid = account.uid
         self.password = account.password
+        self.cookies = account.cookies
 
     async def login(self) -> Union[Dict[str, str], bool]:
         headers = {
@@ -59,6 +62,9 @@ class Login:
             '_json': 'true'
         }
         try:
+            if self.cookies != {} and await BaseSign(self.cookies).check_daily_tasks(nolog=True) != []:
+                log.info("Cookie有效，跳过登录")
+                return self.cookies
             response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2', headers=headers, data=data)
             log.debug(response.text)
             result = response.text.lstrip('&').lstrip('START').lstrip('&')
@@ -67,6 +73,8 @@ class Login:
             if api_data.success:
                 log.success('小米账号登录成功')
                 cookies = await self.get_cookie(api_data.location)
+                self.account.cookies = cookies
+                write_plugin_data()
                 return cookies
             elif not api_data.pwd_wrong:
                 log.error('小米账号登录失败：' + api_data.message)
