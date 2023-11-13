@@ -1,154 +1,223 @@
-import os
 import random
 import time
-import platform
-import dotenv
-import yaml
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives import padding, serialization
+from cryptography.hazmat.backends import default_backend
+import base64
+from urllib.parse import urlparse, parse_qsl
+from pydantic import ValidationError
+from typing import Type
+from tenacity import RetryError, Retrying, stop_after_attempt
 
-from hashlib import md5
-from onepush import notify
-from urllib.request import getproxies
+from .request import get, post
+from .data_model import TokenResultHandler
+from .logger import log
+from .captcha import get_validate
 
-logs = ''
-message = ''
-config = {'account': []}
-CONFIG_VERSION_REQUIRE: str = 'v1.6.0'
+public_key_pem = '''-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArxfNLkuAQ/BYHzkzVwtu
+g+0abmYRBVCEScSzGxJIOsfxVzcuqaKO87H2o2wBcacD3bRHhMjTkhSEqxPjQ/FE
+XuJ1cdbmr3+b3EQR6wf/cYcMx2468/QyVoQ7BADLSPecQhtgGOllkC+cLYN6Md34
+Uii6U+VJf0p0q/saxUTZvhR2ka9fqJ4+6C6cOghIecjMYQNHIaNW+eSKunfFsXVU
++QfMD0q2EM9wo20aLnos24yDzRjh9HJc6xfr37jRlv1/boG/EABMG9FnTm35xWrV
+R0nw3cpYF7GZg13QicS/ZwEsSd4HyboAruMxJBPvK3Jdr4ZS23bpN0cavWOJsBqZ
+VwIDAQAB
+-----END PUBLIC KEY-----'''
 
+headers = {
+    'Accept': '*/*',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Content-type': 'application/x-www-form-urlencoded',
+    'Origin': 'https://web.vip.miui.com',
+    'Pragma': 'no-cache',
+    'Referer': 'https://web.vip.miui.com/',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'cross-site',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+    'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+}
 
-def md5_crypto(passwd: str) -> str:
-    return md5(passwd.encode('utf8')).hexdigest()
+def get_random_chars_as_string(count: int) -> str:
+    characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
+    selected_chars = random.sample(characters, count)
+    return ''.join(selected_chars)
 
+def aes_encrypt(key, data) -> base64:
+    iv = b'0102030405060708'
+    cipher = Cipher(algorithms.AES(key.encode('utf-8')), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+    padded_data = padder.update(data.encode('utf-8')) + padder.finalize()
+    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+    return base64.b64encode(ciphertext).decode('utf-8')
 
-def show_info(tip, info):
-    return "{}: {}".format(tip, info)
+def rsa_encrypt(public_key_pem, data: str) -> base64:
+    public_key = serialization.load_pem_public_key(
+        public_key_pem.encode('utf-8'),
+        backend=default_backend()
+    )
+    encoded_data = base64.b64encode(data.encode('utf-8'))
+    ciphertext = public_key.encrypt(
+        encoded_data,
+        PKCS1v15()
+    )
 
+    return base64.b64encode(ciphertext).decode('utf-8')
 
-def system_info():
-    w_log(show_info('操作系统平台', platform.platform()))
-    w_log(show_info('操作系统版本', platform.version()))
-    w_log(show_info('操作系统名称', platform.system()))
-    w_log(show_info('操作系统位元', platform.architecture()))
-    w_log(show_info('操作系统类型', platform.machine()))
-    w_log(show_info('处理器信息', platform.processor()))
-    w_log(show_info('Python 版本', str(platform.python_version()) + ' ' + str(platform.python_build())))
-    if getproxies():
-        w_log(show_info('系统代理', getproxies()))
-
-
-def get_config() -> dict:
-    global config
-    config_path_legacy = dotenv.find_dotenv(filename='config.env')
-    config_path_yaml = dotenv.find_dotenv(filename='config.yaml')
-
-    # yaml config
-    if config_path_yaml:
-        w_log('正在加载 ' + config_path_yaml + ' 配置文件')
-        with open(config_path_yaml, "rb") as stream:
-            try:
-                config = yaml.safe_load(stream)
-                config_version: str = config.get('version')
-
-                # check config file version
-                # if config version not meet the requirement
-                if CONFIG_VERSION_REQUIRE != config_version:
-                    w_log('配置文件版本和程序运行要求版本不匹配，请检查配置文件')
-                    w_log('配置文件版本: ' + config_version)
-                    w_log('运行程序配置版本要求: ' + CONFIG_VERSION_REQUIRE)
-                    exit(1)  # exit the program
-                w_log('配置文件已成功加载，文件版本 ' + config_version)
-
-            except yaml.YAMLError as e:
-                w_log('配置文件载入错误')
-                w_log(e)
-            return config
-    else:
-        w_log('配置文件不存在')
-        exit(1)
-
-
-def w_log(text):
-    global logs
-    global message
-    now_localtime = time.strftime("%H:%M:%S", time.localtime())
-    logs += now_localtime + ' | ' + str(text) + '\n'
-    message += str(text) + '\n'
-    print(now_localtime + ' | ' + str(text))
-
-
-def s_log(flag):
-    if flag:
-        global logs
-        folder = os.path.exists('./logs')
-        if not folder:
-            os.makedirs('./logs')
-        now_localtime = time.strftime("%Y-%m-%d", time.localtime())
-        fname = now_localtime + '.log'
-        with open('./logs/' + fname, 'a+', encoding='utf-8') as f:
-            f.write(logs)
-
-
-def check_config(config: dict) -> bool:
-    if config.get('accounts'):
-        for i in config.get('accounts'):
-            if not i.get('uid') or not i.get('password') or not i.get('user-agent'):
-                return False
-            if not isinstance(i.get('check-in'), bool):
-                return False
-            if not isinstance(i.get('browse-user-page'), bool):
-                return False
-            if not isinstance(i.get('browse-post'), bool):
-                return False
-            if not isinstance(i.get('thumb-up'), bool):
-                return False
-            if not isinstance(i.get('browse-specialpage'), bool):
-                return False
-            if not isinstance(i.get('board-follow'), bool):
-                return False
-            if not isinstance(i.get('carrot-pull'), bool):
-                return False
-    else:
-        return False
-    if not isinstance(config.get('logging'), bool):
-        return False
-    return True
-
-
-def format_config(config: dict) -> dict:
-    for i in config.get('accounts'):
-        i['uid'] = str(i.get('uid'))
-        i['user-agent'] = str(i.get('user-agent'))
-        if len(i.get('password')) != 32:
-            i['password'] = md5_crypto(i.get('password')).upper()
-        else:
-            i['password'] = str(i.get('password')).upper()
-        if i.get('device-id'):
-            i['device-id'] = str(i.get('device-id'))
-        else:
-            i['device-id'] = None
-    return config
-
-
-def random_sleep():
-    time.sleep(random.randint(1, 9))
-
-
-def sleep_ten_sec_more():
-    time.sleep(random.randint(10, 12))
-
-
-def notify_me(content=None):
+IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError, ValidationError)
+"""API返回数据无效会触发的异常组合"""
+def is_incorrect_return(exception: Exception, *addition_exceptions: Type[Exception]) -> bool:
     """
-    默认推送日志
+    判断是否是API返回数据无效的异常
+    :param exception: 异常对象
+    :param addition_exceptions: 额外的异常类型，用于触发判断
     """
-    global message
-    global config
-    if not content:
-        content = message
-    notifier = config.get('ONEPUSH', {}).get('notifier', '')
-    params = config.get('ONEPUSH', {}).get('params', '')
-    if not notifier or not params:
-        s_log('未配置推送或未正确配置推送')
-        return
-    if not config.get('ONEPUSH', {}).get('title', ''):
-        config['ONEPUSH']['title'] = ''
-    return notify(notifier, content=content, **params)
+    exceptions = IncorrectReturn + addition_exceptions
+    return isinstance(exception, exceptions) or isinstance(exception.__cause__, exceptions)
+
+async def get_token_by_captcha(url: str) -> str:
+    try:
+        parsed_url = urlparse(url)
+        query_params = dict(parse_qsl(parsed_url.query)) # 解析URL参数
+        gt = query_params.get("c")
+        challenge = query_params.get("l")
+        geetest_data = await get_validate(gt, challenge)
+        params = {
+            'k': '3dc42a135a8d45118034d1ab68213073',
+            'locale': 'zh_CN',
+            '_t': round(time.time()*1000),
+        }
+
+        data = {
+            'e': query_params.get("e"), # 人机验证的e参数，来自URL
+            'challenge': geetest_data.challenge,
+            'seccode': f'{geetest_data.validate}|jordan',
+        }
+
+        response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers, data=data)
+        log.debug(response.text)
+        result = response.json()
+        api_data = TokenResultHandler(result)
+        if api_data.success:
+            return api_data.token
+        elif not api_data.data.get("result"):
+            log.error("遇到人机验证码，无法获取TOKEN")
+            return False
+        else:
+            log.error("遇到未知错误，无法获取TOKEN")
+            return False
+    except Exception:
+        log.exception("获取TOKEN异常")
+        return False
+    
+async def get_token(uid: str) -> str:
+    try:
+        for attempt in Retrying(stop=stop_after_attempt(3)):
+            with attempt:
+                data = {
+                    "type": 0,
+                    "startTs": round(time.time()*1000),
+                    "endTs": round(time.time()*1000),
+                    "env": {
+                        "p1": "",
+                        "p2": "",
+                        "p3": "",
+                        "p4": "",
+                        "p5": "",
+                        "p6": "",
+                        "p7": "",
+                        "p8": "",
+                        "p9": "",
+                        "p10": "",
+                        "p11": "",
+                        "p12": "",
+                        "p13": "",
+                        "p14": "",
+                        "p15": "",
+                        "p16": "",
+                        "p17": "",
+                        "p18": "",
+                        "p19": "",
+                        "p20": "",
+                        "p21": "",
+                        "p22": "",
+                        "p23": "",
+                        "p24": "",
+                        "p25": "",
+                        "p26": "",
+                        "p28": "",
+                        "p29": "",
+                        "p30": "",
+                        "p31": "",
+                        "p32": "",
+                        "p33": [],
+                        "p34": ""
+                    },
+                    "action": {
+                        "a1": [],
+                        "a2": [],
+                        "a3": [],
+                        "a4": [],
+                        "a5": [],
+                        "a6": [],
+                        "a7": [],
+                        "a8": [],
+                        "a9": [],
+                        "a10": [],
+                        "a11": [],
+                        "a12": [],
+                        "a13": [],
+                        "a14": []
+                    },
+                    "force": False,
+                    "talkBack": False,
+                    "uid": uid,
+                    "nonce": {
+                        "t": round(time.time()),
+                        "r": round(time.time())
+                    },
+                    "version": "2.0",
+                    "scene": "GROW_UP_CHECKIN"
+                }
+
+                key = get_random_chars_as_string(16)
+
+                params = {
+                    'k': '3dc42a135a8d45118034d1ab68213073',
+                    'locale': 'zh_CN',
+                    '_t': round(time.time()*1000),
+                }
+
+
+                data = {
+                    's': rsa_encrypt(public_key_pem, key),
+                    'd': aes_encrypt(key, str(data)),
+                    'a': 'GROW_UP_CHECKIN',
+                }
+                response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
+                result = response.json()
+                api_data = TokenResultHandler(result)
+                if api_data.success:
+                    return api_data.token
+                elif api_data.need_verify:
+                    log.error("遇到人机验证码, 尝试调用解决方案")
+                    url = api_data.data.get("url")
+                    for _ in range(3):
+                        if toekn := await get_token_by_captcha(url):
+                            return toekn
+                    return False
+                else:
+                    log.error("遇到未知错误，无法获取TOKEN")
+                    return False
+    except RetryError as e:
+        if is_incorrect_return(e):
+            log.exception(f"TOKEN - 服务器没有正确返回 {response.text}")
+        else:
+            log.exception("获取TOKEN异常")
+        return False
