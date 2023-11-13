@@ -1,9 +1,12 @@
 import time
+import random
+import asyncio
 
 from typing import Dict, List, Optional, Set, Type, Union
 
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
 from ..request import get, post
+from utils.utils import get_token
 from ..logger import log
 
 
@@ -54,6 +57,17 @@ class BaseSign:
         except Exception:
             log.exception("获取每日任务异常") if not nolog else None
             return []
+        
+    @classmethod
+    async def randomized_sign_method(cls, cookie, tasks_to_execute):
+        tasks = [sign_class(cookie) for task_name, sign_class in cls.AVAILABLE_SIGNS.items() if task_name in tasks_to_execute]
+        random.shuffle(tasks)
+        log.debug(f"随机后的任务列表：{tasks}")
+
+        for task in tasks:
+            await task.sign()
+            delay = random.uniform(5, 12)
+            await asyncio.sleep(delay)
 
     async def sign(self) -> bool:
         """
@@ -104,6 +118,12 @@ class Check_In(BaseSign):
     }
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
+    async def sign(self) -> bool:
+        if not self.token:
+            self.token = await get_token(self.cookie["cUserId"])
+        if not self.token:
+            log.error("获取 Token 失败")
+            return False
 
 class Browse_Post(BaseSign):
     """

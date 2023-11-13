@@ -2,9 +2,9 @@
 一个适用于 社区 4.0 模拟网络功能请求的脚本
 
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) ![GitHub](https://img.shields.io/github/license/0-8-4/miui-auto-tasks) 
-![Python](https://img.shields.io/badge/python-3.7+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.8+-blue) ![DockerHub](https://github.com/0-8-4/miui-auto-tasks/actions/workflows/docker-image.yml/badge.svg)
 
-## 我们收到反馈，部分用户已收到通知要求不得继续随意调用社区接口，否则社区账户将被永久封禁。<br/>鉴于以上情况，我们作为项目维护者建议停用脚本。<br/>感谢大家的支持，谢谢所有Star和Fork的人。
+## 我们收到反馈，部分用户已收到通知要求不得继续随意调用社区接口，否则社区账户将被永久封禁。<br/>鉴于以上情况，我们作为项目维护者建议慎用脚本。<br/>感谢大家的支持，谢谢所有Star和Fork的人。
 
 ## **关于项目**:
 
@@ -26,7 +26,7 @@
 
 
 ### **项目依赖**：
-  1. 需要前往 Python 官网自行下载自己系统对应的 Python 版本，或使用自己系统对应的包管理安装，推荐至少 Python 3.7 以上
+  1. 需要前往 Python 官网自行下载自己系统对应的 Python 版本，或使用自己系统对应的包管理安装，至少 Python 3.8 以上
 
   ```
   https://www.python.org/downloads/
@@ -59,6 +59,7 @@
 - [x] 支持 Docker 部署
 - [x] 支持 青龙面板 部署
 - [x] 支持 自动登录账号刷新社区 Cookie 以便于实现自动化   
+- [x] 支持 随机延迟乱序执行任务   
 - [x] 绝大多数功能均可在配置文件中自行开关启用   
 
 &#x26A0; 请注意，配置文件默认禁用了 MIUI Task 绝大多数模拟网络请求的功能能力，请注意修改配置文件按需启用。根据社区相关规则，模拟这些功能的网络请求可能存在一定风险。您需要自行承担使用本脚本的后果
