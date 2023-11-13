@@ -1,5 +1,5 @@
-requests>=2.25.1
-python-dotenv>=0.19.2
-PyYAML>=6.0
-crypto
 onepush
+orjson>=3.9.10
+loguru>=0.7.2
+pydantic>=2.4.2
+httpx>=0.25.1
