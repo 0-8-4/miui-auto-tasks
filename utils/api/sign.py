@@ -119,8 +119,8 @@ class Check_In(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
     async def sign(self) -> bool:
-        if not self.token:
-            self.token = await get_token(self.cookie["cUserId"])
+        log.info("开始获取 Token ")
+        self.token = await get_token(self.cookie["cUserId"])
         if not self.token:
             log.error("获取 Token 失败")
             return False
