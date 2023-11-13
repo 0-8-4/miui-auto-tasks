@@ -1,0 +1,99 @@
+name: 问题反馈
+description: Create a report to help us improve
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        如果你可以自己 Debug 并解决的话, 建议您直接提交 PR 或 描述解决方法, 非常感谢!
+  - type: checkboxes
+    id: verify_step
+    attributes:
+      label: Verify Steps
+      description: |
+        在提交之前, 请确认 / Please verify that you've followed these steps.
+      options:
+        - label: Tracker 我已经在 [Issue Tracker](……/) 中找过我要提出的问题
+          required: true
+        - label: Latest 我已经使用最新版本测试过，问题依旧存在
+          required: true
+        - label: Code 这是 MIUITask 自身代码存在的问题，并非我所使用的 网络 或 设备 等特定问题
+          required: true
+        - label: Meaningful 我提交的不是无意义的 催促更新或修复 请求
+          required: true
+  - type: input
+    id: miuitask_version
+    attributes:
+      label: MIUITask Version
+      description: |
+        MIUITask 版本号
+      placeholder: "v1.6.0.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: bug_os
+    attributes:
+      label: Bug Found in Environment
+      description: |
+        发现问题所在的系统环境 / System Environment
+      multiple: true
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Docker
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: bug_pyversion
+    attributes:
+      label: Bug Found in Python Version
+      description: |
+        发现问题所在的Python版本 / Python Version
+      multiple: true
+      options:
+        - 3.12
+        - 3.11
+        - 3.10
+        - 3.9
+        - 3.8
+        - 3.7
+        - 3.6
+    validations:
+      required: true
+  - type: textarea
+    id: describe_bug
+    attributes:
+      label: Describe the Bug
+      description: |
+        对Bug本身清晰而简洁的描述 / Describe the Bug
+    validations:
+      required: true
+  - type: textarea
+    id: miuitask_log
+    attributes:
+      label: MIUITask Log
+      description: |
+        在下方附上 MIUITask 输出日志 / MIUItask  Log
+    validations:
+      required: true
+  - type: textarea
+    id: miuitask_config
+    attributes:
+      label: MIUITask Config
+      description: |
+        可选 在下方附上 MIUITask 配置文件 / MIUITask config
+        隐私提示: 上传此日志前请注意检查、隐去账号、密码等相关敏感信息
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: |
+        添加图片以帮助解释您的问题 / Screenshots
+    validations:
+      required: false

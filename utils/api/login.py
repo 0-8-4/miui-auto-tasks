@@ -12,6 +12,7 @@ from ..request import get, post
 from ..logger import log
 from ..data_model import LoginResultHandler
 
+
 class Login:
     def __init__(self, account: Account) -> None:
         self.user_agent = account.user_agent
@@ -79,7 +80,7 @@ class Login:
         except Exception:
             log.exception("登录小米账号出错")
             return False
-    
+
     async def get_cookie(self, url: str) -> Union[Dict[str, str], bool]:
         try:
             response = await get(url, follow_redirects=False)
@@ -88,4 +89,3 @@ class Login:
         except Exception:
             log.exception("社区获取 Cookie 失败")
             return False
-  

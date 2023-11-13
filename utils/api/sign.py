@@ -6,6 +6,7 @@ from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
 from ..request import get, post
 from ..logger import log
 
+
 class BaseSign:
     """
     签到基类
@@ -34,7 +35,7 @@ class BaseSign:
     async def check_daily_tasks(self) -> Union[List[DailyTasksResult], List[None]]:
         try:
             response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
-                                    cookies=self.cookie)
+                                 cookies=self.cookie)
             log.debug(response.text)
             result = response.json()
             api_data = ApiResultHandler(result)
@@ -64,7 +65,7 @@ class BaseSign:
             params['token'] = self.token if 'token' in params else params
             data = self.DATA.copy()
             data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
-            response = await post(self.URL_SIGN, 
+            response = await post(self.URL_SIGN,
                                   params=params, data=data,
                                   cookies=self.cookie, headers=self.headers)
             log.debug(response.text)
@@ -83,6 +84,7 @@ class BaseSign:
             log.exception(f"{self.NAME}出错")
             return False
 
+
 class Check_In(BaseSign):
     """
     每日签到
@@ -100,7 +102,8 @@ class Check_In(BaseSign):
         'miui_vip_ph': "{miui_vip_ph}",
         'token': ""
     }
-    URL_SIGN ='https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
+    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
+
 
 class Browse_Post(BaseSign):
     """
@@ -120,6 +123,7 @@ class Browse_Post(BaseSign):
     }
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
+
 class Browse_User_Page(BaseSign):
     """
     浏览个人主页10s
@@ -137,6 +141,7 @@ class Browse_User_Page(BaseSign):
         'miui_vip_ph': "{miui_vip_ph}"
     }
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
+
 
 class Browse_Special_Page(BaseSign):
     """
@@ -156,6 +161,7 @@ class Browse_Special_Page(BaseSign):
     }
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
+
 class Board_Follow(BaseSign):
     """
     加入小米圈子
@@ -170,6 +176,7 @@ class Board_Follow(BaseSign):
     }
 
     URL_SIGN = 'https://api.vip.miui.com/api/community/board/follow'
+
 
 class Board_UnFollow(BaseSign):
     """
@@ -186,6 +193,7 @@ class Board_UnFollow(BaseSign):
 
     URL_SIGN = 'https://api.vip.miui.com/api/community/board/unfollow'
 
+
 class Thumb_Up(BaseSign):
     """
     点赞他人帖子
@@ -193,12 +201,13 @@ class Thumb_Up(BaseSign):
     NAME = "点赞他人帖子"
 
     DATA = {
-        'postId':'36625780',
-        'sign':'36625780',
-        'timestamp':int(round(time.time()*1000))
+        'postId': '36625780',
+        'sign': '36625780',
+        'timestamp': int(round(time.time() * 1000))
     }
 
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp'
+
 
 # 注册签到任务
 BaseSign.AVAILABLE_SIGNS[Check_In.NAME] = Check_In

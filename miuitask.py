@@ -1,7 +1,7 @@
 '''
-Date: 2023-11-11 23:49:21
+Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-13 20:14:46
+LastEditTime: 2023-11-13 20:29:58
 '''
 import asyncio
 
@@ -14,23 +14,25 @@ from utils.utils import get_token
 
 _conf = ConfigManager.data_obj
 
+
 async def main():
     for account in _conf.accounts:
         login_obj = Login(account)
         if (cookies := await login_obj.login()) and (token := await get_token(cookies["cUserId"])):
             sign_obj = BaseSign(cookies)
             daily_tasks = await sign_obj.check_daily_tasks()
-            sign_task_obj = sign_obj.AVAILABLE_SIGNS # 签到任务对象合集
+            sign_task_obj = sign_obj.AVAILABLE_SIGNS  # 签到任务对象合集
             for task in daily_tasks:
                 if not task.showType:
                     log.info(f"开始执行{task.name}任务")
-                    if task_obj := sign_task_obj.get(task.name): # 签到任务对象
+                    if task_obj := sign_task_obj.get(task.name):  # 签到任务对象
                         await task_obj(cookies, token).sign()
                     else:
                         log.error(f"未找到{task.name}任务")
                 else:
                     log.info(f"{task.name}任务已完成")
     notify_me(get_message())
+
 
 if __name__ == "__main__":
     asyncio.run(main())

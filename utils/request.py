@@ -1,8 +1,8 @@
-'''
+"""
 Date: 2023-11-11 23:34:08
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 LastEditTime: 2023-11-13 18:17:50
-'''
+"""
 import httpx
 
 from typing import Any, Dict, Optional
@@ -14,12 +14,13 @@ from .config import ConfigManager
 
 _conf = ConfigManager.data_obj
 
+
 async def get(url: str,
-                *,
-                headers: Optional[Dict[str, str]] = None,
-                params: Optional[Dict[str, Any]] = None,
-                timeout: Optional[int] = 20,
-                **kwargs) -> httpx.Response:
+              *,
+              headers: Optional[Dict[str, str]] = None,
+              params: Optional[Dict[str, Any]] = None,
+              timeout: Optional[int] = 20,
+              **kwargs) -> httpx.Response:
     """
     说明：
         httpx的get请求封装
@@ -38,12 +39,13 @@ async def get(url: str,
                                 timeout=timeout,
                                 **kwargs)
 
+
 async def post(url: str,
-                *,
-                headers: Optional[Dict[str, str]] = None,
-                params: Optional[Dict[str, Any]] = None,
-                timeout: Optional[int] = 20,
-                **kwargs) -> httpx.Response:
+               *,
+               headers: Optional[Dict[str, str]] = None,
+               params: Optional[Dict[str, Any]] = None,
+               timeout: Optional[int] = 20,
+               **kwargs) -> httpx.Response:
     """
     说明：
         httpx的post请求封装
@@ -57,10 +59,11 @@ async def post(url: str,
     """
     async with httpx.AsyncClient() as client:
         return await client.post(url,
-                                headers=headers,
-                                params=params,
-                                timeout=timeout,
-                                **kwargs)
+                                 headers=headers,
+                                 params=params,
+                                 timeout=timeout,
+                                 **kwargs)
+
 
 def notify_me(content=""):
     """
