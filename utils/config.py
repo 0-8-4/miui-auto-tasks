@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from hashlib import md5
 
+import yaml
 from loguru import logger as log
 from orjson import JSONDecodeError
 from pydantic import BaseModel, ValidationError, validator
@@ -13,7 +14,7 @@ ROOT_PATH = Path(__name__).parent.absolute()
 DATA_PATH = ROOT_PATH / "data"
 '''数据保存目录'''
 
-CONFIG_PATH = DATA_PATH / "config.json"
+CONFIG_PATH = DATA_PATH / "config.yaml"
 """数据文件默认路径"""
 
 def md5_crypto(passwd: str) -> str:
@@ -76,11 +77,12 @@ def write_plugin_data(data: Config = None):
         if data is None:
             data = ConfigManager.data_obj
         try:
-            str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+            #str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+            str_data = yaml.dump(data.model_dump(), indent=2, allow_unicode=True, sort_keys=False)
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False
-        with open(CONFIG_PATH, "wb") as f:
+        with open(CONFIG_PATH, "w") as f:
             f.write(str_data)
         return True
     except OSError:
@@ -99,8 +101,10 @@ class ConfigManager:
         """
         if os.path.exists(DATA_PATH) and os.path.isfile(CONFIG_PATH):
             try:
-                new_model = Config.parse_file(CONFIG_PATH)
-                for attr in new_model.__fields__:
+                with open(CONFIG_PATH, 'r') as file:
+                    data = yaml.safe_load(file)
+                new_model = Config.model_validate(data)
+                for attr in new_model.model_fields:
                     ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
                 write_plugin_data(ConfigManager.data_obj) # 同步配置
             except (ValidationError, JSONDecodeError):
@@ -111,15 +115,10 @@ class ConfigManager:
                     f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 是否存在且有权限读取和写入")
                 raise
         else:
-            config_data = Config()
             try:
-                print(config_data.dict())
-                str_data = orjson.dumps(config_data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
-                print(str_data)
                 if not os.path.exists(DATA_PATH):
                     os.mkdir(DATA_PATH)
-                with open(CONFIG_PATH, "wb") as f:
-                    f.write(str_data)
+                write_plugin_data()
             except (AttributeError, TypeError, ValueError, PermissionError):
                 log.exception(f"创建数据文件失败，请检查是否有权限读取和写入 {CONFIG_PATH}")
                 raise
