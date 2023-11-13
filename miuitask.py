@@ -1,8 +1,8 @@
-'''
+"""
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-13 21:13:14
-'''
+LastEditTime: 2023-11-13 20:29:58
+"""
 import asyncio
 
 from utils.api.login import Login
@@ -11,11 +11,13 @@ from utils.config import ConfigManager
 from utils.logger import log, get_message
 from utils.request import notify_me
 from utils.utils import get_token
+from utils.system_info import print_info
 
 _conf = ConfigManager.data_obj
 
 
 async def main():
+    print_info()
     for account in _conf.accounts:
         login_obj = Login(account)
         if (cookies := await login_obj.login()) and (token := await get_token(cookies["cUserId"])):
