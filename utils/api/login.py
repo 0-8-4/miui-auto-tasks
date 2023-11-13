@@ -1,8 +1,3 @@
-'''
-Date: 2023-11-12 14:05:06
-LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-13 21:30:59
-'''
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
