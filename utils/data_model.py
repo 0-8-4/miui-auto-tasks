@@ -11,7 +11,7 @@ class ApiResultHandler(BaseModel):
     """API返回的JSON对象序列化以后的Dict对象"""
     data: Optional[Dict[str, Any]] = None
     """API返回的数据体"""
-    message: Optional[str] = None
+    message: str = ""
     """API返回的消息内容"""
     status: Optional[int] = None
     """API返回的状态码"""
@@ -20,23 +20,18 @@ class ApiResultHandler(BaseModel):
         super().__init__(content=content)
 
         for key in ["data", "entity"]:
-            if not self.data:
+            if self.data is None:
                 self.data = self.content.get(key)
             else:
                 break
 
         for key in ["code", "status"]:
-            if not self.status:
+            if self.status is None:
                 self.status = self.content.get(key)
-                if self.status:
-                    break
 
         for key in ["desc", "message"]:
-            if not self.message:
-                self.message = self.content.get(key)
-                if self.message:
-                    break
-            self.message: str = ""
+            if self.message == "":
+                self.message = self.content.get(key, "")
 
     @property
     def success(self):
@@ -110,4 +105,14 @@ class SignResultHandler(ApiResultHandler):
         cookie是否失效
         """
         return self.status == 401
-    
+
+class TokenResultHandler(ApiResultHandler):
+    """
+    TOKEN数据处理器
+    """
+    token: Optional[str] = None
+
+    def __init__(self, content: Dict[str, Any]):
+        super().__init__(content=content)
+        
+        self.token = self.data.get("token")

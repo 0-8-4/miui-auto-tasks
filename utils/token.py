@@ -1,6 +1,5 @@
 import random
 import time
-import asyncio
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives import padding, serialization
@@ -8,6 +7,8 @@ from cryptography.hazmat.backends import default_backend
 import base64
 
 from .request import get, post
+from .data_model import TokenResultHandler
+from .logger import log
 
 public_key_pem = '''-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArxfNLkuAQ/BYHzkzVwtu
@@ -47,206 +48,112 @@ def rsa_encrypt(public_key_pem, data: str) -> str:
     return base64.b64encode(ciphertext).decode('utf-8')
 
 async def get_token_data(uid: str) -> str:
-    data = {
-        "type": 0,
-        "startTs": round(time.time()*1000),
-        "endTs": round(time.time()*1000),
-        "env": {
-            "p1": "0.1",
-            "p2": "pc-Chrome119",
-            "p3": "Win32",
-            "p4": "Gecko",
-            "p5": "zh-CN",
-            "p6": "Netscape",
-            "p7": "Mozilla",
-            "p8": "true",
-            "p9": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
-            "p10": 480,
-            "p11": 1699803509070,
-            "p12": 1707,
-            "p13": 1067,
-            "p14": 1707,
-            "p15": 1067,
-            "p16": 1354,
-            "p17": 880,
-            "p18": "https://web.vip.miui.com/page/info/mio/mio/checkIn?app_version=dev.230904",
-            "p19": 5,
-            "p20": "",
-            "p21": "",
-            "p22": 6,
-            "p23": "",
-            "p24": "",
-            "p25": "",
-            "p26": "",
-            "p28": "",
-            "p29": 38,
-            "p30": 188,
-            "p31": 98,
-            "p32": "0.65",
-            "p33": [],
-            "p34": "https://web.vip.miui.com/page/info/mio/mio/checkIn?app_version=dev.230904"
-        },
-        "action": {
-            "a1": [
-                1354,
-                880
-            ],
-            "a2": [],
-            "a3": [
-                [
-                    668,
-                    269,
-                    1028
-                ]
-            ],
-            "a4": [],
-            "a5": [
-                [
-                    1128,
-                    301,
-                    5
-                ],
-                [
-                    1119,
-                    301,
-                    57
-                ],
-                [
-                    1111,
-                    300,
-                    112
-                ],
-                [
-                    1105,
-                    299,
-                    164
-                ],
-                [
-                    1097,
-                    299,
-                    220
-                ],
-                [
-                    1087,
-                    298,
-                    273
-                ],
-                [
-                    1078,
-                    297,
-                    324
-                ],
-                [
-                    1065,
-                    296,
-                    377
-                ],
-                [
-                    1049,
-                    295,
-                    430
-                ],
-                [
-                    1031,
-                    295,
-                    481
-                ],
-                [
-                    1002,
-                    295,
-                    532
-                ],
-                [
-                    966,
-                    296,
-                    584
-                ],
-                [
-                    917,
-                    299,
-                    636
-                ],
-                [
-                    840,
-                    300,
-                    691
-                ],
-                [
-                    770,
-                    300,
-                    742
-                ],
-                [
-                    732,
-                    297,
-                    793
-                ],
-                [
-                    718,
-                    293,
-                    844
-                ],
-                [
-                    686,
-                    277,
-                    895
-                ]
-            ],
-            "a6": [],
-            "a7": [],
-            "a8": [],
-            "a9": [],
-            "a10": [],
-            "a11": [],
-            "a12": [],
-            "a13": [],
-            "a14": []
-        },
-        "force": "false",
-        "talkBack": "false",
-        "uid": uid,
-        "nonce": {
-            "t": round(time.time()),
-            "r": round(time.time())
-        },
-        "version": "2.0",
-        "scene": "GROW_UP_CHECKIN"
-    }
+    try:
+        data = {
+            "type": 0,
+            "startTs": round(time.time()*1000),
+            "endTs": round(time.time()*1000),
+            "env": {
+                "p1": "",
+                "p2": "",
+                "p3": "",
+                "p4": "",
+                "p5": "",
+                "p6": "",
+                "p7": "",
+                "p8": "",
+                "p9": "",
+                "p10": "",
+                "p11": "",
+                "p12": "",
+                "p13": "",
+                "p14": "",
+                "p15": "",
+                "p16": "",
+                "p17": "",
+                "p18": "",
+                "p19": "",
+                "p20": "",
+                "p21": "",
+                "p22": "",
+                "p23": "",
+                "p24": "",
+                "p25": "",
+                "p26": "",
+                "p28": "",
+                "p29": "",
+                "p30": "",
+                "p31": "",
+                "p32": "",
+                "p33": [],
+                "p34": ""
+            },
+            "action": {
+                "a1": [],
+                "a2": [],
+                "a3": [],
+                "a4": [],
+                "a5": [],
+                "a6": [],
+                "a7": [],
+                "a8": [],
+                "a9": [],
+                "a10": [],
+                "a11": [],
+                "a12": [],
+                "a13": [],
+                "a14": []
+            },
+            "force": False,
+            "talkBack": False,
+            "uid": uid,
+            "nonce": {
+                "t": round(time.time()),
+                "r": round(time.time())
+            },
+            "version": "2.0",
+            "scene": "GROW_UP_CHECKIN"
+        }
 
-    key = get_random_chars_as_string(16)
+        key = get_random_chars_as_string(16)
 
-    headers = {
-        'Accept': '*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Content-type': 'application/x-www-form-urlencoded',
-        'Origin': 'https://web.vip.miui.com',
-        'Pragma': 'no-cache',
-        'Referer': 'https://web.vip.miui.com/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'cross-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
-        'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-    }
+        headers = {
+            'Accept': '*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Content-type': 'application/x-www-form-urlencoded',
+            'Origin': 'https://web.vip.miui.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://web.vip.miui.com/',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+            'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        }
 
-    params = {
-        'k': '3dc42a135a8d45118034d1ab68213073',
-        'locale': 'zh_CN',
-        '_t': round(time.time()*1000),
-    }
+        params = {
+            'k': '3dc42a135a8d45118034d1ab68213073',
+            'locale': 'zh_CN',
+            '_t': round(time.time()*1000),
+        }
 
 
-    data = {
-        's': rsa_encrypt(public_key_pem, key),
-        'd': aes_encrypt(key, str(data)),
-        'a': 'GROW_UP_CHECKIN',
-    }
-    response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
-    result = response.json()
-    token = result.get("data", {}).get("token", "")
-    return token
-    
+        data = {
+            's': rsa_encrypt(public_key_pem, key),
+            'd': aes_encrypt(key, str(data)),
+            'a': 'GROW_UP_CHECKIN',
+        }
+        response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
+        log.debug(response.text)
+        result = response.json()
+        api_data = TokenResultHandler(result)
+        if api_data.success:
+            return api_data.token
+        else:
+            exit("TOKEN获取失败")
+    except Exception:
+        log.exception("获取TOKEN异常")

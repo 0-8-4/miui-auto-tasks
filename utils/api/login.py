@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-12 14:38:36
+LastEditTime: 2023-11-13 12:32:26
 '''
 import orjson
 
@@ -83,6 +83,7 @@ class Login:
     async def get_cookie(self, url: str) -> Union[Dict[str, str], bool]:
         try:
             response = await get(url, follow_redirects=False)
+            log.debug(response.text)
             return dict(response.cookies)
         except Exception:
             log.exception("社区获取 Cookie 失败")

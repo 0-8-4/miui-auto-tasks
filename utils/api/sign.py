@@ -25,13 +25,13 @@ class BaseSign:
     AVAILABLE_SIGNS: Dict[str, Type["BaseSign"]] = {}
     """可用的子类"""
 
-    def __init__(self, cookie, token):
+    def __init__(self, cookie: Dict, token: Optional[str] = None):
         self.cookie = cookie
         self.token = token
         self.headers = {
         }
 
-    async def check_daily_tasks(self) -> Optional[list[DailyTasksResult]]:
+    async def check_daily_tasks(self) -> Union[List[DailyTasksResult], List[None]]:
         try:
             response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
                                     cookies=self.cookie)
@@ -49,10 +49,10 @@ class BaseSign:
                 return task_status
             else:
                 log.error("获取每日任务状态失败：" + api_data.message)
-                return None
+                return []
         except Exception as e:
             log.exception("获取每日任务异常")
-            return None
+            return []
 
     async def sign(self) -> bool:
         """
@@ -93,8 +93,12 @@ class Check_In(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/checkIn',
         'version': 'dev.231026',
+        'miui_vip_ph': "{miui_vip_ph}"
+    }
+
+    DATA = {
         'miui_vip_ph': "{miui_vip_ph}",
-        "token": ""
+        'token': ""
     }
     URL_SIGN ='https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
