@@ -98,6 +98,10 @@ SOFTWARE.
 ```
 
 # **鸣谢**
+## 项目
+
+感谢由 [Xiaomi-Community-AutoTask](https://github.com/CMDQ8575/Xiaomi-Community-AutoTask) 启发的部分相关功能代码
+
 ## 社区
 
 本项目所有贡献者感谢所有Star了本项目的人
