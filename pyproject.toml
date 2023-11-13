@@ -14,6 +14,7 @@ dependencies = [
     "httpx>=0.25.1",
     "cryptography>=41.0.5",
     "pyyaml>=6.0.1",
+    "tenacity>=8.2.3",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}

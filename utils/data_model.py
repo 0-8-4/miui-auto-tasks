@@ -127,3 +127,8 @@ class TokenResultHandler(ApiResultHandler):
         """是否成功获取TOKEN"""
         return self.token != ""
     
+class GeetestResult(NamedTuple):
+    """人机验证结果数据"""
+    validate: str
+    challenge: str
+    
