@@ -1,5 +1,4 @@
 import os
-import orjson
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from hashlib import md5
@@ -14,9 +13,9 @@ ROOT_PATH = Path(__name__).parent.absolute()
 DATA_PATH = ROOT_PATH / "data"
 '''数据保存目录'''
 
-CONFIG_PATH = DATA_PATH / "config.yaml"
+CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
 """数据文件默认路径"""
-
+log.info(CONFIG_PATH)
 
 def md5_crypto(passwd: str) -> str:
     return md5(passwd.encode('utf8')).hexdigest().upper()
