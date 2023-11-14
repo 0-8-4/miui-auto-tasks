@@ -28,7 +28,10 @@ async def main():
                 if not task.showType:
                     log.info(f"开始执行{task.name}任务")
                     if task_obj := sign_task_obj.get(task.name):  # 签到任务对象
-                        await task_obj(cookies, token).sign()
+                        if getattr(account, task_obj.__name__):
+                            await task_obj(cookies, token).sign()
+                        else:
+                            log.info(f"任务{task.name}被禁用")
                     else:
                         log.error(f"未找到{task.name}任务")
                 else:
