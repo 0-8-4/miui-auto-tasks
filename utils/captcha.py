@@ -1,8 +1,8 @@
-"""
+'''
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-13 20:24:51
-"""
+LastEditTime: 2023-11-14 21:20:38
+'''
 
 from .request import get, post
 from .logger import log

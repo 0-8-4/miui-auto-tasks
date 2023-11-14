@@ -65,7 +65,12 @@ class BaseSign:
             params['token'] = self.token if 'token' in params else params
             data = self.DATA.copy()
             data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
-            data['token'] = self.token if 'token' in data else data
+            if 'token' in data:
+                if self.token:
+                    data['token'] = self.token
+                else:
+                    log.info(f"未获取到token, 跳过{self.NAME}")
+                    return False
             response = await post(self.URL_SIGN,
                                   params=params, data=data,
                                   cookies=self.cookie, headers=self.headers)
@@ -101,7 +106,7 @@ class Check_In(BaseSign):
 
     DATA = {
         'miui_vip_ph': "{miui_vip_ph}",
-        'token': ""
+        'token': "{token}"
     }
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
