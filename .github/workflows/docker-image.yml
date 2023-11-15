@@ -25,13 +25,13 @@ jobs:
         with:
             python-version: '3.11'
 
-      - name: Install PDM
+      - name: Install pipreqs
         run: |
-          pip install pdm
+          pip install pipreqs
 
       - name: Export requirements.txt
         run: |
-          pdm export -f requirements --without-hashes -o requirements.txt
+          pipreqs . --encoding=utf8 --force
 
       - name: Upload requirements.txt
         uses: actions/upload-artifact@v3.1.3
