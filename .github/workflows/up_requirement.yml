@@ -25,7 +25,10 @@ jobs:
           pipreqs . --encoding=utf8 --force
 
       - name: Upload requirements.txt
-        uses: actions/upload-artifact@v3.1.3
+        uses: EndBug/add-and-commit@v9.1.3
         with:
-          name: requirements.txt
-          path: requirements.txt
+          author_name: github-actions[bot]
+          author_email: github-actions[bot]@users.noreply.github.com
+          message: ':wrench: 自动更新requirements'
+          add: |
+            'requirements.txt'
