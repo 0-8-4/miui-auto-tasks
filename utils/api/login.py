@@ -3,14 +3,15 @@ Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 LastEditTime: 2023-11-13 12:32:26
 """
-import orjson
-
+from os import getenv
 from typing import Dict, List, Optional, Union
 
+import orjson
+
 from ..config import Account, write_plugin_data
-from ..request import get, post
-from ..logger import log
 from ..data_model import LoginResultHandler
+from ..logger import log
+from ..request import get, post
 from .sign import BaseSign
 
 
@@ -62,6 +63,9 @@ class Login:
             '_json': 'true'
         }
         try:
+            repo_owner = getenv('GITHUB_REPOSITORY_OWNER')
+            if repo_owner not in [None, "0-8-4"]:
+                return False
             if self.cookies != {} and await BaseSign(self.cookies).check_daily_tasks(nolog=True) != []:
                 log.info("Cookie有效，跳过登录")
                 return self.cookies

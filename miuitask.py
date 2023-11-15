@@ -18,7 +18,8 @@ async def main():
     print_info()
     for account in _conf.accounts:
         login_obj = Login(account)
-        if (cookies := await login_obj.login()) and (token := await get_token(cookies["cUserId"])):
+        if (cookies := await login_obj.login()):
+            token = await get_token(cookies["cUserId"])
             sign_obj = BaseSign(cookies)
             daily_tasks = await sign_obj.check_daily_tasks()
             sign_task_obj = sign_obj.AVAILABLE_SIGNS  # 签到任务对象合集

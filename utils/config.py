@@ -1,5 +1,4 @@
 import os
-import orjson
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from hashlib import md5
@@ -14,7 +13,7 @@ ROOT_PATH = Path(__name__).parent.absolute()
 DATA_PATH = ROOT_PATH / "data"
 '''数据保存目录'''
 
-CONFIG_PATH = DATA_PATH / "config.yaml"
+CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
 """数据文件默认路径"""
 
 
@@ -78,10 +77,20 @@ class OnePush(BaseModel):
     }
     """推送参数"""
 
+class Preference(BaseModel):
+    geetest_url: str = ""
+    """极验验证URL"""
+    geetest_params: Dict = {}
+    """极验自定义params参数"""
+    geetest_data: Dict = {}
+    """极验自定义data参数"""
+
 
 class Config(BaseModel):
-    accounts: List[Account] = [Account()]
+    preference: Preference = Preference()
     """偏好设置"""
+    accounts: List[Account] = [Account()]
+    """账号设置"""
     ONEPUSH: OnePush = OnePush()
     """消息推送"""
 
