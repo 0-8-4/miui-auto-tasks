@@ -1,13 +1,17 @@
 import os
+from hashlib import md5
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from hashlib import md5
 
 import yaml
 from loguru import logger as log
-from orjson import JSONDecodeError
 from pydantic import BaseModel, ValidationError, validator
 
+try:
+    from orjson import JSONDecodeError
+except:
+    from json import JSONDecodeError
+    
 ROOT_PATH = Path(__name__).parent.absolute()
 
 DATA_PATH = ROOT_PATH / "data"

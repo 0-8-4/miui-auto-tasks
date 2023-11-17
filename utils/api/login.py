@@ -6,7 +6,10 @@ LastEditTime: 2023-11-13 12:32:26
 from os import getenv
 from typing import Dict, List, Optional, Union
 
-import orjson
+try:
+    import orjson as json
+except:
+    import json
 
 from ..config import Account, write_plugin_data
 from ..data_model import LoginResultHandler
@@ -72,7 +75,7 @@ class Login:
             response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2', headers=headers, data=data)
             log.debug(response.text)
             result = response.text.lstrip('&').lstrip('START').lstrip('&')
-            data = orjson.loads(result)
+            data = json.loads(result)
             api_data = LoginResultHandler(data)
             if api_data.success:
                 log.success('小米账号登录成功')
