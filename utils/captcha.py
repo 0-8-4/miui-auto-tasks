@@ -14,6 +14,8 @@ _conf = ConfigManager.data_obj
 async def get_validate(gt: str, challenge: str) -> GeetestResult:
     try:
         validate = ""
+        if not _conf.preference.geetest_url:
+            return GeetestResult(challenge="", validate="")
         params = _conf.preference.geetest_params
         for key, value in params.items():
             if isinstance(value, str):
