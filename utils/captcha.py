@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-18 13:38:48
+LastEditTime: 2023-11-18 14:10:09
 '''
 
 from .request import post
@@ -34,6 +34,6 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:
         challenge = geetest.data["challenge"]
         validate = geetest.data["validate"]
         return GeetestResult(challenge=challenge, validate=validate)
-    except Exception:
+    except Exception: # pylint: disable=broad-exception-caught
         log.exception("获取人机验证结果异常")
         return GeetestResult(challenge="", validate="")

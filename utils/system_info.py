@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-14 21:13:35
+LastEditTime: 2023-11-18 14:22:37
 '''
 import platform
 from urllib.request import getproxies
@@ -9,6 +9,7 @@ from utils.logger import log
 
 
 def print_info():
+    """打印系统信息"""
     log.info("MIUI-AUTO-TASK v1.7.1")
     log.info('---------- 系统信息 -------------')
     system_info()
@@ -20,6 +21,7 @@ def print_info():
 
 
 def system_info():
+    """系统信息"""
     log.info(show_info('操作系统平台', platform.platform()))
     log.info(show_info('操作系统版本', platform.version()))
     log.info(show_info('操作系统名称', platform.system()))
@@ -31,5 +33,6 @@ def system_info():
         log.info(show_info('系统代理', getproxies()))
 
 
-def show_info(tip, info):
-    return "{}: {}".format(tip, info)
+def show_info(tip: str, info: str):
+    """格式化输出"""
+    return f"{tip}: {info}"

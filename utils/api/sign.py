@@ -55,7 +55,7 @@ class BaseSign:
                 if not nolog:
                     log.error(f"获取每日任务状态失败：{api_data.message}")
             return []
-        except Exception:
+        except Exception: # pylint: disable=broad-exception-caught
             if not nolog:
                 log.exception("获取每日任务异常")
             return []
@@ -91,7 +91,7 @@ class BaseSign:
             else:
                 log.error(f"{self.NAME}失败：" + api_data.message)
                 return False
-        except Exception:
+        except Exception: # pylint: disable=broad-exception-caught
             log.exception(f"{self.NAME}出错")
             return False
 

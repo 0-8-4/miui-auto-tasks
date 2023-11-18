@@ -58,19 +58,20 @@ class Account(BaseModel):
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _password(cls, v: Optional[str]):
+    def _password(cls, v: Optional[str]): # pylint: disable=no-self-argument
         if len(v) == 32:
             return v
         return md5_crypto(v)
 
     @validator("cookies", allow_reuse=True)
-    def _cookies(cls, v: Union[dict, str]):
+    def _cookies(cls, v: Union[dict, str]): # pylint: disable=no-self-argument
         if isinstance(v, str):
             return cookies_to_dict(v)
         return v
 
 
 class OnePush(BaseModel):
+    """推送配置"""
     notifier: Union[str, bool] = ""
     """是否开启消息推送"""
     params: Dict = {
@@ -82,6 +83,7 @@ class OnePush(BaseModel):
     """推送参数"""
 
 class Preference(BaseModel):
+    """偏好设置"""
     geetest_url: str = ""
     """极验验证URL"""
     geetest_params: Dict = {}
@@ -91,6 +93,7 @@ class Preference(BaseModel):
 
 
 class Config(BaseModel):
+    """插件数据"""
     preference: Preference = Preference()
     """偏好设置"""
     accounts: List[Account] = [Account()]
@@ -114,14 +117,15 @@ def write_plugin_data(data: Config = None):
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False
-        with open(CONFIG_PATH, "w") as f:
-            f.write(str_data)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as file:
+            file.write(str_data)
         return True
     except OSError:
         return False
 
 
 class ConfigManager:
+    """配置管理器"""
     data_obj = Config()
     """加载出的插件数据对象"""
     platform = "pc"
@@ -134,11 +138,12 @@ class ConfigManager:
         """
         if os.path.exists(DATA_PATH) and os.path.isfile(CONFIG_PATH):
             try:
-                with open(CONFIG_PATH, 'r') as file:
+                with open(CONFIG_PATH, 'r', encoding="utf-8") as file:
                     data = yaml.safe_load(file)
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
-                    ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
+                    #ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
+                    setattr(ConfigManager.data_obj, attr, getattr(new_model, attr))
                 write_plugin_data(ConfigManager.data_obj)  # 同步配置
             except (ValidationError, JSONDecodeError):
                 log.exception(f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 格式是否正确")
