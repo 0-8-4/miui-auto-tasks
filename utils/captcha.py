@@ -11,10 +11,10 @@ from .data_model import ApiResultHandler, GeetestResult
 
 _conf = ConfigManager.data_obj
 
-async def get_validate(gt: str, challenge: str) -> GeetestResult:
+async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""
     try:
-        validate = "" # pylint: disable=invalid-name
+        validate = ""
         params = _conf.preference.geetest_params.copy()
         for key, value in params.items():
             if isinstance(value, str):
