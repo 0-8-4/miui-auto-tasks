@@ -20,25 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Set up python 3.11    run the program once to create the `/data`
-        uses: actions/setup-python@v4
-        with:
-            python-version: '3.11'
-
-      - name: Install pipreqs
-        run: |
-          pip install pipreqs
-
-      - name: Export requirements.txt
-        run: |
-          pipreqs . --encoding=utf8 --force
-
-      -
-        name: run the program once to create the `/data`
-        run: |
-          python3 miuitask.py
-
-      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 

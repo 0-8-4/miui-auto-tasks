@@ -1,5 +1,10 @@
 FROM python:3.9-alpine
 
+RUN pip install -r requirements.txt \ 
+    pip install pipreqs \
+    pipreqs . --encoding=utf8 --force \
+    python miuitask.py
+
 COPY ./utils /srv/utils/
 
 COPY ./requirements.txt /tmp
