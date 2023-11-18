@@ -10,7 +10,6 @@ name: DockerHub CI
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 env:
   DOCKERHUB_REPO: o1si/miui-auto-tasks
