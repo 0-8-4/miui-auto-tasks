@@ -20,7 +20,7 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:
         for key, value in params.items():
             if isinstance(value, str):
                 params[key] = value.format(gt=gt, challenge=challenge)
-        data = _conf.preference.geetest_data
+        data = _conf.preference.geetest_data.copy()
         for key, value in data.items():
             if isinstance(value, str):
                 data[key] = value.format(gt=gt, challenge=challenge)
