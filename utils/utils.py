@@ -53,7 +53,7 @@ def get_random_chars_as_string(count: int) -> str:
 
 def aes_encrypt(key: str, data: str) -> base64:
     """AES加密"""
-    iv = b'0102030405060708'
+    iv = b'0102030405060708' # pylint: disable=invalid-name
     cipher = Cipher(algorithms.AES(key.encode('utf-8')), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
     padder = padding.PKCS7(algorithms.AES.block_size).padder()
@@ -91,7 +91,7 @@ async def get_token_by_captcha(url: str) -> str:
     try:
         parsed_url = urlparse(url)
         query_params = dict(parse_qsl(parsed_url.query)) # 解析URL参数
-        gt = query_params.get("c")
+        gt = query_params.get("c") # pylint: disable=invalid-name
         challenge = query_params.get("l")
         geetest_data = await get_validate(gt, challenge)
         params = {
@@ -222,8 +222,8 @@ async def get_token(uid: str) -> str:
                 else:
                     log.error("遇到未知错误，无法获取TOKEN")
                     return False
-    except RetryError as e:
-        if is_incorrect_return(e):
+    except RetryError as error:
+        if is_incorrect_return(error):
             log.exception(f"TOKEN - 服务器没有正确返回 {response.text}")
         else:
             log.exception("获取TOKEN异常")

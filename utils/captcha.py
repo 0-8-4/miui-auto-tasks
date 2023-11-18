@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-18 14:10:09
+LastEditTime: 2023-11-18 14:30:41
 '''
 
 from .request import post
@@ -14,7 +14,7 @@ _conf = ConfigManager.data_obj
 async def get_validate(gt: str, challenge: str) -> GeetestResult:
     """获取人机验证结果"""
     try:
-        validate = ""
+        validate = "" # pylint: disable=invalid-name
         params = _conf.preference.geetest_params.copy()
         for key, value in params.items():
             if isinstance(value, str):

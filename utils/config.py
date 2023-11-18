@@ -58,16 +58,16 @@ class Account(BaseModel):
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _password(cls, v: Optional[str]): # pylint: disable=no-self-argument
-        if len(v) == 32:
-            return v
-        return md5_crypto(v)
+    def _password(cls, value: Optional[str]): # pylint: disable=no-self-argument
+        if len(value) == 32:
+            return value
+        return md5_crypto(value)
 
     @validator("cookies", allow_reuse=True)
-    def _cookies(cls, v: Union[dict, str]): # pylint: disable=no-self-argument
-        if isinstance(v, str):
-            return cookies_to_dict(v)
-        return v
+    def _cookies(cls, value: Union[dict, str]): # pylint: disable=no-self-argument
+        if isinstance(value, str):
+            return cookies_to_dict(value)
+        return value
 
 
 class OnePush(BaseModel):
