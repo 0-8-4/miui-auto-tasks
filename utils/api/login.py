@@ -4,7 +4,7 @@ LastEditors: Night-stars-1 nujj1042633805@gmail.com
 LastEditTime: 2023-11-13 12:32:26
 """
 from os import getenv
-from typing import Dict, List, Optional, Union
+from typing import Dict, Union
 
 import orjson
 
@@ -16,6 +16,8 @@ from .sign import BaseSign
 
 
 class Login:
+    """登录类"""
+
     def __init__(self, account: Account) -> None:
         self.account = account
         self.user_agent = account.user_agent
@@ -24,6 +26,7 @@ class Login:
         self.cookies = account.cookies
 
     async def login(self) -> Union[Dict[str, str], bool]:
+        """登录小米账号"""
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'Referer': 'https://account.xiaomi.com/fe/service/login/password?sid=miui_vip&qs=%253Fcallback%253Dhttp'
@@ -72,7 +75,7 @@ class Login:
             response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2', headers=headers, data=data)
             log.debug(response.text)
             result = response.text.lstrip('&').lstrip('START').lstrip('&')
-            data = orjson.loads(result)
+            data = orjson.loads(result)  # pylint: disable=no-member
             api_data = LoginResultHandler(data)
             if api_data.success:
                 log.success('小米账号登录成功')
@@ -81,23 +84,22 @@ class Login:
                 write_plugin_data()
                 return cookies
             elif not api_data.pwd_wrong:
-                log.error('小米账号登录失败：' + api_data.message)
-                return False
+                log.error(f'小米账号登录失败：{api_data.message}')
             elif api_data.need_captcha:
                 log.error('当前账号需要短信验证码, 请尝试修改UA或设备ID')
-                return False
             else:
                 log.error('小米账号登录失败：用户名或密码不正确')
-                return False
-        except Exception:
+            return False
+        except Exception: # pylint: disable=broad-exception-caught
             log.exception("登录小米账号出错")
             return False
 
     async def get_cookie(self, url: str) -> Union[Dict[str, str], bool]:
+        """获取社区 Cookie"""
         try:
             response = await get(url, follow_redirects=False)
             log.debug(response.text)
             return dict(response.cookies)
-        except Exception:
+        except Exception: # pylint: disable=broad-exception-caught
             log.exception("社区获取 Cookie 失败")
             return False

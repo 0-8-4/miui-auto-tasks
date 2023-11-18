@@ -94,9 +94,9 @@ class SignResultHandler(ApiResultHandler):
         super().__init__(content=content)
         
         self.growth = self.content.get("entity", {})
-        if type(self.growth) == dict:
+        if isinstance(self.growth, dict):
             self.growth = self.growth.get("score", "未知")
-        elif type(self.growth) == int:
+        elif isinstance(self.growth, int):
             self.growth = str(self.growth)
         
 
@@ -128,15 +128,14 @@ class TokenResultHandler(ApiResultHandler):
     @property
     def need_verify(self):
         """需要验证码"""
-        return self.data.get("result") == False and self.data.get("url")
+        return self.data.get("result") is False and self.data.get("url")
 
     @property
     def success(self):
         """是否成功获取TOKEN"""
         return self.token != ""
-    
+
 class GeetestResult(NamedTuple):
     """人机验证结果数据"""
     validate: str
-    challenge: str
-    
+    challenge: str    

@@ -1,8 +1,8 @@
-"""
-Date: 2023-11-11 23:39:10
+'''
+Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-12 13:58:56
-"""
+LastEditTime: 2023-11-18 00:33:18
+'''
 import os
 import sys
 
@@ -12,6 +12,7 @@ message = ""
 
 
 def LogFilter(record):
+    """loguru过滤器"""
     global message
     if record["level"].no >= 20:
         message += f"{record.get('message')}\n"

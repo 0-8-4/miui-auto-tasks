@@ -1,12 +1,14 @@
+""""配置文件"""
 import os
+from hashlib import md5
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from hashlib import md5
 
 import yaml
 from loguru import logger as log
-from orjson import JSONDecodeError
-from pydantic import BaseModel, ValidationError, validator
+from pydantic import (BaseModel,  # pylint: disable=no-name-in-module
+                      ValidationError, validator)
 
 ROOT_PATH = Path(__name__).parent.absolute()
 
@@ -18,9 +20,11 @@ CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is 
 
 
 def md5_crypto(passwd: str) -> str:
+    """MD5加密"""
     return md5(passwd.encode('utf8')).hexdigest().upper()
 
 def cookies_to_dict(cookies):
+    """将cookies字符串转换为字典"""
     cookies_dict = {}
     for cookie in cookies.split(';'):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
@@ -28,6 +32,7 @@ def cookies_to_dict(cookies):
     return cookies_dict
 
 class Account(BaseModel):
+    """账号处理器"""
     uid: str = "100000"
     """账户ID 非账户用户名或手机号"""
     password: str = ""
@@ -37,31 +42,30 @@ class Account(BaseModel):
     user_agent: str = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
     """登录社区时所用浏览器的 User-Agent"""
 
-    """功能开关"""
-    Check_In: bool = False
+    CheckIn: bool = False
     """社区成长值签到，启用功能意味着你愿意自行承担相关风险"""
-    Browse_User_Page: bool = False
+    BrowseUserPage: bool = False
     """社区浏览个人主页10秒，启用功能意味着你愿意自行承担相关风险"""
-    Browse_Post: bool = False
+    BrowsePost: bool = False
     """社区浏览帖子10秒，启用功能意味着你愿意自行承担相关风险"""
-    Thumb_Up: bool = False
+    ThumbUp: bool = False
     """点赞帖子，启用功能意味着你愿意自行承担相关风险"""
-    Browse_Special_Page: bool = False
+    BrowseSpecialPage: bool = False
     """社区在活动期间可能会出现限时的“浏览指定专题页”任务，启用功能意味着你愿意自行承担相关风险"""
-    Board_Follow: bool = False
+    BoardFollow: bool = False
     """社区可能会出现限时的“加入圈子”任务，启用功能意味着你愿意自行承担相关风险"""
-    carrot_pull: bool = False
+    carrotpull: bool = False
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _password(cls, v: Optional[str]):
+    def _password(self, v: Optional[str]):
         if len(v) == 32:
             return v
         return md5_crypto(v)
-    
+
     @validator("cookies", allow_reuse=True)
-    def _cookies(cls, v: Union[dict, str]):
-        if type(v) == str:
+    def _cookies(self, v: Union[dict, str]):
+        if isinstance(v, str):
             return cookies_to_dict(v)
         return v
 

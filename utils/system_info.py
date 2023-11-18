@@ -9,7 +9,7 @@ from utils.logger import log
 
 
 def print_info():
-    log.info("MIUI-AUTO-TASK v1.7.1.1")
+    log.info("MIUI-AUTO-TASK v1.7.1")
     log.info('---------- 系统信息 -------------')
     system_info()
     log.info('---------- 项目信息 -------------')
