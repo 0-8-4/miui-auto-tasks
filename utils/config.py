@@ -58,13 +58,13 @@ class Account(BaseModel):
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _password(self, v: Optional[str]):
+    def _password(cls, v: Optional[str]):
         if len(v) == 32:
             return v
         return md5_crypto(v)
 
     @validator("cookies", allow_reuse=True)
-    def _cookies(self, v: Union[dict, str]):
+    def _cookies(cls, v: Union[dict, str]):
         if isinstance(v, str):
             return cookies_to_dict(v)
         return v
