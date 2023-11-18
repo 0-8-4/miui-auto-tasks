@@ -1,17 +1,22 @@
 FROM python:3.9-alpine
 
-COPY ./utils /srv/utils/
+RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
 
-COPY ./requirements.txt /tmp
+RUN pip install pdm
+
+COPY ./utils /srv/utils/
 
 COPY ./miuitask.py /srv/
 
-VOLUME ["./data", "/srv/data"]
-
-RUN pip install --no-cache-dir -i https://mirrors.bfsu.edu.cn/pypi/web/simple -r /tmp/requirements.txt && \
-    rm -rf /tmp/* && \
-    echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
+COPY pyproject.toml pdm.lock /srv/
 
 WORKDIR /srv
+
+RUN 
+
+RUN pdm install --prod && \
+    echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
+
+VOLUME ["./data", "/srv/data"]
 
 CMD ["/usr/sbin/crond", "-f"]

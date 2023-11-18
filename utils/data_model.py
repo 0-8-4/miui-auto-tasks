@@ -1,5 +1,6 @@
+"""数据处理模型"""
 from typing import (Any, Dict, NamedTuple, Optional)
-from pydantic import BaseModel
+from pydantic import BaseModel #pylint: disable=no-name-in-module
 
 
 class ApiResultHandler(BaseModel):
@@ -92,14 +93,12 @@ class SignResultHandler(ApiResultHandler):
 
     def __init__(self, content: Dict[str, Any]):
         super().__init__(content=content)
-        
         self.growth = self.content.get("entity", {})
-        if type(self.growth) == dict:
+        if isinstance(self.growth, dict):
             self.growth = self.growth.get("score", "未知")
-        elif type(self.growth) == int:
+        elif isinstance(self.growth, int):
             self.growth = str(self.growth)
-        
-
+    # pylint: disable=trailing-whitespace
     def __bool__(self):
         """
         签到是否成功
@@ -128,15 +127,14 @@ class TokenResultHandler(ApiResultHandler):
     @property
     def need_verify(self):
         """需要验证码"""
-        return self.data.get("result") == False and self.data.get("url")
+        return self.data.get("result") is False and self.data.get("url")
 
     @property
     def success(self):
         """是否成功获取TOKEN"""
         return self.token != ""
-    
+
 class GeetestResult(NamedTuple):
     """人机验证结果数据"""
     validate: str
     challenge: str
-    

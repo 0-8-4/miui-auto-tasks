@@ -1,12 +1,14 @@
+""""配置文件"""
 import os
+from hashlib import md5
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from hashlib import md5
 
 import yaml
 from loguru import logger as log
-from orjson import JSONDecodeError
-from pydantic import BaseModel, ValidationError, validator
+from pydantic import (BaseModel,  # pylint: disable=no-name-in-module
+                      ValidationError, validator)
 
 ROOT_PATH = Path(__name__).parent.absolute()
 
@@ -18,9 +20,11 @@ CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is 
 
 
 def md5_crypto(passwd: str) -> str:
+    """MD5加密"""
     return md5(passwd.encode('utf8')).hexdigest().upper()
 
 def cookies_to_dict(cookies):
+    """将cookies字符串转换为字典"""
     cookies_dict = {}
     for cookie in cookies.split(';'):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
@@ -28,6 +32,7 @@ def cookies_to_dict(cookies):
     return cookies_dict
 
 class Account(BaseModel):
+    """账号处理器"""
     uid: str = "100000"
     """账户ID 非账户用户名或手机号"""
     password: str = ""
@@ -37,36 +42,36 @@ class Account(BaseModel):
     user_agent: str = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
     """登录社区时所用浏览器的 User-Agent"""
 
-    """功能开关"""
-    Check_In: bool = False
+    CheckIn: bool = False
     """社区成长值签到，启用功能意味着你愿意自行承担相关风险"""
-    Browse_User_Page: bool = False
+    BrowseUserPage: bool = False
     """社区浏览个人主页10秒，启用功能意味着你愿意自行承担相关风险"""
-    Browse_Post: bool = False
+    BrowsePost: bool = False
     """社区浏览帖子10秒，启用功能意味着你愿意自行承担相关风险"""
-    Thumb_Up: bool = False
+    ThumbUp: bool = False
     """点赞帖子，启用功能意味着你愿意自行承担相关风险"""
-    Browse_Special_Page: bool = False
+    BrowseSpecialPage: bool = False
     """社区在活动期间可能会出现限时的“浏览指定专题页”任务，启用功能意味着你愿意自行承担相关风险"""
-    Board_Follow: bool = False
+    BoardFollow: bool = False
     """社区可能会出现限时的“加入圈子”任务，启用功能意味着你愿意自行承担相关风险"""
-    carrot_pull: bool = False
+    carrotpull: bool = False
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
-    def _password(cls, v: Optional[str]):
-        if len(v) == 32:
-            return v
-        return md5_crypto(v)
-    
+    def _password(cls, value: Optional[str]): # pylint: disable=no-self-argument
+        if len(value) == 32:
+            return value
+        return md5_crypto(value)
+
     @validator("cookies", allow_reuse=True)
-    def _cookies(cls, v: Union[dict, str]):
-        if type(v) == str:
-            return cookies_to_dict(v)
-        return v
+    def _cookies(cls, value: Union[dict, str]): # pylint: disable=no-self-argument
+        if isinstance(value, str):
+            return cookies_to_dict(value)
+        return value
 
 
 class OnePush(BaseModel):
+    """推送配置"""
     notifier: Union[str, bool] = ""
     """是否开启消息推送"""
     params: Dict = {
@@ -78,6 +83,7 @@ class OnePush(BaseModel):
     """推送参数"""
 
 class Preference(BaseModel):
+    """偏好设置"""
     geetest_url: str = ""
     """极验验证URL"""
     geetest_params: Dict = {}
@@ -87,6 +93,7 @@ class Preference(BaseModel):
 
 
 class Config(BaseModel):
+    """插件数据"""
     preference: Preference = Preference()
     """偏好设置"""
     accounts: List[Account] = [Account()]
@@ -110,14 +117,15 @@ def write_plugin_data(data: Config = None):
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False
-        with open(CONFIG_PATH, "w") as f:
-            f.write(str_data)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as file:
+            file.write(str_data)
         return True
     except OSError:
         return False
 
 
 class ConfigManager:
+    """配置管理器"""
     data_obj = Config()
     """加载出的插件数据对象"""
     platform = "pc"
@@ -130,11 +138,12 @@ class ConfigManager:
         """
         if os.path.exists(DATA_PATH) and os.path.isfile(CONFIG_PATH):
             try:
-                with open(CONFIG_PATH, 'r') as file:
+                with open(CONFIG_PATH, 'r', encoding="utf-8") as file:
                     data = yaml.safe_load(file)
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
-                    ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
+                    #ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
+                    setattr(ConfigManager.data_obj, attr, getattr(new_model, attr))
                 write_plugin_data(ConfigManager.data_obj)  # 同步配置
             except (ValidationError, JSONDecodeError):
                 log.exception(f"读取数据文件失败，请检查数据文件 {CONFIG_PATH} 格式是否正确")

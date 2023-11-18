@@ -1,21 +1,23 @@
+"""工具类"""
+import base64
 import random
 import time
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
-from cryptography.hazmat.primitives import padding, serialization
-from cryptography.hazmat.backends import default_backend
-import base64
-from urllib.parse import urlparse, parse_qsl
-from pydantic import ValidationError
 from typing import Type
+from urllib.parse import parse_qsl, urlparse
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding, serialization
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from pydantic import ValidationError
 from tenacity import RetryError, Retrying, stop_after_attempt
 
-from .request import get, post
+from .captcha import get_validate
 from .data_model import TokenResultHandler
 from .logger import log
-from .captcha import get_validate
+from .request import post
 
-public_key_pem = '''-----BEGIN PUBLIC KEY-----
+PUBLIC_KEY_PEM = '''-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArxfNLkuAQ/BYHzkzVwtu
 g+0abmYRBVCEScSzGxJIOsfxVzcuqaKO87H2o2wBcacD3bRHhMjTkhSEqxPjQ/FE
 XuJ1cdbmr3+b3EQR6wf/cYcMx2468/QyVoQ7BADLSPecQhtgGOllkC+cLYN6Md34
@@ -44,12 +46,14 @@ headers = {
 }
 
 def get_random_chars_as_string(count: int) -> str:
+    """获取随机字符串"""
     characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
     selected_chars = random.sample(characters, count)
     return ''.join(selected_chars)
 
-def aes_encrypt(key, data) -> base64:
-    iv = b'0102030405060708'
+def aes_encrypt(key: str, data: str) -> base64:
+    """AES加密"""
+    iv = b'0102030405060708' # pylint: disable=invalid-name
     cipher = Cipher(algorithms.AES(key.encode('utf-8')), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
     padder = padding.PKCS7(algorithms.AES.block_size).padder()
@@ -57,7 +61,8 @@ def aes_encrypt(key, data) -> base64:
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
     return base64.b64encode(ciphertext).decode('utf-8')
 
-def rsa_encrypt(public_key_pem, data: str) -> base64:
+def rsa_encrypt(public_key_pem: str, data: str) -> base64:
+    """RSA加密"""
     public_key = serialization.load_pem_public_key(
         public_key_pem.encode('utf-8'),
         backend=default_backend()
@@ -82,10 +87,11 @@ def is_incorrect_return(exception: Exception, *addition_exceptions: Type[Excepti
     return isinstance(exception, exceptions) or isinstance(exception.__cause__, exceptions)
 
 async def get_token_by_captcha(url: str) -> str:
+    """通过人机验证码获取TOKEN"""
     try:
         parsed_url = urlparse(url)
         query_params = dict(parse_qsl(parsed_url.query)) # 解析URL参数
-        gt = query_params.get("c")
+        gt = query_params.get("c") # pylint: disable=invalid-name
         challenge = query_params.get("l")
         geetest_data = await get_validate(gt, challenge)
         params = {
@@ -112,11 +118,12 @@ async def get_token_by_captcha(url: str) -> str:
         else:
             log.error("遇到未知错误，无法获取TOKEN")
             return False
-    except Exception:
+    except Exception: # pylint: disable=broad-exception-caught
         log.exception("获取TOKEN异常")
         return False
-    
+# pylint: disable=trailing-whitespace
 async def get_token(uid: str) -> str:
+    """获取TOKEN"""
     try:
         for attempt in Retrying(stop=stop_after_attempt(3)):
             with attempt:
@@ -196,7 +203,7 @@ async def get_token(uid: str) -> str:
 
 
                 data = {
-                    's': rsa_encrypt(public_key_pem, key),
+                    's': rsa_encrypt(PUBLIC_KEY_PEM, key),
                     'd': aes_encrypt(key, str(data)),
                     'a': 'GROW_UP_CHECKIN',
                 }
@@ -215,8 +222,8 @@ async def get_token(uid: str) -> str:
                 else:
                     log.error("遇到未知错误，无法获取TOKEN")
                     return False
-    except RetryError as e:
-        if is_incorrect_return(e):
+    except RetryError as error:
+        if is_incorrect_return(error):
             log.exception(f"TOKEN - 服务器没有正确返回 {response.text}")
         else:
             log.exception("获取TOKEN异常")

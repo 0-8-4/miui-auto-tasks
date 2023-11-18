@@ -1,6 +1,8 @@
+"""签到实例"""
+
 import time
 
-from typing import Dict, List, Optional, Set, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
 from ..request import get, post
@@ -33,6 +35,7 @@ class BaseSign:
         }
 
     async def check_daily_tasks(self, nolog: bool=False) -> Union[List[DailyTasksResult], List[None]]:
+        """获取每日任务状态"""
         try:
             response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
                                  cookies=self.cookie)
@@ -45,14 +48,16 @@ class BaseSign:
                 for daily_task in task['data']:
                     task_name = daily_task['title']
                     task_desc = daily_task.get('desc', '')
-                    showType = True if daily_task['showType'] == 0 else False
-                    task_status.append(DailyTasksResult(name=task_name, showType=showType, desc=task_desc))
+                    show_type = True if daily_task['showType'] == 0 else False # pylint: disable=simplifiable-if-expression
+                    task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
                 return task_status
             else:
-                log.error("获取每日任务状态失败：" + api_data.message) if not nolog else None
-                return []
-        except Exception:
-            log.exception("获取每日任务异常") if not nolog else None
+                if not nolog:
+                    log.error(f"获取每日任务状态失败：{api_data.message}")
+            return []
+        except Exception: # pylint: disable=broad-exception-caught
+            if not nolog:
+                log.exception("获取每日任务异常")
             return []
 
     async def sign(self) -> bool:
@@ -86,12 +91,12 @@ class BaseSign:
             else:
                 log.error(f"{self.NAME}失败：" + api_data.message)
                 return False
-        except Exception:
+        except Exception: # pylint: disable=broad-exception-caught
             log.exception(f"{self.NAME}出错")
             return False
 
 
-class Check_In(BaseSign):
+class CheckIn(BaseSign):
     """
     每日签到
     """
@@ -111,7 +116,7 @@ class Check_In(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
 
-class Browse_Post(BaseSign):
+class BrowsePost(BaseSign):
     """
     浏览帖子超过10秒
     """
@@ -130,7 +135,7 @@ class Browse_Post(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
-class Browse_User_Page(BaseSign):
+class BrowseUserPage(BaseSign):
     """
     浏览个人主页10s
     """
@@ -149,7 +154,7 @@ class Browse_User_Page(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
-class Browse_Special_Page(BaseSign):
+class BrowseSpecialPage(BaseSign):
     """
     浏览指定专题页
     """
@@ -168,7 +173,7 @@ class Browse_Special_Page(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
-class Board_Follow(BaseSign):
+class BoardFollow(BaseSign):
     """
     加入小米圈子
     """
@@ -184,7 +189,7 @@ class Board_Follow(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/api/community/board/follow'
 
 
-class Board_UnFollow(BaseSign):
+class BoardUnFollow(BaseSign):
     """
     退出小米圈子
     """
@@ -200,7 +205,7 @@ class Board_UnFollow(BaseSign):
     URL_SIGN = 'https://api.vip.miui.com/api/community/board/unfollow'
 
 
-class Thumb_Up(BaseSign):
+class ThumbUp(BaseSign):
     """
     点赞他人帖子
     """
@@ -216,10 +221,10 @@ class Thumb_Up(BaseSign):
 
 
 # 注册签到任务
-BaseSign.AVAILABLE_SIGNS[Check_In.NAME] = Check_In
-BaseSign.AVAILABLE_SIGNS[Browse_Post.NAME] = Browse_Post
-BaseSign.AVAILABLE_SIGNS[Browse_User_Page.NAME] = Browse_User_Page
-BaseSign.AVAILABLE_SIGNS[Browse_Special_Page.NAME] = Browse_Special_Page
-BaseSign.AVAILABLE_SIGNS[Board_Follow.NAME] = Board_Follow
-BaseSign.AVAILABLE_SIGNS[Board_UnFollow.NAME] = Board_UnFollow
-BaseSign.AVAILABLE_SIGNS[Thumb_Up.NAME] = Thumb_Up
+BaseSign.AVAILABLE_SIGNS[CheckIn.NAME] = CheckIn
+BaseSign.AVAILABLE_SIGNS[BrowsePost.NAME] = BrowsePost
+BaseSign.AVAILABLE_SIGNS[BrowseUserPage.NAME] = BrowseUserPage
+BaseSign.AVAILABLE_SIGNS[BrowseSpecialPage.NAME] = BrowseSpecialPage
+BaseSign.AVAILABLE_SIGNS[BoardFollow.NAME] = BoardFollow
+BaseSign.AVAILABLE_SIGNS[BoardUnFollow.NAME] = BoardUnFollow
+BaseSign.AVAILABLE_SIGNS[ThumbUp.NAME] = ThumbUp

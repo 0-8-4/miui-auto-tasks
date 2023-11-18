@@ -1,16 +1,15 @@
-"""
-Date: 2023-11-11 23:34:08
+'''
+Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-13 18:17:50
-"""
-import httpx
-
+LastEditTime: 2023-11-18 00:32:53
+'''
 from typing import Any, Dict, Optional
 
+import httpx
 from onepush import notify
 
-from .logger import log
 from .config import ConfigManager
+from .logger import log
 
 _conf = ConfigManager.data_obj
 
@@ -73,5 +72,5 @@ def notify_me(content=""):
     params = _conf.ONEPUSH.params
     if not notifier or not params:
         log.error('未配置推送或未正确配置推送')
-        return
+        return False
     return notify(notifier, content=content, **params)

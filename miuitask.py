@@ -1,4 +1,4 @@
-# new Env("MIUI-Auto-Task")
+# new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
 
 import asyncio
@@ -15,6 +15,7 @@ _conf = ConfigManager.data_obj
 
 
 async def main():
+    """启动签到"""
     print_info()
     for account in _conf.accounts:
         login_obj = Login(account)

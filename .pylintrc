@@ -1,0 +1,5 @@
+[FORMAT]
+max-line-length=200
+
+[MESSAGES CONTROL]
+disable=no-else-return, too-few-public-methods
