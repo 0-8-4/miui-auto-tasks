@@ -49,7 +49,7 @@ def get_random_chars_as_string(count: int) -> str:
     selected_chars = random.sample(characters, count)
     return ''.join(selected_chars)
 
-def aes_encrypt(key, data) -> base64:
+def aes_encrypt(key: str, data: str) -> base64:
     iv = b'0102030405060708'
     cipher = Cipher(algorithms.AES(key.encode('utf-8')), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
@@ -58,7 +58,7 @@ def aes_encrypt(key, data) -> base64:
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
     return base64.b64encode(ciphertext).decode('utf-8')
 
-def rsa_encrypt(public_key_pem, data: str) -> base64:
+def rsa_encrypt(public_key_pem: str, data: str) -> base64:
     public_key = serialization.load_pem_public_key(
         public_key_pem.encode('utf-8'),
         backend=default_backend()
