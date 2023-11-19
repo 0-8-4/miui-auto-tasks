@@ -28,10 +28,14 @@ class ApiResultHandler(BaseModel):
         for key in ["code", "status"]:
             if self.status is None:
                 self.status = self.content.get(key)
+                if self.status is None and isinstance(self.data, dict):
+                    self.status = self.data.get(key)
 
         for key in ["desc", "message"]:
             if self.message == "":
                 self.message = self.content.get(key, "")
+                if self.message is None and isinstance(self.data, dict):
+                    self.message = self.data.get(key)
 
     @property
     def success(self):
@@ -95,9 +99,11 @@ class SignResultHandler(ApiResultHandler):
         super().__init__(content=content)
         self.growth = self.content.get("entity", {})
         if isinstance(self.growth, dict):
-            self.growth = self.growth.get("score", "未知")
+            self.growth = self.growth.get("score")
         elif isinstance(self.growth, int):
             self.growth = str(self.growth)
+        else:
+            self.growth = None
     # pylint: disable=trailing-whitespace
     def __bool__(self):
         """

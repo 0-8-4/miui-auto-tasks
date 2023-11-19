@@ -54,7 +54,7 @@ class Account(BaseModel):
     """社区在活动期间可能会出现限时的“浏览指定专题页”任务，启用功能意味着你愿意自行承担相关风险"""
     BoardFollow: bool = False
     """社区可能会出现限时的“加入圈子”任务，启用功能意味着你愿意自行承担相关风险"""
-    carrotpull: bool = False
+    CarrotPull: bool = False
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
     @validator("password", allow_reuse=True)
@@ -90,6 +90,10 @@ class Preference(BaseModel):
     """极验自定义params参数"""
     geetest_data: Dict = {}
     """极验自定义data参数"""
+    hour: Optional[str] = None
+    """自动执行的时间"""
+    minute: Optional[str] = None
+    """自动执行的时间"""
 
 
 class Config(BaseModel):

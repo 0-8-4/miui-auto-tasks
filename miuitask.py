@@ -3,16 +3,17 @@
 
 import asyncio
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from utils.api.login import Login
 from utils.api.sign import BaseSign
 from utils.config import ConfigManager
-from utils.logger import log, get_message
+from utils.logger import get_message, log
 from utils.request import notify_me
-from utils.utils import get_token
 from utils.system_info import print_info
+from utils.utils import get_token
 
 _conf = ConfigManager.data_obj
-
 
 async def main():
     """启动签到"""
@@ -40,4 +41,18 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    if _conf.preference.hour and _conf.preference.minute:
+        # 创建一个新的事件循环
+        loop = asyncio.get_event_loop()
+        scheduler = AsyncIOScheduler()
+        scheduler.add_job(main, 'cron', hour=_conf.preference.hour, minute=_conf.preference.minute, id='miuitask')
+        scheduler.start()
+        try:
+            loop.run_forever()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        finally:
+            scheduler.shutdown()
+    else:
+        asyncio.run(main())
+        
