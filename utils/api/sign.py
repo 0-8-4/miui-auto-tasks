@@ -2,7 +2,7 @@
 
 import time
 
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union, Any
 
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
 from ..request import get, post
@@ -44,12 +44,13 @@ class BaseSign:
             api_data = ApiResultHandler(result)
             if api_data.success:
                 task_status = []
-                task = next(filter(lambda x: x['head']['title'] == "每日任务", api_data.data))
-                for daily_task in task['data']:
-                    task_name = daily_task['title']
-                    task_desc = daily_task.get('desc', '')
-                    show_type = True if daily_task['showType'] == 0 else False # pylint: disable=simplifiable-if-expression
-                    task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
+                tasks: List[Dict[str, List[Dict[str, Any]]]] = filter(lambda x: x['head']['title'] in ["每日任务", "其他任务"], api_data.data)
+                for task in tasks:
+                    for daily_task in task['data']:
+                        task_name = daily_task['title']
+                        task_desc = daily_task.get('desc', '')
+                        show_type = True if daily_task['showType'] == 0 else False # pylint: disable=simplifiable-if-expression
+                        task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
                 return task_status
             else:
                 if not nolog:
@@ -83,13 +84,16 @@ class BaseSign:
             result = response.json()
             api_data = SignResultHandler(result)
             if api_data:
-                log.success(f"{self.NAME}结果: 成长值+" + api_data.growth)
+                if api_data.growth:
+                    log.success(f"{self.NAME}结果: 成长值+{api_data.growth}")
+                else:
+                    log.success(f"{self.NAME}结果: {api_data.message}")
                 return True
             elif api_data.ck_invalid:
                 log.error(f"{self.NAME}失败: Cookie无效")
                 return False
             else:
-                log.error(f"{self.NAME}失败：" + api_data.message)
+                log.error(f"{self.NAME}失败：{api_data.message}")
                 return False
         except Exception: # pylint: disable=broad-exception-caught
             log.exception(f"{self.NAME}出错")
@@ -219,6 +223,15 @@ class ThumbUp(BaseSign):
 
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp'
 
+class CarrotPull(BaseSign):
+    """
+    参与拔萝卜获得奖励
+    """
+    NAME = "参与拔萝卜获得奖励"
+    DATA = {
+        'miui_vip_ph': "{miui_vip_ph}"
+    }
+    URL_SIGN = 'https://api.vip.miui.com/api/carrot/pull'
 
 # 注册签到任务
 BaseSign.AVAILABLE_SIGNS[CheckIn.NAME] = CheckIn
@@ -228,3 +241,4 @@ BaseSign.AVAILABLE_SIGNS[BrowseSpecialPage.NAME] = BrowseSpecialPage
 BaseSign.AVAILABLE_SIGNS[BoardFollow.NAME] = BoardFollow
 BaseSign.AVAILABLE_SIGNS[BoardUnFollow.NAME] = BoardUnFollow
 BaseSign.AVAILABLE_SIGNS[ThumbUp.NAME] = ThumbUp
+BaseSign.AVAILABLE_SIGNS[CarrotPull.NAME] = CarrotPull

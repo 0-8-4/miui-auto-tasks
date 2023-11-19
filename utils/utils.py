@@ -208,6 +208,7 @@ async def get_token(uid: str) -> str:
                     'a': 'GROW_UP_CHECKIN',
                 }
                 response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
+                log.debug(response.text)
                 result = response.json()
                 api_data = TokenResultHandler(result)
                 if api_data.success:
