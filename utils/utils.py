@@ -216,10 +216,10 @@ async def get_token(uid: str) -> str:
                 elif api_data.need_verify:
                     log.error("遇到人机验证码, 尝试调用解决方案")
                     url = api_data.data.get("url")
-                    for _ in range(3):
-                        if toekn := await get_token_by_captcha(url):
-                            return toekn
-                    return False
+                    if toekn := await get_token_by_captcha(url):
+                        return toekn
+                    else:
+                        raise Exception("人机验证失败")
                 else:
                     log.error("遇到未知错误，无法获取TOKEN")
                     return False
