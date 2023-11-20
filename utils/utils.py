@@ -219,7 +219,7 @@ async def get_token(uid: str) -> str:
                     if toekn := await get_token_by_captcha(url):
                         return toekn
                     else:
-                        raise Exception("人机验证失败")
+                        raise ValueError("人机验证失败")
                 else:
                     log.error("遇到未知错误，无法获取TOKEN")
                     return False
