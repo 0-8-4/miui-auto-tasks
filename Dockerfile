@@ -2,10 +2,7 @@ FROM python:alpine
 
 RUN sed -i 's|https://dl-cdn.alpinelinux.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apk/repositories
 
-RUN apt-get update \
-    && apt-get install -y gcc musl-dev libffi-dev libssl-dev ca-certificates cron \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
 
 RUN apk add --no-cache --virtual .build-app curl
 
