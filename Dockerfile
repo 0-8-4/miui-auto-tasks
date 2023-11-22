@@ -1,24 +1,18 @@
 FROM python:alpine
 
-RUN sed -i 's|https://dl-cdn.alpinelinux.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apk/repositories
-
 RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
 
 RUN apk add --no-cache --virtual .build-app curl
-
-RUN pip config set global.index-url 'https://mirrors.sustech.edu.cn/pypi/web/simple'
 
 RUN curl -sSL https://pdm-project.org/install-pdm.py | python3 -
 
 ENV PATH="/root/.local/bin:$PATH"
 
-RUN pdm config pypi.url 'https://mirrors.sustech.edu.cn/pypi/web/simple'
-
 WORKDIR /srv
 
 COPY ./utils ./utils
 
-COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./
+COPY ./pyproject.toml ./miuitask.py ./
 
 RUN pdm install --prod
 
