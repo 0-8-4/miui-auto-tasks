@@ -1,8 +1,8 @@
-'''
+"""
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 LastEditTime: 2023-11-18 14:20:44
-'''
+"""
 import os
 import sys
 
@@ -13,7 +13,7 @@ MESSAGE = ""
 
 def log_filter(record: dict):
     """loguru过滤器"""
-    global MESSAGE # pylint: disable=global-statement
+    global MESSAGE  # pylint: disable=global-statement
     if record["level"].no >= 20:
         MESSAGE += f"{record.get('message')}\n"
     return True
@@ -26,7 +26,7 @@ def get_message():
     返回:
         收集到的消息
     """
-    global MESSAGE # pylint: disable=global-variable-not-assigned
+    global MESSAGE  # pylint: disable=global-variable-not-assigned
     return MESSAGE
 
 

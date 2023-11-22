@@ -15,12 +15,13 @@ from utils.utils import get_token
 
 _conf = ConfigManager.data_obj
 
+
 async def main():
     """启动签到"""
     print_info()
     for account in _conf.accounts:
         login_obj = Login(account)
-        if (cookies := await login_obj.login()):
+        if cookies := await login_obj.login():
             token = await get_token(cookies["cUserId"])
             sign_obj = BaseSign(cookies)
             daily_tasks = await sign_obj.check_daily_tasks()
@@ -55,4 +56,3 @@ if __name__ == "__main__":
             scheduler.shutdown()
     else:
         asyncio.run(main())
-        
