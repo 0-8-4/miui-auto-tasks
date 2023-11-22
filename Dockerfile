@@ -1,6 +1,7 @@
-FROM python:3.9-alpine
+FROM python:3.12.0-slim
 
-RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
+RUN apt-get update \
+    && apt-get install -y gcc musl-dev libffi-dev libssl-dev ca-certificates cron
 
 RUN pip install pdm
 
@@ -12,7 +13,8 @@ COPY pyproject.toml pdm.lock /srv/
 
 WORKDIR /srv
 
-RUN 
+RUN pip install urllib3 \
+                certifi
 
 RUN pdm install --prod && \
     echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root

@@ -45,21 +45,24 @@ headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
+
 def get_random_chars_as_string(count: int) -> str:
     """获取随机字符串"""
     characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
     selected_chars = random.sample(characters, count)
     return ''.join(selected_chars)
 
+
 def aes_encrypt(key: str, data: str) -> base64:
     """AES加密"""
-    iv = b'0102030405060708' # pylint: disable=invalid-name
+    iv = b'0102030405060708'  # pylint: disable=invalid-name
     cipher = Cipher(algorithms.AES(key.encode('utf-8')), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
     padder = padding.PKCS7(algorithms.AES.block_size).padder()
     padded_data = padder.update(data.encode('utf-8')) + padder.finalize()
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
     return base64.b64encode(ciphertext).decode('utf-8')
+
 
 def rsa_encrypt(public_key_pem: str, data: str) -> base64:
     """RSA加密"""
@@ -75,8 +78,11 @@ def rsa_encrypt(public_key_pem: str, data: str) -> base64:
 
     return base64.b64encode(ciphertext).decode('utf-8')
 
+
 IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError, ValidationError)
 """API返回数据无效会触发的异常组合"""
+
+
 def is_incorrect_return(exception: Exception, *addition_exceptions: Type[Exception]) -> bool:
     """
     判断是否是API返回数据无效的异常
@@ -86,27 +92,29 @@ def is_incorrect_return(exception: Exception, *addition_exceptions: Type[Excepti
     exceptions = IncorrectReturn + addition_exceptions
     return isinstance(exception, exceptions) or isinstance(exception.__cause__, exceptions)
 
-async def get_token_by_captcha(url: str) -> str:
+
+async def get_token_by_captcha(url: str) -> str | bool:
     """通过人机验证码获取TOKEN"""
     try:
         parsed_url = urlparse(url)
-        query_params = dict(parse_qsl(parsed_url.query)) # 解析URL参数
-        gt = query_params.get("c") # pylint: disable=invalid-name
+        query_params = dict(parse_qsl(parsed_url.query))  # 解析URL参数
+        gt = query_params.get("c")  # pylint: disable=invalid-name
         challenge = query_params.get("l")
         geetest_data = await get_validate(gt, challenge)
         params = {
             'k': '3dc42a135a8d45118034d1ab68213073',
             'locale': 'zh_CN',
-            '_t': round(time.time()*1000),
+            '_t': round(time.time() * 1000),
         }
 
         data = {
-            'e': query_params.get("e"), # 人机验证的e参数，来自URL
+            'e': query_params.get("e"),  # 人机验证的e参数，来自URL
             'challenge': geetest_data.challenge,
             'seccode': f'{geetest_data.validate}|jordan',
         }
 
-        response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers, data=data)
+        response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers,
+                              data=data)
         log.debug(response.text)
         result = response.json()
         api_data = TokenResultHandler(result)
@@ -118,19 +126,21 @@ async def get_token_by_captcha(url: str) -> str:
         else:
             log.error("遇到未知错误，无法获取TOKEN")
             return False
-    except Exception: # pylint: disable=broad-exception-caught
+    except Exception:  # pylint: disable=broad-exception-caught
         log.exception("获取TOKEN异常")
         return False
+
+
 # pylint: disable=trailing-whitespace
-async def get_token(uid: str) -> str:
+async def get_token(uid: str) -> str | bool:
     """获取TOKEN"""
     try:
         for attempt in Retrying(stop=stop_after_attempt(3)):
             with attempt:
                 data = {
                     "type": 0,
-                    "startTs": round(time.time()*1000),
-                    "endTs": round(time.time()*1000),
+                    "startTs": round(time.time() * 1000),
+                    "endTs": round(time.time() * 1000),
                     "env": {
                         "p1": "",
                         "p2": "",
@@ -198,16 +208,16 @@ async def get_token(uid: str) -> str:
                 params = {
                     'k': '3dc42a135a8d45118034d1ab68213073',
                     'locale': 'zh_CN',
-                    '_t': round(time.time()*1000),
+                    '_t': round(time.time() * 1000),
                 }
-
 
                 data = {
                     's': rsa_encrypt(PUBLIC_KEY_PEM, key),
                     'd': aes_encrypt(key, str(data)),
                     'a': 'GROW_UP_CHECKIN',
                 }
-                response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers, data=data)
+                response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers,
+                                      data=data)
                 log.debug(response.text)
                 result = response.json()
                 api_data = TokenResultHandler(result)
@@ -216,8 +226,8 @@ async def get_token(uid: str) -> str:
                 elif api_data.need_verify:
                     log.error("遇到人机验证码, 尝试调用解决方案")
                     url = api_data.data.get("url")
-                    if toekn := await get_token_by_captcha(url):
-                        return toekn
+                    if token := await get_token_by_captcha(url):
+                        return token
                     else:
                         raise ValueError("人机验证失败")
                 else:
