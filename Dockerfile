@@ -1,23 +1,30 @@
-FROM python:3.12.0-slim
+FROM python:alpine
 
-RUN apt-get update \
-    && apt-get install -y gcc musl-dev libffi-dev libssl-dev ca-certificates cron
+RUN sed -i 's|https://dl-cdn.alpinelinux.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apk/repositories
 
-RUN pip install pdm
+RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
 
-COPY ./utils /srv/utils/
+RUN apk add --no-cache --virtual .build-app curl
 
-COPY ./miuitask.py /srv/
+RUN pip config set global.index-url 'https://mirrors.sustech.edu.cn/pypi/web/simple'
 
-COPY pyproject.toml pdm.lock /srv/
+RUN curl -sSL https://pdm-project.org/install-pdm.py | python3 -
+
+ENV PATH="/root/.local/bin:$PATH"
+
+RUN pdm config pypi.url 'https://mirrors.sustech.edu.cn/pypi/web/simple'
 
 WORKDIR /srv
 
-RUN pip install urllib3 \
-                certifi
+COPY ./utils ./utils
 
-RUN pdm install --prod && \
-    echo "0   4	*	*	*	python /srv/miuitask.py" > /var/spool/cron/crontabs/root
+COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./
+
+RUN pdm install --prod
+
+RUN { crontab -l; printf '%s\t%s\t%s\t%s\t%s\t%s\n' '0' '4' '*' '*' '*' '/usr/bin/env pdm run python /srv/miuitask.py'; } | crontab -
+
+RUN apk del .build-app
 
 VOLUME ["./data", "/srv/data"]
 
