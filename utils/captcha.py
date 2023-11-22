@@ -28,6 +28,7 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: dis
             _conf.preference.geetest_url,
             params=params,
             json=data,
+            timeout=20,
         )
         log.debug(response.text)
         geetest_data = response.json()
