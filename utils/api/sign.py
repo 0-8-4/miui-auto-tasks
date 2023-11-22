@@ -34,7 +34,7 @@ class BaseSign:
         self.headers = {
         }
 
-    async def check_daily_tasks(self, nolog: bool=False) -> Union[List[DailyTasksResult], List[None]]:
+    async def check_daily_tasks(self, nolog: bool = False) -> Union[List[DailyTasksResult], List[None]]:
         """获取每日任务状态"""
         try:
             response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
@@ -44,19 +44,20 @@ class BaseSign:
             api_data = ApiResultHandler(result)
             if api_data.success:
                 task_status = []
-                tasks: List[Dict[str, List[Dict[str, Any]]]] = filter(lambda x: x['head']['title'] in ["每日任务", "其他任务"], api_data.data)
+                tasks: List[Dict[str, List[Dict[str, Any]]]] = list(filter(
+                    lambda x: x['head']['title'] in ["每日任务", "其他任务"], api_data.data))
                 for task in tasks:
                     for daily_task in task['data']:
                         task_name = daily_task['title']
                         task_desc = daily_task.get('desc', '')
-                        show_type = True if daily_task['showType'] == 0 else False # pylint: disable=simplifiable-if-expression
+                        show_type = True if daily_task['showType'] == 0 else False  # pylint: disable=simplifiable-if-expression
                         task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
                 return task_status
             else:
                 if not nolog:
                     log.error(f"获取每日任务状态失败：{api_data.message}")
             return []
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             if not nolog:
                 log.exception("获取每日任务异常")
             return []
@@ -95,7 +96,7 @@ class BaseSign:
             else:
                 log.error(f"{self.NAME}失败：{api_data.message}")
                 return False
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             log.exception(f"{self.NAME}出错")
             return False
 
@@ -223,6 +224,7 @@ class ThumbUp(BaseSign):
 
     URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp'
 
+
 class CarrotPull(BaseSign):
     """
     参与拔萝卜获得奖励
@@ -232,6 +234,7 @@ class CarrotPull(BaseSign):
         'miui_vip_ph': "{miui_vip_ph}"
     }
     URL_SIGN = 'https://api.vip.miui.com/api/carrot/pull'
+
 
 # 注册签到任务
 BaseSign.AVAILABLE_SIGNS[CheckIn.NAME] = CheckIn

@@ -1,6 +1,6 @@
 """数据处理模型"""
 from typing import (Any, Dict, NamedTuple, Optional)
-from pydantic import BaseModel #pylint: disable=no-name-in-module
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class ApiResultHandler(BaseModel):
@@ -104,6 +104,7 @@ class SignResultHandler(ApiResultHandler):
             self.growth = str(self.growth)
         else:
             self.growth = None
+
     # pylint: disable=trailing-whitespace
     def __bool__(self):
         """
@@ -139,6 +140,7 @@ class TokenResultHandler(ApiResultHandler):
     def success(self):
         """是否成功获取TOKEN"""
         return self.token != ""
+
 
 class GeetestResult(NamedTuple):
     """人机验证结果数据"""

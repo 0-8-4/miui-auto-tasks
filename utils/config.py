@@ -7,21 +7,24 @@ from typing import Dict, List, Optional, Union
 
 import yaml
 from loguru import logger as log
-from pydantic import (BaseModel,  # pylint: disable=no-name-in-module
-                      ValidationError, validator)
+from pydantic import (field_validator, BaseModel,  # pylint: disable=no-name-in-module
+                      ValidationError)
 
 ROOT_PATH = Path(__name__).parent.absolute()
 
 DATA_PATH = ROOT_PATH / "data"
-'''数据保存目录'''
+"""数据保存目录"""
 
 CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
 """数据文件默认路径"""
+
+os.makedirs(DATA_PATH, exist_ok=True)
 
 
 def md5_crypto(passwd: str) -> str:
     """MD5加密"""
     return md5(passwd.encode('utf8')).hexdigest().upper()
+
 
 def cookies_to_dict(cookies):
     """将cookies字符串转换为字典"""
@@ -30,6 +33,7 @@ def cookies_to_dict(cookies):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
         cookies_dict[key] = value
     return cookies_dict
+
 
 class Account(BaseModel):
     """账号处理器"""
@@ -57,14 +61,16 @@ class Account(BaseModel):
     CarrotPull: bool = False
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
 
-    @validator("password", allow_reuse=True)
-    def _password(cls, value: Optional[str]): # pylint: disable=no-self-argument
+    @field_validator("password")
+    @classmethod
+    def _password(cls, value: Optional[str]):  # pylint: disable=no-self-argument
         if len(value) == 32:
             return value
         return md5_crypto(value)
 
-    @validator("cookies", allow_reuse=True)
-    def _cookies(cls, value: Union[dict, str]): # pylint: disable=no-self-argument
+    @field_validator("cookies")
+    @classmethod
+    def _cookies(cls, value: Union[dict, str]):  # pylint: disable=no-self-argument
         if isinstance(value, str):
             return cookies_to_dict(value)
         return value
@@ -81,6 +87,7 @@ class OnePush(BaseModel):
         "userid": ""
     }
     """推送参数"""
+
 
 class Preference(BaseModel):
     """偏好设置"""
@@ -146,7 +153,7 @@ class ConfigManager:
                     data = yaml.safe_load(file)
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
-                    #ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
+                    # ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))
                     setattr(ConfigManager.data_obj, attr, getattr(new_model, attr))
                 write_plugin_data(ConfigManager.data_obj)  # 同步配置
             except (ValidationError, JSONDecodeError):
