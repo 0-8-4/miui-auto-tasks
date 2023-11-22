@@ -8,3 +8,4 @@ pydantic==1.10.7
 PyYAML==6.0.1
 qrcode==7.4.2
 tenacity==8.2.3
+tzdata==2023.3
