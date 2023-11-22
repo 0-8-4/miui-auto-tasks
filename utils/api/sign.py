@@ -50,8 +50,7 @@ class BaseSign:
                     for daily_task in task['data']:
                         task_name = daily_task['title']
                         task_desc = daily_task.get('desc', '')
-                        show_type = True if daily_task[
-                                                'showType'] == 0 else False  # pylint: disable=simplifiable-if-expression
+                        show_type = True if daily_task['showType'] == 0 else False  # pylint: disable=simplifiable-if-expression
                         task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
                 return task_status
             else:
