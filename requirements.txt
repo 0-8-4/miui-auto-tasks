@@ -7,3 +7,4 @@ orjson==3.9.10
 pydantic==2.5.1
 PyYAML==6.0.1
 tenacity==8.2.3
+tzdata==2023.3
