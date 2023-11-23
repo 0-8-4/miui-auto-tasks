@@ -2,9 +2,7 @@
 name = ""
 version = ""
 description = ""
-authors = [
-    {name = "Night-stars-1", email = "nujj1042633805@gmail.com"},
-]
+authors = []
 dependencies = [
     "onepush",
     "orjson>=3.9.10",
@@ -15,7 +13,7 @@ dependencies = [
     "pyyaml>=6.0.1",
     "tenacity>=8.2.3",
     "apscheduler>=3.10.4",
-    "tzdata==2023.3",
+    "tzdata>=2023.3",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
