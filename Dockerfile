@@ -14,4 +14,6 @@ RUN pdm install --prod
 
 VOLUME ["./data", "/srv/data"]
 
+VOLUME ["./logs", "/srv/logs"]
+
 CMD ["pdm", "run", "python", "miuitask.py"]
