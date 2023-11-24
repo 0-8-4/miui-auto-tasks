@@ -47,11 +47,14 @@ async def main():
 
 
 if __name__ == "__main__":
-    if _conf.preference.hour and _conf.preference.minute:
+    HOUR = _conf.preference.hour
+    MINUTE = _conf.preference.minute
+    if HOUR and MINUTE:
+        log.info(f"脚本将在每日{HOUR}:{MINUTE}自动运行")
         # 创建一个新的事件循环
         loop = asyncio.get_event_loop()
         scheduler = AsyncIOScheduler()
-        scheduler.add_job(main, 'cron', hour=_conf.preference.hour, minute=_conf.preference.minute, id='miuitask')
+        scheduler.add_job(main, 'cron', hour=HOUR, minute=MINUTE, id='miuitask')
         scheduler.start()
         try:
             loop.run_forever()
