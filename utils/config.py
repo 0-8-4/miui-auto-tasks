@@ -97,9 +97,9 @@ class Preference(BaseModel):
     """极验自定义params参数"""
     geetest_data: Dict = {}
     """极验自定义data参数"""
-    hour: Optional[str] = None
+    hour: Optional[int] = None
     """自动执行的时间"""
-    minute: Optional[str] = None
+    minute: Optional[int] = None
     """自动执行的时间"""
 
 
