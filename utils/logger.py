@@ -20,7 +20,7 @@ class InterceptHandler:
 
     def write(self, record: dict):
         """写入"""
-        InterceptHandler.message += record.get('message')
+        InterceptHandler.message += f"{record.get('message')}\n"
 
 path_log = os.path.join("logs", '日志文件.log')
 log = logger
