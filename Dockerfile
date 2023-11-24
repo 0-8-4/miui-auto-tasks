@@ -2,7 +2,7 @@ FROM python:alpine
 
 RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
 
-RUN pip install pdm
+RUN pip install --no-cache-dir pdm
 
 WORKDIR /srv
 
