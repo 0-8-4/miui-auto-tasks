@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from utils.api.login import Login
 from utils.api.sign import BaseSign
 from utils.config import ConfigManager
-from utils.logger import get_message, log
+from utils.logger import get_message, log, InterceptHandler
 from utils.request import notify_me
 from utils.system_info import print_info
 from utils.utils import get_token
@@ -38,7 +38,8 @@ async def main():
                         log.error(f"未找到{task.name}任务")
                 else:
                     log.info(f"{task.name}任务已完成")
-    notify_me(get_message())
+    log.info("`任务执行完毕`")
+    notify_me(InterceptHandler.message)
 
 
 if __name__ == "__main__":

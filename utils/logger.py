@@ -1,3 +1,8 @@
+'''
+Date: 2023-11-12 14:05:06
+LastEditors: Night-stars-1 nujj1042633805@gmail.com
+LastEditTime: 2023-11-24 13:06:03
+'''
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
@@ -8,27 +13,19 @@ import sys
 
 from loguru import logger
 
-MESSAGE = ""
 
+class InterceptHandler:
+    """拦截器"""
 
-def log_filter(record: dict):
-    """loguru过滤器"""
-    global MESSAGE  # pylint: disable=global-statement
-    if record["level"].no >= 20:
-        MESSAGE += f"{record.get('message')}\n"
-    return True
+    message = ""
+    """消息"""
 
+    def __init__(self, record: dict):
+        self.write(record)
 
-def get_message():
-    """
-    说明:
-        返回消息
-    返回:
-        收集到的消息
-    """
-    global MESSAGE  # pylint: disable=global-variable-not-assigned
-    return MESSAGE
-
+    def write(self, record: dict):
+        """写入"""
+        InterceptHandler.message += record.get('message')
 
 path_log = os.path.join("logs", '日志文件.log')
 log = logger
@@ -37,7 +34,7 @@ log.remove()
 log.add(sys.stdout, level="INFO", colorize=True,
         format="<cyan>{module}</cyan>.<cyan>{function}</cyan>"
                ":<cyan>{line}</cyan> - "
-               "<level>{message}</level>", filter=log_filter)
+               "<level>{message}</level>", filter=InterceptHandler)
 
 log.add(path_log, level="DEBUG",
         format="{time:HH:mm:ss} - "
