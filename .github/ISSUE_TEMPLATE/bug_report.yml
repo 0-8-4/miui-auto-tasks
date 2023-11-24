@@ -1,6 +1,6 @@
 name: 问题反馈
 description: Create a report to help us improve
-title: "[Bug] "
+title: "[Bug] 请在这块简要说明问题，否则该issue将会被关闭"
 labels: ["bug"]
 body:
   - type: markdown
@@ -77,6 +77,7 @@ body:
       label: MIUITask Log
       description: |
         在下方附上 MIUITask 输出日志 / MIUItask  Log
+        不上传log该issue将会被关闭
     validations:
       required: true
   - type: textarea
