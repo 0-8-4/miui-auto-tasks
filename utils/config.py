@@ -8,7 +8,7 @@ from random import randint
 from typing import Dict, List, Optional, Union
 
 import yaml
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import BaseModel
 from pydantic import ValidationError, ValidationInfo, field_validator
 
 from .logger import log
@@ -124,7 +124,6 @@ class Preference(BaseModel):
         if ConfigManager.platform == "docker" and value is None:
             return times.get(info.field_name)
         return value
-    
 
 class Config(BaseModel):
     """插件数据"""
