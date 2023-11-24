@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from utils.api.login import Login
 from utils.api.sign import BaseSign
 from utils.config import ConfigManager
-from utils.logger import get_message, log, InterceptHandler
+from utils.logger import InterceptHandler, log
 from utils.request import notify_me
 from utils.system_info import print_info
 from utils.utils import get_token
