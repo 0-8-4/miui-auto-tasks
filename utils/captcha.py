@@ -11,9 +11,9 @@ from .data_model import ApiResultHandler, GeetestResult
 
 _conf = ConfigManager.data_obj
 
-def find_key(d: dict, key: str):
+def find_key(data: dict, key: str):
     """递归查找字典中的key"""
-    for dkey, dvalue in d.items():
+    for dkey, dvalue in data.items():
         if dkey == key:
             return dvalue
         if isinstance(dvalue, dict):
