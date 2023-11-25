@@ -11,6 +11,14 @@ from .data_model import ApiResultHandler, GeetestResult
 
 _conf = ConfigManager.data_obj
 
+def find_key(d: dict, key: str):
+    if key in d:
+        return d[key]
+    for k, v in d.items():
+        if isinstance(v, dict):
+            found = find_key(v, key)
+            if found is not None:
+                return found
 
 async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""
@@ -33,8 +41,8 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: dis
             log.debug(response.text)
             geetest_data = response.json()
             geetest = ApiResultHandler(geetest_data)
-            challenge = geetest.data["challenge"]
-            validate = geetest.data["validate"]
+            challenge = find_key(geetest.data, "challenge")
+            validate = find_key(geetest.data, "validate")
             return GeetestResult(challenge=challenge, validate=validate)
         else:
             return GeetestResult(challenge="", validate="")
