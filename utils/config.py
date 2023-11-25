@@ -4,7 +4,6 @@ import platform
 from hashlib import md5
 from json import JSONDecodeError
 from pathlib import Path
-from random import randint
 from typing import Dict, List, Optional, Union
 
 import yaml
