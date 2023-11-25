@@ -109,21 +109,6 @@ class Preference(BaseModel):
     """极验自定义params参数"""
     geetest_data: Dict = {}
     """极验自定义data参数"""
-    hour: Optional[int] = None
-    """自动执行的时间"""
-    minute: Optional[int] = None
-    """自动执行的时间"""
-
-    @field_validator("hour", "minute")
-    @classmethod
-    def _hour(cls, value, info: ValidationInfo):  # pylint: disable=no-self-argument
-        times = {
-            "hour": randint(0, 24),
-            "minute": randint(0, 60)
-        }
-        if ConfigManager.platform == "docker" and value is None:
-            return times.get(info.field_name)
-        return value
 
 class Config(BaseModel):
     """插件数据"""

@@ -8,8 +8,6 @@ LastEditTime: 2023-11-24 16:23:43
 
 import asyncio
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from utils.api.login import Login
 from utils.api.sign import BaseSign
 from utils.config import ConfigManager
@@ -47,20 +45,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    HOUR = _conf.preference.hour
-    MINUTE = _conf.preference.minute
-    if HOUR and MINUTE:
-        log.info(f"脚本将在每日{HOUR}:{MINUTE}自动运行")
-        # 创建一个新的事件循环
-        loop = asyncio.get_event_loop()
-        scheduler = AsyncIOScheduler()
-        scheduler.add_job(main, 'cron', hour=HOUR, minute=MINUTE, id='miuitask')
-        scheduler.start()
-        try:
-            loop.run_forever()
-        except (KeyboardInterrupt, SystemExit):
-            pass
-        finally:
-            scheduler.shutdown()
-    else:
-        asyncio.run(main())
+    asyncio.run(main())

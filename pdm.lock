@@ -18,17 +18,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "apscheduler"
-version = "3.10.4"
-requires_python = ">=3.6"
-summary = "In-process task scheduler with Cron-like capabilities"
-dependencies = [
-    "pytz",
-    "six>=1.4.0",
-    "tzlocal!=3.*,>=2.0",
-]
-
-[[package]]
 name = "certifi"
 version = "2023.11.17"
 requires_python = ">=3.6"

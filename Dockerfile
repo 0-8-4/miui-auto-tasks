@@ -8,10 +8,12 @@ WORKDIR /srv
 
 COPY ./utils ./utils
 
-COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./
+COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./run.sh ./
 
 RUN pdm install --prod
 
 VOLUME ["/srv/data", "/srv/logs"]
 
-CMD ["pdm", "run", "python", "miuitask.py"]
+RUN { crontab -l; printf '%s\t%s\t%s\t%s\t%s\t%s\n' '0' '4' '*' '*' '*' '/srv/run.sh'; } | crontab -
+
+CMD ["crond", "-f"]
