@@ -12,8 +12,6 @@ COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./
 
 RUN pdm install --prod
 
-VOLUME ["./data", "/srv/data"]
-
-VOLUME ["./logs", "/srv/logs"]
+VOLUME ["/srv/data", "/srv/logs"]
 
 CMD ["pdm", "run", "python", "miuitask.py"]
