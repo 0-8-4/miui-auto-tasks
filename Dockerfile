@@ -8,12 +8,12 @@ WORKDIR /srv
 
 COPY ./utils ./utils
 
-COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./
+COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./docker_start.sh ./
 
-RUN pdm install --prod
+RUN pdm install --prod && \
+    echo "0 4 * * * cd /srv && pdm run /srv/miuitask.py" > /var/spool/cron/crontabs/root && \
+    chmod +x docker_start.sh
 
-VOLUME ["./data", "/srv/data"]
+VOLUME ["/srv/data", "/srv/logs"]
 
-VOLUME ["./logs", "/srv/logs"]
-
-CMD ["pdm", "run", "python", "miuitask.py"]
+CMD ["/srv/docker_start.sh"]
