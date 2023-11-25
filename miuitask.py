@@ -52,7 +52,8 @@ if __name__ == "__main__":
     if HOUR and MINUTE:
         log.info(f"脚本将在每日{HOUR}:{MINUTE}自动运行")
         # 创建一个新的事件循环
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         scheduler = AsyncIOScheduler()
         scheduler.add_job(main, 'cron', hour=HOUR, minute=MINUTE, id='miuitask')
         scheduler.start()
