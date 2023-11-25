@@ -1,8 +1,8 @@
-"""
+'''
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-18 14:30:41
-"""
+LastEditTime: 2023-11-25 15:59:40
+'''
 
 from .request import post
 from .logger import log
@@ -12,13 +12,13 @@ from .data_model import ApiResultHandler, GeetestResult
 _conf = ConfigManager.data_obj
 
 def find_key(d: dict, key: str):
-    if key in d:
-        return d[key]
-    for k, v in d.items():
-        if isinstance(v, dict):
-            found = find_key(v, key)
-            if found is not None:
-                return found
+    """递归查找字典中的key"""
+    for dkey, dvalue in d.items():
+        if dkey == key:
+            return dvalue
+        if isinstance(dvalue, dict):
+            find_key(dvalue, key)
+    return None
 
 async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""

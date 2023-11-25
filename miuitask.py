@@ -1,14 +1,7 @@
-'''
-Date: 2023-11-13 20:29:19
-LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-24 16:23:43
-'''
 # new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
 
 import asyncio
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from utils.api.login import Login
 from utils.api.sign import BaseSign
@@ -47,21 +40,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    HOUR = _conf.preference.hour
-    MINUTE = _conf.preference.minute
-    if HOUR and MINUTE:
-        log.info(f"脚本将在每日{HOUR}:{MINUTE}自动运行")
-        # 创建一个新的事件循环
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        scheduler = AsyncIOScheduler()
-        scheduler.add_job(main, 'cron', hour=HOUR, minute=MINUTE, id='miuitask')
-        scheduler.start()
-        try:
-            loop.run_forever()
-        except (KeyboardInterrupt, SystemExit):
-            pass
-        finally:
-            scheduler.shutdown()
-    else:
-        asyncio.run(main())
+    asyncio.run(main())
