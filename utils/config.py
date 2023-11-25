@@ -1,14 +1,17 @@
 """"配置文件"""
 import os
+import platform
 from hashlib import md5
 from json import JSONDecodeError
 from pathlib import Path
+from random import randint
 from typing import Dict, List, Optional, Union
 
 import yaml
-from loguru import logger as log
-from pydantic import (field_validator, BaseModel,  # pylint: disable=no-name-in-module
-                      ValidationError)
+from pydantic import BaseModel
+from pydantic import ValidationError, ValidationInfo, field_validator
+
+from .logger import log
 
 ROOT_PATH = Path(__name__).parent.absolute()
 
@@ -33,6 +36,15 @@ def cookies_to_dict(cookies):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
         cookies_dict[key] = value
     return cookies_dict
+
+def get_platform() -> str:
+    """获取当前运行平台"""
+    if os.path.exists('/.dockerenv'):
+        if os.environ.get('QL_DIR') and os.environ.get('QL_BRANCH'):
+            return "qinglong"
+        else:
+            return "docker"
+    return platform.system().lower()
 
 
 class Account(BaseModel):
@@ -102,6 +114,16 @@ class Preference(BaseModel):
     minute: Optional[int] = None
     """自动执行的时间"""
 
+    @field_validator("hour", "minute")
+    @classmethod
+    def _hour(cls, value, info: ValidationInfo):  # pylint: disable=no-self-argument
+        times = {
+            "hour": randint(0, 24),
+            "minute": randint(0, 60)
+        }
+        if ConfigManager.platform == "docker" and value is None:
+            return times.get(info.field_name)
+        return value
 
 class Config(BaseModel):
     """插件数据"""
@@ -111,7 +133,6 @@ class Config(BaseModel):
     """账号设置"""
     ONEPUSH: OnePush = OnePush()
     """消息推送"""
-
 
 def write_plugin_data(data: Config = None):
     """
@@ -139,8 +160,8 @@ class ConfigManager:
     """配置管理器"""
     data_obj = Config()
     """加载出的插件数据对象"""
-    platform = "pc"
-    """运行环境"""
+    platform = get_platform()
+    """运行平台"""
 
     @classmethod
     def load_config(cls):
