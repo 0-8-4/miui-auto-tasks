@@ -4,7 +4,6 @@ version = ""
 description = ""
 authors = []
 dependencies = [
-    "onepush",
     "orjson>=3.9.10",
     "loguru>=0.7.2",
     "pydantic>=2.4.2",
@@ -12,8 +11,8 @@ dependencies = [
     "cryptography>=41.0.5",
     "pyyaml>=6.0.1",
     "tenacity>=8.2.3",
-    "apscheduler>=3.10.4",
     "tzdata>=2023.3",
+    "onepush @ git+https://github.com/y1ndan/onepush.git@main",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
