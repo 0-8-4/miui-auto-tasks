@@ -4,12 +4,11 @@ import platform
 from hashlib import md5
 from json import JSONDecodeError
 from pathlib import Path
-from random import randint
 from typing import Dict, List, Optional, Union
 
+import orjson
 import yaml
-from pydantic import BaseModel
-from pydantic import ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, field_validator
 
 from .logger import log
 
@@ -18,7 +17,10 @@ ROOT_PATH = Path(__name__).parent.absolute()
 DATA_PATH = ROOT_PATH / "data"
 """数据保存目录"""
 
-CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
+CONFIG_TYPE = "json" if os.path.isfile(DATA_PATH / "config.json") else "yaml"
+"""数据文件类型"""
+
+CONFIG_PATH = DATA_PATH / f"config.{CONFIG_TYPE}" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
 """数据文件默认路径"""
 
 os.makedirs(DATA_PATH, exist_ok=True)
@@ -129,14 +131,18 @@ def write_plugin_data(data: Config = None):
         if data is None:
             data = ConfigManager.data_obj
         try:
-            # str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
-            str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
+            if CONFIG_TYPE == "json":
+                str_data = orjson.dumps(data.model_dump(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+                with open(CONFIG_PATH, "wb") as file:
+                    file.write(str_data)
+            else:
+                str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
+                with open(CONFIG_PATH, "w", encoding="utf-8") as file:
+                    file.write(str_data)
+            return True
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False
-        with open(CONFIG_PATH, "w", encoding="utf-8") as file:
-            file.write(str_data)
-        return True
     except OSError:
         return False
 
@@ -156,7 +162,10 @@ class ConfigManager:
         if os.path.exists(DATA_PATH) and os.path.isfile(CONFIG_PATH):
             try:
                 with open(CONFIG_PATH, 'r', encoding="utf-8") as file:
-                    data = yaml.safe_load(file)
+                    if CONFIG_TYPE == "json":
+                        data = orjson.loads(file.read())
+                    else:
+                        data = yaml.safe_load(file)
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
                     # ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))

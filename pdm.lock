@@ -100,8 +100,11 @@ dependencies = [
 
 [[package]]
 name = "onepush"
-version = "1.3.0"
+version = "1.2.0"
 requires_python = ">=3.6"
+git = "https://github.com/y1ndan/onepush.git"
+ref = "main"
+revision = "8b09e62330ad74ba3221bfc2b080d1732a1dcc55"
 summary = "A Python library to send notifications to your iPhone, Discord, Telegram, WeChat, QQ and DingTalk."
 dependencies = [
     "pycryptodome",
@@ -204,7 +207,7 @@ summary = "A small Python utility to set file creation time on Windows"
 lock_version = "4.2"
 cross_platform = true
 groups = ["default"]
-content_hash = "sha256:566a9a72c24c47971354bfa0ce10ce921cde51561fd737c3fd433c69621edd5e"
+content_hash = "sha256:7c922391569ae98b5aba9438d7da9b0ab1b413b23a1e333df2e61bfab038c0ac"
 
 [metadata.files]
 "annotated-types 0.6.0" = [
@@ -413,9 +416,6 @@ content_hash = "sha256:566a9a72c24c47971354bfa0ce10ce921cde51561fd737c3fd433c696
 "loguru 0.7.2" = [
     {url = "https://files.pythonhosted.org/packages/03/0a/4f6fed21aa246c6b49b561ca55facacc2a44b87d65b8b92362a8e99ba202/loguru-0.7.2-py3-none-any.whl", hash = "sha256:003d71e3d3ed35f0f8984898359d65b79e5b21943f78af86aa5491210429b8eb"},
     {url = "https://files.pythonhosted.org/packages/9e/30/d87a423766b24db416a46e9335b9602b054a72b96a88a241f2b09b560fa8/loguru-0.7.2.tar.gz", hash = "sha256:e671a53522515f34fd406340ee968cb9ecafbc4b36c679da03c18fd8d0bd51ac"},
-]
-"onepush 1.3.0" = [
-    {url = "https://files.pythonhosted.org/packages/e1/a2/1d65907128f1b7980d7da0e68b134298ced50d38df8ddf5133e32c8e9f99/onepush-1.3.0-py3-none-any.whl", hash = "sha256:196af2e147a54381b5ffa32565f5f3955a0647328cc283812ce2f87f4bc09f47"},
 ]
 "orjson 3.9.10" = [
     {url = "https://files.pythonhosted.org/packages/03/96/4fd0da4f4a5a450054e69439875b4e856654dcbbfea6907d7753b827c937/orjson-3.9.10-cp312-none-win_amd64.whl", hash = "sha256:3e892621434392199efb54e69edfff9f699f6cc36dd9553c5bf796058b14b20d"},
