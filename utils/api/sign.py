@@ -3,10 +3,12 @@
 import time
 
 from typing import Dict, List, Optional, Type, Union, Any
+from tenacity import RetryError, Retrying, stop_after_attempt
 
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
 from ..request import get, post
 from ..logger import log
+from ..utils import is_incorrect_return
 
 
 class BaseSign:
@@ -37,28 +39,32 @@ class BaseSign:
     async def check_daily_tasks(self, nolog: bool = False) -> Union[List[DailyTasksResult], List[None]]:
         """获取每日任务状态"""
         try:
-            response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
-                                 cookies=self.cookie)
-            log.debug(response.text)
-            result = response.json()
-            api_data = ApiResultHandler(result)
-            if api_data.success:
-                task_status = []
-                tasks: List[Dict[str, List[Dict[str, Any]]]] = list(filter(
-                    lambda x: x['head']['title'] in ["每日任务", "其他任务"], api_data.data))
-                for task in tasks:
-                    for daily_task in task['data']:
-                        task_name = daily_task['title']
-                        task_desc = daily_task.get('desc', '')
-                        show_type = True if daily_task['showType'] == 0 else False  # pylint: disable=simplifiable-if-expression
-                        task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
-                return task_status
+            for attempt in Retrying(stop=stop_after_attempt(3)):
+                with attempt:
+                    response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
+                                        cookies=self.cookie)
+                    log.debug(response.text)
+                    result = response.json()
+                    api_data = ApiResultHandler(result)
+                    if api_data.success:
+                        task_status = []
+                        tasks: List[Dict[str, List[Dict[str, Any]]]] = list(filter(
+                            lambda x: x['head']['title'] in ["每日任务", "其他任务"], api_data.data))
+                        for task in tasks:
+                            for daily_task in task['data']:
+                                task_name = daily_task['title']
+                                task_desc = daily_task.get('desc', '')
+                                show_type = True if daily_task['showType'] == 0 else False  # pylint: disable=simplifiable-if-expression
+                                task_status.append(DailyTasksResult(name=task_name, showType=show_type, desc=task_desc))
+                        return task_status
+                    else:
+                        if not nolog:
+                            log.error(f"获取每日任务状态失败：{api_data.message}")
+                    return []
+        except RetryError as error:
+            if is_incorrect_return(error):
+                log.exception(f"每日任务 - 服务器没有正确返回 {response.text}")
             else:
-                if not nolog:
-                    log.error(f"获取每日任务状态失败：{api_data.message}")
-            return []
-        except Exception:  # pylint: disable=broad-exception-caught
-            if not nolog:
                 log.exception("获取每日任务异常")
             return []
 
@@ -67,39 +73,43 @@ class BaseSign:
         每日任务处理器
         """
         try:
-            params = self.PARAMS.copy()
-            params['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else params
-            params['token'] = self.token if 'token' in params else params
-            data = self.DATA.copy()
-            data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
-            if 'token' in data:
-                if self.token:
-                    data['token'] = self.token
-                else:
-                    log.info(f"未获取到token, 跳过{self.NAME}")
-                    return False
-            response = await post(self.URL_SIGN,
-                                  params=params, data=data,
-                                  cookies=self.cookie, headers=self.headers)
-            log.debug(response.text)
-            result = response.json()
-            api_data = SignResultHandler(result)
-            if api_data:
-                if api_data.growth:
-                    log.success(f"{self.NAME}结果: 成长值+{api_data.growth}")
-                else:
-                    log.success(f"{self.NAME}结果: {api_data.message}")
-                return True
-            elif api_data.ck_invalid:
-                log.error(f"{self.NAME}失败: Cookie无效")
-                return False
+            for attempt in Retrying(stop=stop_after_attempt(3)):
+                with attempt:
+                    params = self.PARAMS.copy()
+                    params['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else params
+                    params['token'] = self.token if 'token' in params else params
+                    data = self.DATA.copy()
+                    data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
+                    if 'token' in data:
+                        if self.token:
+                            data['token'] = self.token
+                        else:
+                            log.info(f"未获取到token, 跳过{self.NAME}")
+                            return False
+                    response = await post(self.URL_SIGN,
+                                        params=params, data=data,
+                                        cookies=self.cookie, headers=self.headers)
+                    log.debug(response.text)
+                    result = response.json()
+                    api_data = SignResultHandler(result)
+                    if api_data:
+                        if api_data.growth:
+                            log.success(f"{self.NAME}结果: 成长值+{api_data.growth}")
+                        else:
+                            log.success(f"{self.NAME}结果: {api_data.message}")
+                        return True
+                    elif api_data.ck_invalid:
+                        log.error(f"{self.NAME}失败: Cookie无效")
+                        return False
+                    else:
+                        log.error(f"{self.NAME}失败：{api_data.message}")
+                        return False
+        except RetryError as error:
+            if is_incorrect_return(error):
+                log.exception(f"{self.NAME} - 服务器没有正确返回 {response.text}")
             else:
-                log.error(f"{self.NAME}失败：{api_data.message}")
-                return False
-        except Exception:  # pylint: disable=broad-exception-caught
-            log.exception(f"{self.NAME}出错")
+                log.exception("{self.NAME}出错")
             return False
-
 
 class CheckIn(BaseSign):
     """
