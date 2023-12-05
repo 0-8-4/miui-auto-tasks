@@ -1,21 +1,26 @@
 """"配置文件"""
 import os
+import platform
 from hashlib import md5
 from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-import yaml
-from loguru import logger as log
-from pydantic import (field_validator, BaseModel,  # pylint: disable=no-name-in-module
-                      ValidationError)
+import orjson
+import yaml # pylint: disable=wrong-import-order
+from pydantic import BaseModel, ValidationError, field_validator
+
+from .logger import log
 
 ROOT_PATH = Path(__name__).parent.absolute()
 
 DATA_PATH = ROOT_PATH / "data"
 """数据保存目录"""
 
-CONFIG_PATH = DATA_PATH / "config.yaml" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
+CONFIG_TYPE = "json" if os.path.isfile(DATA_PATH / "config.json") else "yaml"
+"""数据文件类型"""
+
+CONFIG_PATH = DATA_PATH / f"config.{CONFIG_TYPE}" if os.getenv("MIUITASK_CONFIG_PATH") is None else Path(os.getenv("MIUITASK_CONFIG_PATH"))
 """数据文件默认路径"""
 
 os.makedirs(DATA_PATH, exist_ok=True)
@@ -33,6 +38,15 @@ def cookies_to_dict(cookies):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
         cookies_dict[key] = value
     return cookies_dict
+
+def get_platform() -> str:
+    """获取当前运行平台"""
+    if os.path.exists('/.dockerenv'):
+        if os.environ.get('QL_DIR') and os.environ.get('QL_BRANCH'):
+            return "qinglong"
+        else:
+            return "docker"
+    return platform.system().lower()
 
 
 class Account(BaseModel):
@@ -97,11 +111,6 @@ class Preference(BaseModel):
     """极验自定义params参数"""
     geetest_data: Dict = {}
     """极验自定义data参数"""
-    hour: Optional[str] = None
-    """自动执行的时间"""
-    minute: Optional[str] = None
-    """自动执行的时间"""
-
 
 class Config(BaseModel):
     """插件数据"""
@@ -111,7 +120,6 @@ class Config(BaseModel):
     """账号设置"""
     ONEPUSH: OnePush = OnePush()
     """消息推送"""
-
 
 def write_plugin_data(data: Config = None):
     """
@@ -123,14 +131,18 @@ def write_plugin_data(data: Config = None):
         if data is None:
             data = ConfigManager.data_obj
         try:
-            # str_data = orjson.dumps(data.dict(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
-            str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
+            if CONFIG_TYPE == "json":
+                str_data = orjson.dumps(data.model_dump(), option=orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+                with open(CONFIG_PATH, "wb") as file:
+                    file.write(str_data)
+            else:
+                str_data = yaml.dump(data.model_dump(), indent=4, allow_unicode=True, sort_keys=False)
+                with open(CONFIG_PATH, "w", encoding="utf-8") as file:
+                    file.write(str_data)
+            return True
         except (AttributeError, TypeError, ValueError):
             log.exception("数据对象序列化失败，可能是数据类型错误")
             return False
-        with open(CONFIG_PATH, "w", encoding="utf-8") as file:
-            file.write(str_data)
-        return True
     except OSError:
         return False
 
@@ -139,8 +151,8 @@ class ConfigManager:
     """配置管理器"""
     data_obj = Config()
     """加载出的插件数据对象"""
-    platform = "pc"
-    """运行环境"""
+    platform = get_platform()
+    """运行平台"""
 
     @classmethod
     def load_config(cls):
@@ -150,7 +162,10 @@ class ConfigManager:
         if os.path.exists(DATA_PATH) and os.path.isfile(CONFIG_PATH):
             try:
                 with open(CONFIG_PATH, 'r', encoding="utf-8") as file:
-                    data = yaml.safe_load(file)
+                    if CONFIG_TYPE == "json":
+                        data = orjson.loads(file.read())
+                    else:
+                        data = yaml.safe_load(file)
                 new_model = Config.model_validate(data)
                 for attr in new_model.model_fields:
                     # ConfigManager.data_obj.__setattr__(attr, new_model.__getattribute__(attr))

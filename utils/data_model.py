@@ -1,6 +1,6 @@
 """数据处理模型"""
 from typing import (Any, Dict, NamedTuple, Optional)
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import BaseModel
 
 
 class ApiResultHandler(BaseModel):
