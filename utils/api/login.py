@@ -94,7 +94,7 @@ class Login:
             log.exception("登录小米账号出错")
             return False
 
-    async def get_cookie(url: str) -> Union[Dict[str, str], bool]:
+    async def get_cookie(self, url: str) -> Union[Dict[str, str], bool]:
         """获取社区 Cookie"""
         try:
             response = await get(url, follow_redirects=False)
