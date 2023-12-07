@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import orjson
-import yaml
+import yaml # pylint: disable=wrong-import-order
 from pydantic import BaseModel, ValidationError, field_validator
 
 from .logger import log
