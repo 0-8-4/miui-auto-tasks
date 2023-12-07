@@ -31,9 +31,11 @@ def md5_crypto(passwd: str) -> str:
     return md5(passwd.encode('utf8')).hexdigest().upper()
 
 
-def cookies_to_dict(cookies):
+def cookies_to_dict(cookies: str):
     """将cookies字符串转换为字典"""
     cookies_dict = {}
+    if not cookies or "=" not in cookies:
+        return cookies_dict
     for cookie in cookies.split(';'):
         key, value = cookie.strip().split('=', 1)  # 分割键和值
         cookies_dict[key] = value
