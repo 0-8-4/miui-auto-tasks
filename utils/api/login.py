@@ -14,18 +14,6 @@ from ..logger import log
 from ..request import get, post
 from .sign import BaseSign
 
-
-async def get_cookie(url: str) -> Union[Dict[str, str], bool]:
-    """获取社区 Cookie"""
-    try:
-        response = await get(url, follow_redirects=False)
-        log.debug(response.text)
-        return dict(response.cookies)
-    except Exception: # pylint: disable=broad-exception-caught
-        log.exception("社区获取 Cookie 失败")
-        return False
-
-
 class Login:
     """登录类"""
 
@@ -90,7 +78,8 @@ class Login:
             api_data = LoginResultHandler(data)
             if api_data.success:
                 log.success('小米账号登录成功')
-                cookies = await get_cookie(api_data.location)
+                if (cookies := await self.get_cookie(api_data.location)) is False:
+                    return False
                 self.account.cookies = cookies
                 write_plugin_data()
                 return cookies
@@ -104,3 +93,14 @@ class Login:
         except Exception: # pylint: disable=broad-exception-caught
             log.exception("登录小米账号出错")
             return False
+
+    async def get_cookie(url: str) -> Union[Dict[str, str], bool]:
+        """获取社区 Cookie"""
+        try:
+            response = await get(url, follow_redirects=False)
+            log.debug(response.text)
+            return dict(response.cookies)
+        except Exception: # pylint: disable=broad-exception-caught
+            log.exception("社区获取 Cookie 失败")
+            return False
+        
