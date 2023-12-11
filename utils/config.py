@@ -12,7 +12,7 @@ from pydantic import BaseModel, ValidationError, field_validator
 
 from .logger import log
 
-ROOT_PATH = Path(__name__).parent.absolute()
+ROOT_PATH = Path(__file__).parent.parent.absolute()
 
 DATA_PATH = ROOT_PATH / "data"
 """数据保存目录"""
