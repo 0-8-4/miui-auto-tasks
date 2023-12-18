@@ -9,7 +9,7 @@ class ApiResultHandler(BaseModel):
     """
     content: Dict[str, Any]
     """API返回的JSON对象序列化以后的Dict对象"""
-    data: Optional[Dict[str, Any]] = None
+    data: Dict[str, Any] = {}
     """API返回的数据体"""
     message: str = ""
     """API返回的消息内容"""
@@ -20,8 +20,8 @@ class ApiResultHandler(BaseModel):
         super().__init__(content=content)
 
         for key in ["data", "entity"]:
-            if self.data is None:
-                self.data = self.content.get(key)
+            if self.data == {}:
+                self.data = self.content.get(key, {})
             else:
                 break
 
