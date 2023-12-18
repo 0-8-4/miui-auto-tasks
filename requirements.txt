@@ -6,3 +6,4 @@ orjson==3.9.10
 pydantic==2.5.2
 PyYAML==6.0.1
 tenacity==8.2.3
+qrcode>=7.4.2
