@@ -2,10 +2,10 @@
 
 import time
 
-from typing import Dict, List, Optional, Type, Union, Any
+from typing import Dict, List, Optional, Type, Union, Any, Tuple
 from tenacity import RetryError, Retrying, stop_after_attempt
 
-from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
+from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler, UserInfoResult
 from ..request import get, post
 from ..logger import log
 from ..utils import is_incorrect_return
@@ -30,9 +30,10 @@ class BaseSign:
     AVAILABLE_SIGNS: Dict[str, Type["BaseSign"]] = {}
     """可用的子类"""
 
-    def __init__(self, cookie: Dict, token: Optional[str] = None):
-        self.cookie = cookie
+    def __init__(self, cookies: Dict, user_agent: str, token: Optional[str] = None):
+        self.cookies = cookies
         self.token = token
+        self.user_agent = user_agent
         self.headers = {
         }
 
@@ -42,7 +43,7 @@ class BaseSign:
             for attempt in Retrying(stop=stop_after_attempt(3)):
                 with attempt:
                     response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
-                                        cookies=self.cookie)
+                                        cookies=self.cookies)
                     log.debug(response.text)
                     result = response.json()
                     api_data = ApiResultHandler(result)
@@ -68,7 +69,7 @@ class BaseSign:
                 log.exception("获取每日任务异常")
             return []
 
-    async def sign(self) -> bool:
+    async def sign(self) -> Tuple[bool, str]:
         """
         每日任务处理器
         """
@@ -76,19 +77,19 @@ class BaseSign:
             for attempt in Retrying(stop=stop_after_attempt(3)):
                 with attempt:
                     params = self.PARAMS.copy()
-                    params['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else params
+                    params['miui_vip_ph'] = self.cookies['miui_vip_ph'] if 'miui_vip_ph' in self.cookies else params
                     params['token'] = self.token if 'token' in params else params
                     data = self.DATA.copy()
-                    data['miui_vip_ph'] = self.cookie['miui_vip_ph'] if 'miui_vip_ph' in self.cookie else data
+                    data['miui_vip_ph'] = self.cookies['miui_vip_ph'] if 'miui_vip_ph' in self.cookies else data
                     if 'token' in data:
                         if self.token:
                             data['token'] = self.token
                         else:
                             log.info(f"未获取到token, 跳过{self.NAME}")
-                            return False
+                            return False, "None"
                     response = await post(self.URL_SIGN,
                                         params=params, data=data,
-                                        cookies=self.cookie, headers=self.headers)
+                                        cookies=self.cookies, headers=self.headers)
                     log.debug(response.text)
                     result = response.json()
                     api_data = SignResultHandler(result)
@@ -97,20 +98,53 @@ class BaseSign:
                             log.success(f"{self.NAME}结果: 成长值+{api_data.growth}")
                         else:
                             log.success(f"{self.NAME}结果: {api_data.message}")
-                        return True
+                        return True, "None"
                     elif api_data.ck_invalid:
                         log.error(f"{self.NAME}失败: Cookie无效")
-                        return False
+                        return False, "cookie"
                     else:
                         log.error(f"{self.NAME}失败：{api_data.message}")
-                        return False
+                        return False, "None"
         except RetryError as error:
             if is_incorrect_return(error):
                 log.exception(f"{self.NAME} - 服务器没有正确返回 {response.text}")
             else:
                 log.exception("{self.NAME}出错")
-            return False
+            return False, "None"
 
+    async def user_info(self) -> UserInfoResult:
+        """获取用户信息"""
+        try:
+            for attempt in Retrying(stop=stop_after_attempt(3)):
+                with attempt:
+                    headers = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'User-Agent': self.user_agent,
+                        'Request-Container-Mark': 'android',
+                        'Host': 'api.vip.miui.com',
+                        'Connection': 'Keep-Alive',
+                    }
+
+                    response = await get(
+                        'https://api.vip.miui.com/mtop/planet/vip/homepage/mineInfo',
+                        cookies=self.cookies,
+                        headers=headers,
+                    )
+                    log.debug(response.text)
+                    result = response.json()
+                    api_data = ApiResultHandler(result)
+                    if api_data.success:
+                        return UserInfoResult.model_validate(api_data.data)
+                    else:
+                        log.error(f"获取用户信息失败：{api_data.message}")
+                        return UserInfoResult()
+        except RetryError as error:
+            if is_incorrect_return(error):
+                log.exception(f"用户信息 - 服务器没有正确返回 {response.text}")
+            else:
+                log.exception("获取用户信息异常")
+            return UserInfoResult()
+#pylint: disable=trailing-whitespace
 class CheckIn(BaseSign):
     """
     每日签到

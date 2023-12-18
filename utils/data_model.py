@@ -1,6 +1,6 @@
 """数据处理模型"""
 from typing import (Any, Dict, NamedTuple, Optional)
-from pydantic import BaseModel
+from pydantic import BaseModel # pylint: disable=no-name-in-module
 
 
 class ApiResultHandler(BaseModel):
@@ -42,7 +42,7 @@ class ApiResultHandler(BaseModel):
         """
         是否成功
         """
-        return self.status in [0, 200] or self.message in ["成功", "OK", "success"]
+        return (self.status in [0, 200] or self.message in ["成功", "OK", "success"]) and not self.content.get("notificationUrl")
 
 
 class LoginResultHandler(ApiResultHandler):
@@ -65,7 +65,7 @@ class LoginResultHandler(ApiResultHandler):
         """
         是否需要验证码
         """
-        return self.status == 87001 or "验证码" in self.message
+        return self.status == 87001 or "验证码" in self.message or self.content.get("notificationUrl")
 
     @property
     def pwd_wrong(self):
@@ -146,3 +146,17 @@ class GeetestResult(NamedTuple):
     """人机验证结果数据"""
     validate: str
     challenge: str
+
+class UserInfoResult(BaseModel):
+    """用户信息数据"""
+    title: str = "未知"
+    """等级名称"""
+    point: int = 0
+    """积分"""
+
+    def __init__(self, **kwargs):
+        if isinstance(kwargs, dict) and kwargs:
+            kwargs = kwargs.get("userInfo", {}).get("userGrowLevelInfo")
+            super().__init__(**kwargs)
+        else:
+            super().__init__()

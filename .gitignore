@@ -142,5 +142,4 @@ dmypy.json
 logs
 data
 .pdm-python
-test.py
-test2.py
+test*.py
