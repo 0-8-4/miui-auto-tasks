@@ -243,6 +243,7 @@ async def get_token(uid: str) -> str | bool:
         return False
 
 def generate_qrcode(url):
+    """生成二维码"""
     qr = qrcode.QRCode(version=1,
                        error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=10,
@@ -254,10 +255,10 @@ def generate_qrcode(url):
     img.save(bio)
     # 获取二维码的模块 (module) 列表
     qr_modules = qr.get_matrix()
-    CHARS = ["  ", "██"]
+    chaes = ["  ", "██"]
     # 在控制台中打印二维码
     for row in qr_modules:
-        line = "".join(CHARS[pixel] for pixel in row)
+        line = "".join(chaes[pixel] for pixel in row)
         print(line)
         log.debug(line)
         

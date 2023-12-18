@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Union
 
 import orjson
 import yaml # pylint: disable=wrong-import-order
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, field_validator # pylint: disable=no-name-in-module
 
 from .logger import log
 

@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-12-18 18:37:16
+LastEditTime: 2023-12-18 18:46:51
 '''
 # new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
@@ -47,7 +47,7 @@ async def main():
                             token = await get_token(cookies["cUserId"]) if task_obj == CheckIn else None
                             status, reason = await task_obj(cookies, token).sign()
                             if not status and reason == "cookie":
-                                raise ValueError("Cookie失效")               
+                                raise ValueError("Cookie失效")
         except RetryError:
             ...
     notify_me(InterceptHandler.message)

@@ -16,6 +16,7 @@ from ..request import get, post
 from .sign import BaseSign
 from ..utils import generate_qrcode
 
+
 class Login:
     """登录类"""
 
@@ -26,7 +27,7 @@ class Login:
         self.password = account.password
         self.cookies = account.cookies
 
-    async def login(self) -> Union[Dict[str, str], bool]:
+    async def login(self) -> Union[Dict[str, str], bool]: # pylint: disable=too-many-return-statements
         """登录小米账号"""
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -74,8 +75,8 @@ class Login:
                 log.info("Cookie有效，跳过登录")
                 return self.cookies
             elif self.cookies.get("passToken") and \
-                (cookies := await self.get_cookies_by_passtk(userId=self.uid, 
-                                                             passToken=self.cookies["passToken"])):
+                (cookies := await self.get_cookies_by_passtk(user_id=self.uid,
+                                                             pass_token=self.cookies["passToken"])):
                 log.info("Cookie无效，重新复写")
                 self.cookies.update(cookies)
                 self.account.cookies = self.cookies
@@ -90,18 +91,16 @@ class Login:
                 log.success('小米账号登录成功')
                 if (cookies := await self.get_cookie(api_data.location)) is False:
                     return False
-                if (cookies := await self.get_cookie(api_data.location)) is False:
-                    return False
                 self.account.cookies = cookies
                 write_plugin_data()
                 return cookies
             elif api_data.pwd_wrong:
                 log.error('小米账号登录失败：用户名或密码不正确')
                 check_url = await self.qr_login()
-                userId, cookies = await self.check_login(check_url)
+                userid, cookies = await self.check_login(check_url)
                 self.cookies.update(cookies)
                 self.account.cookies = self.cookies
-                self.account.uid = userId
+                self.account.uid = userid
                 write_plugin_data()
                 return cookies
             elif api_data.need_captcha:
@@ -109,7 +108,7 @@ class Login:
             else:
                 log.error(f'小米账号登录失败：{api_data.message}')
             return False
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             log.exception("登录小米账号出错")
             return False
 
@@ -119,11 +118,11 @@ class Login:
             response = await get(url, follow_redirects=False)
             log.debug(response.text)
             return dict(response.cookies)
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             log.exception("社区获取 Cookie 失败")
             return False
 
-    async def get_cookies_by_passtk(self, userId: str, passToken: str) -> Union[Dict[str, str], bool]:
+    async def get_cookies_by_passtk(self, user_id: str, pass_token: str) -> Union[Dict[str, str], bool]:
         """使用passToken获取签到cookies"""
         try:
             headers = {
@@ -142,23 +141,23 @@ class Login:
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
             }
-            
+
             params = {
                 'destUrl': 'https://web.vip.miui.com/page/info/mio/mio/checkIn?app_version=dev.230904',
                 'time': round(time.time() * 1000),
             }
             cookies = {
-                "userId": userId,
-                "passToken": passToken
+                "userId": user_id,
+                "passToken": pass_token
             }
             response = await get('https://api.vip.miui.com/page/login', params=params, headers=headers)
             url = response.headers.get("location")
-            
+
             response = await get(url, cookies=cookies, headers=headers)
             url = response.headers.get("location")
             response = await get(url, cookies=cookies, headers=headers)
             return dict(response.cookies)
-        except Exception: # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught
             log.exception("从passToken获取 Cookie 失败")
             return {}
 
@@ -182,17 +181,18 @@ class Login:
         }
 
         response = await get(
-            'https://account.xiaomi.com/longPolling/loginUrl?_group=DEFAULT&_qrsize=240&qs=%253Fcallback%253Dhttps%25253A%25252F%25252Faccount.xiaomi.com%25252Fsts%25253Fsign%25253DZvAtJIzsDsFe60LdaPa76nNNP58%2525253D%252526followup%25253Dhttps%2525253A%2525252F%2525252Faccount.xiaomi.com%2525252Fpass%2525252Fauth%2525252Fsecurity%2525252Fhome%252526sid%25253Dpassport%2526sid%253Dpassport%2526_group%253DDEFAULT&bizDeviceType=&callback=https:%2F%2Faccount.xiaomi.com%2Fsts%3Fsign%3DZvAtJIzsDsFe60LdaPa76nNNP58%253D%26followup%3Dhttps%253A%252F%252Faccount.xiaomi.com%252Fpass%252Fauth%252Fsecurity%252Fhome%26sid%3Dpassport&theme=&sid=passport&needTheme=false&showActiveX=false&serviceParam=%7B%22checkSafePhone%22:false,%22checkSafeAddress%22:false,%22lsrp_score%22:0.0%7D&_locale=zh_CN&_sign=2%26V1_passport%26BUcblfwZ4tX84axhVUaw8t6yi2E%3D&_dc=1702105962382',
+            'https://account.xiaomi.com/longPolling/loginUrl?_group=DEFAULT&_qrsize=240&qs=%253Fcallback%253Dhttps%25253A%25252F%25252Faccount.xiaomi.com%25252Fsts%25253Fsign%25253DZvAtJIzsDsFe60LdaPa76nNNP58%2525253D%252526followup%25253Dhttps%2525253A%2525252F%2525252Faccount.xiaomi.com%2525252Fpass%2525252Fauth%2525252Fsecurity%2525252Fhome%252526sid%25253Dpassport%2526sid%253Dpassport%2526_group%253DDEFAULT&bizDeviceType=&callback=https:%2F%2Faccount.xiaomi.com%2Fsts%3Fsign%3DZvAtJIzsDsFe60LdaPa76nNNP58%253D%26followup%3Dhttps%253A%252F%252Faccount.xiaomi.com%252Fpass%252Fauth%252Fsecurity%252Fhome%26sid%3Dpassport&theme=&sid=passport&needTheme=false&showActiveX=false&serviceParam=%7B%22checkSafePhone%22:false,%22checkSafeAddress%22:false,%22lsrp_score%22:0.0%7D&_locale=zh_CN&_sign=2%26V1_passport%26BUcblfwZ4tX84axhVUaw8t6yi2E%3D&_dc=1702105962382', # pylint: disable=line-too-long
             headers=headers,
         )
         result = response.text.replace("&&&START&&&", "")
-        data = orjson.loads(result)
-        loginUrl = data["loginUrl"]
+        data = orjson.loads(result) # pylint: disable=no-member
+        login_url = data["loginUrl"]
         check_url = data["lp"]
-        generate_qrcode(loginUrl)
+        generate_qrcode(login_url)
         return check_url
 
     async def check_login(self, url: str) -> Tuple[Optional[int], Optional[dict]]:
+        """检查扫码登录状态"""
         try:
             headers = {
                 'Accept': 'application/json, text/plain, */*',
@@ -212,13 +212,13 @@ class Login:
             }
             response = await get(url, headers=headers)
             result = response.text.replace("&&&START&&&", "")
-            data = orjson.loads(result)
-            passToken = data["passToken"]
-            userId = str(data["userId"])
-            cookies = await self.get_cookies_by_passtk(userId, passToken)
+            data = orjson.loads(result) # pylint: disable=no-member
+            pass_token = data["passToken"]
+            user_id = str(data["userId"])
+            cookies = await self.get_cookies_by_passtk(user_id=user_id, pass_token=pass_token)
             cookies.update({
-                "passToken": passToken
+                "passToken": pass_token
             })
-            return userId, cookies
-        except Exception:
+            return user_id, cookies
+        except Exception: # pylint: disable=broad-exception-caught
             return None, None
