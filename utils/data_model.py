@@ -146,3 +146,17 @@ class GeetestResult(NamedTuple):
     """人机验证结果数据"""
     validate: str
     challenge: str
+
+class UserInfoResult(BaseModel):
+    """用户信息数据"""
+    title: str = "未知"
+    """等级名称"""
+    point: int = 0
+    """积分"""
+
+    def __init__(self, **kwargs):
+        if isinstance(kwargs, dict) and kwargs:
+            kwargs = kwargs.get("userInfo", {}).get("userGrowLevelInfo")
+            super().__init__(**kwargs)
+        else:
+            super().__init__()
