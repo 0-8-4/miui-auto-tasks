@@ -2,7 +2,7 @@
 
 import time
 
-from typing import Dict, List, Optional, Type, Union, Any
+from typing import Dict, List, Optional, Type, Union, Any, Tuple
 from tenacity import RetryError, Retrying, stop_after_attempt
 
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler
@@ -68,7 +68,7 @@ class BaseSign:
                 log.exception("获取每日任务异常")
             return []
 
-    async def sign(self) -> bool:
+    async def sign(self) -> Tuple[bool, str]:
         """
         每日任务处理器
         """
@@ -85,7 +85,7 @@ class BaseSign:
                             data['token'] = self.token
                         else:
                             log.info(f"未获取到token, 跳过{self.NAME}")
-                            return False
+                            return False, "None"
                     response = await post(self.URL_SIGN,
                                         params=params, data=data,
                                         cookies=self.cookie, headers=self.headers)
@@ -97,19 +97,19 @@ class BaseSign:
                             log.success(f"{self.NAME}结果: 成长值+{api_data.growth}")
                         else:
                             log.success(f"{self.NAME}结果: {api_data.message}")
-                        return True
+                        return True, "None"
                     elif api_data.ck_invalid:
                         log.error(f"{self.NAME}失败: Cookie无效")
-                        return False
+                        return False, "cookie"
                     else:
                         log.error(f"{self.NAME}失败：{api_data.message}")
-                        return False
+                        return False, "None"
         except RetryError as error:
             if is_incorrect_return(error):
                 log.exception(f"{self.NAME} - 服务器没有正确返回 {response.text}")
             else:
                 log.exception("{self.NAME}出错")
-            return False
+            return False, "None"
 
 class CheckIn(BaseSign):
     """

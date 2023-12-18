@@ -2,9 +2,11 @@
 import base64
 import random
 import time
+from io import BytesIO
 from typing import Type
 from urllib.parse import parse_qsl, urlparse
 
+import qrcode
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding, serialization
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
@@ -239,3 +241,23 @@ async def get_token(uid: str) -> str | bool:
         else:
             log.exception("获取TOKEN异常")
         return False
+
+def generate_qrcode(url):
+    qr = qrcode.QRCode(version=1,
+                       error_correction=qrcode.constants.ERROR_CORRECT_L,
+                       box_size=10,
+                       border=4)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    bio = BytesIO()
+    img.save(bio)
+    # 获取二维码的模块 (module) 列表
+    qr_modules = qr.get_matrix()
+    CHARS = ["  ", "██"]
+    # 在控制台中打印二维码
+    for row in qr_modules:
+        line = "".join(CHARS[pixel] for pixel in row)
+        print(line)
+        log.debug(line)
+        

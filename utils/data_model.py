@@ -42,7 +42,7 @@ class ApiResultHandler(BaseModel):
         """
         是否成功
         """
-        return self.status in [0, 200] or self.message in ["成功", "OK", "success"]
+        return (self.status in [0, 200] or self.message in ["成功", "OK", "success"]) and not self.content.get("notificationUrl")
 
 
 class LoginResultHandler(ApiResultHandler):
@@ -65,7 +65,7 @@ class LoginResultHandler(ApiResultHandler):
         """
         是否需要验证码
         """
-        return self.status == 87001 or "验证码" in self.message
+        return self.status == 87001 or "验证码" in self.message or self.content.get("notificationUrl")
 
     @property
     def pwd_wrong(self):
