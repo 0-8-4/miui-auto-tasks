@@ -244,7 +244,7 @@ async def get_token(uid: str) -> str | bool:
 
 def generate_qrcode(url):
     """生成二维码"""
-    qr = qrcode.QRCode(version=1,
+    qr = qrcode.QRCode(version=1, # pylint: disable=invalid-name
                        error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=10,
                        border=4)
