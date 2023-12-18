@@ -90,6 +90,8 @@ class Login:
                 log.success('小米账号登录成功')
                 if (cookies := await self.get_cookie(api_data.location)) is False:
                     return False
+                if (cookies := await self.get_cookie(api_data.location)) is False:
+                    return False
                 self.account.cookies = cookies
                 write_plugin_data()
                 return cookies
