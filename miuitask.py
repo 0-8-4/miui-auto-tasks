@@ -45,7 +45,7 @@ async def main():
                                 log.info(f"任务{task.name}被禁用")
                                 continue
                             token = await get_token(cookies["cUserId"]) if task_obj == CheckIn else None
-                            status, reason = await task_obj(cookies, token).sign()
+                            status, reason = await task_obj(cookies, account.user_agent, token).sign()
                             if not status and reason == "cookie":
                                 raise ValueError("Cookie失效")               
         except RetryError:
