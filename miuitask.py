@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-12-29 00:17:41
+LastEditTime: 2023-12-29 00:21:13
 '''
 # new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
@@ -18,7 +18,6 @@ from utils.request import notify_me
 from utils.system_info import print_info
 from utils.utils import get_token
 
-from utils.utils import generate_custom_random_string
 _conf = ConfigManager.data_obj
 
 
