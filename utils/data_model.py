@@ -51,14 +51,19 @@ class LoginResultHandler(ApiResultHandler):
     """
     pwd: Optional[int] = None
     """登录状态"""
+    passToken: Optional[str] = None
+    """登录成功后的passToken"""
     location: Optional[str] = None
     """登录成功后的跳转地址"""
+    userId: Optional[str] = None
 
     def __init__(self, content: Dict[str, Any]):
         super().__init__(content=content)
 
         self.pwd = self.content.get("pwd")
         self.location = self.content.get("location")
+        self.passToken = self.content.get("passToken")
+        self.userId = str(self.content.get("userId"))
 
     @property
     def need_captcha(self):

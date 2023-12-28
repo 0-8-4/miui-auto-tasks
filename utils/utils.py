@@ -1,6 +1,7 @@
 """工具类"""
 import base64
 import random
+import string
 import time
 from io import BytesIO
 from typing import Type
@@ -47,13 +48,8 @@ headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
-
-def get_random_chars_as_string(count: int) -> str:
-    """获取随机字符串"""
-    characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
-    selected_chars = random.sample(characters, count)
-    return ''.join(selected_chars)
-
+def get_random_chars_as_string(length, characters: str = string.ascii_letters + string.digits + string.punctuation):
+    return ''.join(random.choice(characters) for _ in range(length))
 
 def aes_encrypt(key: str, data: str) -> base64:
     """AES加密"""

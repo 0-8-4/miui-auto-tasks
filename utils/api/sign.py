@@ -1,15 +1,21 @@
+'''
+Date: 2023-12-03 02:07:29
+LastEditors: Night-stars-1 nujj1042633805@gmail.com
+LastEditTime: 2023-12-29 00:20:07
+'''
 """签到实例"""
 
 import time
+from requests_toolbelt import MultipartEncoder
 
 from typing import Dict, List, Optional, Type, Union, Any, Tuple
 from tenacity import RetryError, Retrying, stop_after_attempt
 
+from ..config import Account
 from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler, UserInfoResult
 from ..request import get, post
 from ..logger import log
-from ..utils import is_incorrect_return
-
+from ..utils import is_incorrect_return, get_random_chars_as_string
 
 class BaseSign:
     """
@@ -30,11 +36,42 @@ class BaseSign:
     AVAILABLE_SIGNS: Dict[str, Type["BaseSign"]] = {}
     """可用的子类"""
 
-    def __init__(self, cookies: Dict, user_agent: str, token: Optional[str] = None):
-        self.cookies = cookies
+    def __init__(self, account: Account, token: Optional[str] = None):
+        self.cookies = account.cookies
         self.token = token
-        self.user_agent = user_agent
+        self.user_agent = account.user_agent
         self.headers = {
+            'Host': 'api-alpha.vip.miui.com',
+            'Connection': 'keep-alive',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'sec-ch-ua': 'Not_A',
+            'Accept': 'application/json',
+            'sec-ch-ua-mobile': '?1',
+            'User-Agent': self.user_agent,
+            'sec-ch-ua-platform': 'Android',
+            'Origin': 'https://web-alpha.vip.miui.com',
+            'X-Requested-With': 'com.xiaomi.vipaccount',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': 'empty',
+            'Referer': 'https://web-alpha.vip.miui.com/',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        }
+        self.params = {
+            'ref': 'vipAccountShortcut',
+            'pathname': '/mio/detail',
+            'version': 'dev.20231205',
+            'miui_version': 'V816.0.23.12.11.DEV',
+            'android_version': '14',
+            'oaid': {get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyz")},
+            'device': account.device,
+            'restrict_imei': '',
+            'miui_big_version': 'V816',
+            'model': account.device_model,
+            'androidVersion': '14',
+            'miuiBigVersion': 'V816',
+            'miui_vip_a_ph': None,
         }
 
     async def check_daily_tasks(self, nolog: bool = False) -> Union[List[DailyTasksResult], List[None]]:
@@ -42,7 +79,7 @@ class BaseSign:
         try:
             for attempt in Retrying(stop=stop_after_attempt(3)):
                 with attempt:
-                    response = await get('https://api.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
+                    response = await get('https://api-alpha.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList',
                                         cookies=self.cookies)
                     log.debug(response.text)
                     result = response.json()
@@ -77,18 +114,29 @@ class BaseSign:
             for attempt in Retrying(stop=stop_after_attempt(3)):
                 with attempt:
                     params = self.PARAMS.copy()
-                    params['miui_vip_ph'] = self.cookies['miui_vip_ph'] if 'miui_vip_ph' in self.cookies else params
-                    params['token'] = self.token if 'token' in params else params
+                    if 'miui_vip_a_ph' in self.cookies:
+                        params['miui_vip_a_ph'] = self.cookies['miui_vip_a_ph']
+                    if 'token' in params:
+                        params['token'] = self.token
+                    self.params.update(params)
+                    self.params["version"] = self.user_agent.split("/")[-1]
+
                     data = self.DATA.copy()
-                    data['miui_vip_ph'] = self.cookies['miui_vip_ph'] if 'miui_vip_ph' in self.cookies else data
+                    if 'miui_vip_a_ph' in self.cookies:
+                        data['miui_vip_a_ph'] = self.cookies['miui_vip_a_ph']
                     if 'token' in data:
                         if self.token:
                             data['token'] = self.token
                         else:
                             log.info(f"未获取到token, 跳过{self.NAME}")
                             return False, "None"
+                    boundary=f'----WebKitFormBoundaryZ{get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
+                    data = MultipartEncoder(fields=data, boundary=boundary)
+                    #log.info(data.to_string().decode('utf-8'))
+                    
+                    self.headers['Content-Type'] = data.content_type
                     response = await post(self.URL_SIGN,
-                                        params=params, data=data,
+                                        params=self.params, data=data.to_string(),
                                         cookies=self.cookies, headers=self.headers)
                     log.debug(response.text)
                     result = response.json()
@@ -121,12 +169,12 @@ class BaseSign:
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'User-Agent': self.user_agent,
                         'Request-Container-Mark': 'android',
-                        'Host': 'api.vip.miui.com',
+                        'Host': 'api-alpha.vip.miui.com',
                         'Connection': 'Keep-Alive',
                     }
 
                     response = await get(
-                        'https://api.vip.miui.com/mtop/planet/vip/homepage/mineInfo',
+                        'https://api-alpha.vip.miui.com/mtop/planet/vip/homepage/mineInfo',
                         cookies=self.cookies,
                         headers=headers,
                     )
@@ -155,14 +203,14 @@ class CheckIn(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/checkIn',
         'version': 'dev.231026',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
 
     DATA = {
-        'miui_vip_ph': "{miui_vip_ph}",
+        'miui_vip_a_ph': "{miui_vip_a_ph}",
         'token': "{token}"
     }
-    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/user/checkinV2'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/user/checkinV2'
 
 
 class BrowsePost(BaseSign):
@@ -175,13 +223,13 @@ class BrowsePost(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/detail',
         'version': 'dev.231026',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
     DATA = {
         'action': 'BROWSE_POST_10S',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
-    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
 class BrowseUserPage(BaseSign):
@@ -194,13 +242,13 @@ class BrowseUserPage(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/detail',
         'version': 'dev.231026',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
     DATA = {
         'action': 'BROWSE_SPECIAL_PAGES_USER_HOME',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
-    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
 class BrowseSpecialPage(BaseSign):
@@ -213,13 +261,13 @@ class BrowseSpecialPage(BaseSign):
         'ref': 'vipAccountShortcut',
         'pathname': '/mio/detail',
         'version': 'dev.231026',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
     DATA = {
         'action': 'BROWSE_SPECIAL_PAGES_SPECIAL_PAGE',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
-    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
 class BoardFollow(BaseSign):
@@ -232,10 +280,10 @@ class BoardFollow(BaseSign):
         'pathname': '/mio/allboard',
         'version': 'dev.20051',
         'boardId': '558495',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
 
-    URL_SIGN = 'https://api.vip.miui.com/api/community/board/follow'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/api/community/board/follow'
 
 
 class BoardUnFollow(BaseSign):
@@ -248,10 +296,10 @@ class BoardUnFollow(BaseSign):
         'pathname': '/mio/allboard',
         'version': 'dev.20051',
         'boardId': '558495',
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
 
-    URL_SIGN = 'https://api.vip.miui.com/api/community/board/unfollow'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/api/community/board/unfollow'
 
 
 class ThumbUp(BaseSign):
@@ -266,7 +314,7 @@ class ThumbUp(BaseSign):
         'timestamp': int(round(time.time() * 1000))
     }
 
-    URL_SIGN = 'https://api.vip.miui.com/mtop/planet/vip/content/announceThumbUp'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/content/announceThumbUp'
 
 
 class CarrotPull(BaseSign):
@@ -275,9 +323,9 @@ class CarrotPull(BaseSign):
     """
     NAME = "参与拔萝卜获得奖励"
     DATA = {
-        'miui_vip_ph': "{miui_vip_ph}"
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
     }
-    URL_SIGN = 'https://api.vip.miui.com/api/carrot/pull'
+    URL_SIGN = 'https://api-alpha.vip.miui.com/api/carrot/pull'
 
 
 # 注册签到任务

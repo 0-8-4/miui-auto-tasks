@@ -1,7 +1,7 @@
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-12-18 19:21:36
+LastEditTime: 2023-12-29 00:17:41
 '''
 # new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
@@ -18,6 +18,7 @@ from utils.request import notify_me
 from utils.system_info import print_info
 from utils.utils import get_token
 
+from utils.utils import generate_custom_random_string
 _conf = ConfigManager.data_obj
 
 
@@ -30,7 +31,7 @@ async def main():
                 with attempt:
                     login_obj = Login(account)
                     if cookies := await login_obj.login():
-                        sign_obj = BaseSign(cookies, account.user_agent)
+                        sign_obj = BaseSign(account)
                         daily_tasks = await sign_obj.check_daily_tasks()
                         sign_task_obj = sign_obj.AVAILABLE_SIGNS  # 签到任务对象合集
                         for task in daily_tasks:
@@ -45,12 +46,12 @@ async def main():
                                 log.info(f"任务{task.name}被禁用")
                                 continue
                             token = await get_token(cookies["cUserId"]) if task_obj == CheckIn else None
-                            status, reason = await task_obj(cookies, token).sign()
+                            status, reason = await task_obj(account, token).sign()
                             if not status and reason == "cookie":
                                 raise ValueError("Cookie失效")
                         user_info = await sign_obj.user_info()
                         log.info(f"{user_info.title} 成长值: {user_info.point}")
-        except RetryError:
+        except ValueError:
             ...
     notify_me(InterceptHandler.message)
 
