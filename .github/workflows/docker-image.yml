@@ -41,6 +41,7 @@ jobs:
           platforms: |
             linux/amd64
             linux/arm64
+            linux/arm/v7 
           tags: |
             ${{ env.DOCKERHUB_REPO }}:latest
             ${{ env.DOCKERHUB_REPO }}:${{ github.event.release.tag_name }}
