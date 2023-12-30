@@ -1,14 +1,14 @@
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-12-29 00:21:13
+LastEditTime: 2023-12-31 01:26:22
 '''
 # new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
 # cron 30 8 * * * miuitask.py
 
 import asyncio
 
-from tenacity import RetryError, Retrying, stop_after_attempt
+from tenacity import Retrying, stop_after_attempt
 
 from utils.api.login import Login
 from utils.api.sign import BaseSign, CheckIn

@@ -49,6 +49,7 @@ headers = {
 }
 
 def get_random_chars_as_string(length, characters: str = string.ascii_letters + string.digits + string.punctuation):
+    """获取随机字符串"""
     return ''.join(random.choice(characters) for _ in range(length))
 
 def aes_encrypt(key: str, data: str) -> base64:

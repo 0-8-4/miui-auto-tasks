@@ -1,21 +1,21 @@
 '''
 Date: 2023-12-03 02:07:29
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-12-29 00:20:07
+LastEditTime: 2023-12-31 01:28:23
 '''
-"""签到实例"""
-
 import time
-from requests_toolbelt import MultipartEncoder
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
-from typing import Dict, List, Optional, Type, Union, Any, Tuple
+from requests_toolbelt import MultipartEncoder
 from tenacity import RetryError, Retrying, stop_after_attempt
 
 from ..config import Account
-from ..data_model import ApiResultHandler, DailyTasksResult, SignResultHandler, UserInfoResult
-from ..request import get, post
+from ..data_model import (ApiResultHandler, DailyTasksResult,
+                          SignResultHandler, UserInfoResult)
 from ..logger import log
-from ..utils import is_incorrect_return, get_random_chars_as_string
+from ..request import get, post
+from ..utils import get_random_chars_as_string, is_incorrect_return
+
 
 class BaseSign:
     """
@@ -106,7 +106,7 @@ class BaseSign:
                 log.exception("获取每日任务异常")
             return []
 
-    async def sign(self) -> Tuple[bool, str]:
+    async def sign(self) -> Tuple[bool, str]: # pylint: disable=too-many-branches
         """
         每日任务处理器
         """
@@ -132,8 +132,6 @@ class BaseSign:
                             return False, "None"
                     boundary=f'----WebKitFormBoundaryZ{get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
                     data = MultipartEncoder(fields=data, boundary=boundary)
-                    #log.info(data.to_string().decode('utf-8'))
-                    
                     self.headers['Content-Type'] = data.content_type
                     response = await post(self.URL_SIGN,
                                         params=self.params, data=data.to_string(),

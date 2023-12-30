@@ -60,8 +60,8 @@ class Login:
                 self.account.cookies = self.cookies
                 write_plugin_data()
                 return cookies
-            response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2', 
-                                  headers=headers, 
+            response = await post('https://account.xiaomi.com/pass/serviceLoginAuth2',
+                                  headers=headers,
                                   data=data,
                                   cookies={'deviceId': 'S13aukyf5y2jecCG'})
             log.debug(response.text)
@@ -70,9 +70,9 @@ class Login:
             api_data = LoginResultHandler(data)
             if api_data.success:
                 log.success('小米账号登录成功')
-                self.account.cookies["passToken"] = api_data.passToken
-                self.account.uid = api_data.userId
-                if (cookies := await self.get_cookies_by_passtk(api_data.userId, api_data.passToken)) is False:
+                self.account.cookies["passToken"] = api_data.pass_token
+                self.account.uid = api_data.user_id
+                if (cookies := await self.get_cookies_by_passtk(api_data.user_id, api_data.pass_token)) is False:
                     return False
                 self.account.cookies.update(cookies)
                 write_plugin_data()
