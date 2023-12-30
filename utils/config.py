@@ -8,11 +8,11 @@ from typing import Dict, List, Optional, Union
 
 import orjson
 import yaml # pylint: disable=wrong-import-order
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, field_validator # pylint: disable=no-name-in-module
 
 from .logger import log
 
-ROOT_PATH = Path(__name__).parent.absolute()
+ROOT_PATH = Path(__file__).parent.parent.absolute()
 
 DATA_PATH = ROOT_PATH / "data"
 """数据保存目录"""
@@ -59,9 +59,14 @@ class Account(BaseModel):
     """账户密码或其MD5哈希"""
     cookies: Union[dict, str] = {}
     """账户登录后的cookies"""
+    login_user_agent: str = ""
+    """登录账户时所用浏览器的 User-Agent"""
     user_agent: str = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
     """登录社区时所用浏览器的 User-Agent"""
-
+    device: str = ""
+    """设备代号"""
+    device_model: str = ""
+    """设备名称"""
     CheckIn: bool = False
     """社区成长值签到，启用功能意味着你愿意自行承担相关风险"""
     BrowseUserPage: bool = False

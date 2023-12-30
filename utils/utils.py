@@ -1,6 +1,7 @@
 """工具类"""
 import base64
 import random
+import string
 import time
 from io import BytesIO
 from typing import Type
@@ -47,13 +48,9 @@ headers = {
     'sec-ch-ua-platform': '"Windows"',
 }
 
-
-def get_random_chars_as_string(count: int) -> str:
+def get_random_chars_as_string(length, characters: str = string.ascii_letters + string.digits + string.punctuation):
     """获取随机字符串"""
-    characters = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#,%^&*()-=_+~`{}[]|:<>.?/')
-    selected_chars = random.sample(characters, count)
-    return ''.join(selected_chars)
-
+    return ''.join(random.choice(characters) for _ in range(length))
 
 def aes_encrypt(key: str, data: str) -> base64:
     """AES加密"""
@@ -243,7 +240,8 @@ async def get_token(uid: str) -> str | bool:
         return False
 
 def generate_qrcode(url):
-    qr = qrcode.QRCode(version=1,
+    """生成二维码"""
+    qr = qrcode.QRCode(version=1, # pylint: disable=invalid-name
                        error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=10,
                        border=4)
@@ -254,10 +252,10 @@ def generate_qrcode(url):
     img.save(bio)
     # 获取二维码的模块 (module) 列表
     qr_modules = qr.get_matrix()
-    CHARS = ["  ", "██"]
+    chaes = ["  ", "██"]
     # 在控制台中打印二维码
     for row in qr_modules:
-        line = "".join(CHARS[pixel] for pixel in row)
+        line = "".join(chaes[pixel] for pixel in row)
         print(line)
         log.debug(line)
         
