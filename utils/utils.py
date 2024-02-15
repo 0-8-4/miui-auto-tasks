@@ -141,7 +141,7 @@ async def get_token_by_captcha(url: str) -> str | bool:
 async def get_token(uid: str) -> str | bool:
     """获取TOKEN"""
     try:
-        for attempt in Retrying(stop=stop_after_attempt(1)):
+        for attempt in Retrying(stop=stop_after_attempt(3)):
             with attempt:
                 data = {
                     "type": 0,
