@@ -1,9 +1,9 @@
-cryptography==41.0.7
-httpx==0.25.2
+cryptography==42.0.2
+httpx==0.26.0
 loguru==0.7.2
 onepush==1.3.0
-orjson==3.9.10
-pydantic==2.5.2
+orjson==3.9.14
+pydantic==2.6.1
 PyYAML==6.0.1
+qrcode==7.4.2
 tenacity==8.2.3
-qrcode>=7.4.2
