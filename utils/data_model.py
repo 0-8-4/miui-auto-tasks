@@ -146,6 +146,7 @@ class GeetestResult(NamedTuple):
     """人机验证结果数据"""
     validate: str
     challenge: str
+    captchaId: str
 
 class UserInfoResult(BaseModel):
     """用户信息数据"""
