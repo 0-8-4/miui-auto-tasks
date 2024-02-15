@@ -113,6 +113,8 @@ class Preference(BaseModel):
     """极验自定义params参数"""
     geetest_data: Dict = {}
     """极验自定义data参数"""
+    api_key: str = ""
+    "API_KEY"
 
 class Config(BaseModel):
     """插件数据"""

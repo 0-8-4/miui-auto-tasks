@@ -102,31 +102,35 @@ async def get_token_by_captcha(url: str) -> str | bool:
         query_params = dict(parse_qsl(parsed_url.query))  # 解析URL参数
         gt = query_params.get("c")  # pylint: disable=invalid-name
         challenge = query_params.get("l")
-        geetest_data = await get_validate(gt, challenge)
-        params = {
-            'k': '3dc42a135a8d45118034d1ab68213073',
-            'locale': 'zh_CN',
-            '_t': round(time.time() * 1000),
-        }
+        geetest_data = await get_validate(gt, challenge, url)
+        if geetest_data.validate:
+            params = {
+                'k': '3dc42a135a8d45118034d1ab68213073',
+                'locale': 'zh_CN',
+                '_t': round(time.time() * 1000),
+            }
 
-        data = {
-            'e': query_params.get("e"),  # 人机验证的e参数，来自URL
-            'challenge': geetest_data.challenge,
-            'seccode': f'{geetest_data.validate}|jordan',
-        }
+            data = {
+                'e': query_params.get("e"),  # 人机验证的e参数，来自URL
+                'challenge': geetest_data.challenge,
+                'seccode': f'{geetest_data.validate}|jordan',
+            }
 
-        response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers,
-                              data=data)
-        log.debug(response.text)
-        result = response.json()
-        api_data = TokenResultHandler(result)
-        if api_data.success:
-            return api_data.token
-        elif not api_data.data.get("result"):
-            log.error("遇到人机验证码，无法获取TOKEN")
-            return False
+            response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers,
+                                data=data)
+            log.debug(response.text)
+            result = response.json()
+            api_data = TokenResultHandler(result)
+            if api_data.success:
+                return api_data.token
+            elif not api_data.data.get("result"):
+                log.error("遇到人机验证码，无法获取TOKEN")
+                return False
+            else:
+                log.error("遇到未知错误，无法获取TOKEN")
+                return False
         else:
-            log.error("遇到未知错误，无法获取TOKEN")
+            log.error("极验证返回失败:" + geetest_data.captchaId)
             return False
     except Exception:  # pylint: disable=broad-exception-caught
         log.exception("获取TOKEN异常")

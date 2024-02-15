@@ -9,6 +9,7 @@ from .request import post
 from .logger import log
 from .config import ConfigManager
 from .data_model import ApiResultHandler, GeetestResult
+from twocaptcha import TwoCaptcha
 
 _conf = ConfigManager.data_obj
 
@@ -21,26 +22,23 @@ def find_key(data: dict, key: str):
             find_key(dvalue, key)
     return None
 
-async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
+async def get_validate(gt: str, challenge: str, url: str) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""
     try:
         validate = None
-        if _conf.preference.geetest_url:
-            params = _conf.preference.geetest_params.copy()
-            params = json.loads(json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge))
-            data = _conf.preference.geetest_data.copy()
-            data = json.loads(json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge))
-            response = await post(
-                _conf.preference.geetest_url,
-                params=params,
-                json=data,
-            )
-            log.debug(response.text)
-            geetest_data = response.json()
-            geetest = ApiResultHandler(geetest_data)
-            challenge = find_key(geetest.data, "challenge")
-            validate = find_key(geetest.data, "validate")
-            return GeetestResult(challenge=challenge, validate=validate)
+        if _conf.preference.api_key:
+            solver = TwoCaptcha(_conf.preference.api_key)
+            geetest_data = solver.geetest(gt=gt,
+            apiServer='api.geetest.com',
+            challenge=challenge,userAgent='Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36',
+            url=url)
+            # 解析 code 字段为字典对象
+            code_data = json.loads(geetest_data['code'])
+            # 获取 geetest_challenge 和 geetest_validate 的值
+            challenge = code_data['geetest_challenge']
+            validate = code_data['geetest_validate']
+            id = code_data['CAPTCHAID']
+            return GeetestResult(challenge=challenge, validate=validate, captchaId=id)
         else:
             return GeetestResult(challenge="", validate="")
     except Exception:  # pylint: disable=broad-exception-caught
