@@ -59,7 +59,7 @@ class Account(BaseModel):
     """账户密码或其MD5哈希"""
     cookies: Union[dict, str] = {}
     """账户登录后的cookies"""
-    user_agent: str = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36'
+    user_agent: str = 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0'
     """登录社区时所用浏览器的 User-Agent"""
 
     CheckIn: bool = False

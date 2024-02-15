@@ -41,7 +41,7 @@ headers = {
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'cross-site',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0',
     'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
@@ -141,7 +141,7 @@ async def get_token_by_captcha(url: str) -> str | bool:
 async def get_token(uid: str) -> str | bool:
     """获取TOKEN"""
     try:
-        for attempt in Retrying(stop=stop_after_attempt(3)):
+        for attempt in Retrying(stop=stop_after_attempt(1)):
             with attempt:
                 data = {
                     "type": 0,

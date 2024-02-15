@@ -30,14 +30,15 @@ async def get_validate(gt: str, challenge: str, url: str) -> GeetestResult:  # p
             solver = TwoCaptcha(_conf.preference.api_key)
             geetest_data = solver.geetest(gt=gt,
             apiServer='api.geetest.com',
-            challenge=challenge,userAgent='Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/116.0.0.0 Safari/537.36',
+            challenge=challenge,userAgent='Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0',
             url=url)
+            log.info("极验证返回:" + str(geetest_data))
             # 解析 code 字段为字典对象
             code_data = json.loads(geetest_data['code'])
             # 获取 geetest_challenge 和 geetest_validate 的值
             challenge = code_data['geetest_challenge']
             validate = code_data['geetest_validate']
-            id = code_data['CAPTCHAID']
+            id = geetest_data['captchaId']
             return GeetestResult(challenge=challenge, validate=validate, captchaId=id)
         else:
             return GeetestResult(challenge="", validate="")
