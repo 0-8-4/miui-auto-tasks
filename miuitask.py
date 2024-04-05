@@ -1,3 +1,9 @@
+"""
+Author: Night-stars-1 nujj1042633805@gmail.com
+Date: 2024-02-21 22:50:45
+LastEditTime: 2024-04-05 22:30:09
+LastEditors: Night-stars-1 nujj1042633805@gmail.com
+"""
 '''
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
@@ -30,6 +36,7 @@ async def main():
                 with attempt:
                     login_obj = Login(account)
                     if cookies := await login_obj.login():
+                        await login_obj.checkin_info()
                         sign_obj = BaseSign(account)
                         daily_tasks = await sign_obj.check_daily_tasks()
                         sign_task_obj = sign_obj.AVAILABLE_SIGNS  # 签到任务对象合集

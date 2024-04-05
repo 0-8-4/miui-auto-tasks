@@ -78,7 +78,7 @@ class Login:
                 write_plugin_data()
                 return cookies
             elif api_data.pwd_wrong:
-                log.error('小米账号登录失败：用户名或密码不正确')
+                log.error('小米账号登录失败：用户名或密码不正确, 请扫码登录')
                 check_url = await self.qr_login()
                 userid, cookies = await self.check_login(check_url)
                 self.cookies.update(cookies)
@@ -170,6 +170,7 @@ class Login:
         )
         result = response.text.replace("&&&START&&&", "")
         data = orjson.loads(result)  # pylint: disable=no-member
+        log.info(f"浏览器访问: {data['qr']}\n获取扫描下方二维码登录")
         login_url = data["loginUrl"]
         check_url = data["lp"]
         generate_qrcode(login_url)
@@ -206,3 +207,41 @@ class Login:
             return user_id, cookies
         except Exception:  # pylint: disable=broad-exception-caught
             return None, None
+
+    async def checkin_info(self) -> Union[Dict[str, str], bool]:
+        """获取签到+1概率"""
+        headers = {
+            'Accept': '*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Origin': 'https://web-alpha.vip.miui.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://web-alpha.vip.miui.com/',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-site',
+            'User-Agent': self.user_agent,
+            'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        }
+        try:
+            params = {
+                'ref': '',
+                'pathname': '/mio/checkIn',
+                'version': 'dev.20231205',
+                'miui_vip_a_ph': self.cookies["miui_vip_a_ph"],
+            }
+
+            response = await get(
+                'https://api-alpha.vip.miui.com/mtop/planet/vip/user/getUserCheckinInfoV2',
+                params=params,
+                cookies=self.cookies,
+                headers=headers,
+            )
+            log.debug(response.text)
+            data: dict = response.json()  # pylint: disable=no-member
+            log.info(data.get("entity", {}).get("checkinInfoList", ["", "异常"])[1])
+        except Exception:  # pylint: disable=broad-exception-caught
+            log.exception("获取用户信息失败")
