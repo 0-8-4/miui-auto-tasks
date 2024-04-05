@@ -28,9 +28,10 @@ class Login:
         self.password = account.password
         self.cookies = account.cookies
 
+    # pylint: disable=too-many-return-statements
     async def login(
         self,
-    ) -> Union[Dict[str, str], bool]:  # pylint: disable=too-many-return-statements
+    ) -> Union[Dict[str, str], bool]:
         """登录小米账号"""
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
