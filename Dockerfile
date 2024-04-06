@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev
+RUN apk add --no-cache gcc g++ musl-dev python3-dev libffi-dev rust rustc cargo
 
 RUN pip install --no-cache-dir pdm
 
