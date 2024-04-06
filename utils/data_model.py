@@ -9,7 +9,7 @@ class ApiResultHandler(BaseModel):
     """
     content: Dict[str, Any]
     """API返回的JSON对象序列化以后的Dict对象"""
-    data: Optional[Dict[str, Any]] = None
+    data: Dict[str, Any] = {}
     """API返回的数据体"""
     message: str = ""
     """API返回的消息内容"""
@@ -20,8 +20,8 @@ class ApiResultHandler(BaseModel):
         super().__init__(content=content)
 
         for key in ["data", "entity"]:
-            if self.data is None:
-                self.data = self.content.get(key)
+            if self.data == {}:
+                self.data = self.content.get(key, {})
             else:
                 break
 
@@ -51,14 +51,19 @@ class LoginResultHandler(ApiResultHandler):
     """
     pwd: Optional[int] = None
     """登录状态"""
+    pass_token: Optional[str] = None
+    """登录成功后的passToken"""
     location: Optional[str] = None
     """登录成功后的跳转地址"""
+    user_id: Optional[str] = None
 
     def __init__(self, content: Dict[str, Any]):
         super().__init__(content=content)
 
         self.pwd = self.content.get("pwd")
         self.location = self.content.get("location")
+        self.pass_token = self.content.get("passToken")
+        self.user_id = str(self.content.get("userId"))
 
     @property
     def need_captcha(self):

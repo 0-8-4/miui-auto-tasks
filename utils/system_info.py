@@ -1,7 +1,7 @@
 """
 Date: 2023-11-13 20:29:19
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-19 14:39:20
+LastEditTime: 2024-04-05 22:36:46
 """
 import platform
 from urllib.request import getproxies
@@ -10,7 +10,7 @@ from utils.logger import log
 
 def print_info():
     """打印系统信息"""
-    log.info("MIUI-AUTO-TASK v1.7.4")
+    log.info("MIUI-AUTO-TASK v1.7.5")
     log.info('---------- 系统信息 -------------')
     system_info()
     log.info('---------- 项目信息 -------------')

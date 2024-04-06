@@ -1,8 +1,9 @@
 '''
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-11-25 15:59:40
+LastEditTime: 2023-12-18 20:46:51
 '''
+import json
 
 from .request import post
 from .logger import log
@@ -26,13 +27,9 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: dis
         validate = None
         if _conf.preference.geetest_url:
             params = _conf.preference.geetest_params.copy()
-            for key, value in params.items():
-                if isinstance(value, str):
-                    params[key] = value.format(gt=gt, challenge=challenge)
+            params = json.loads(json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge))
             data = _conf.preference.geetest_data.copy()
-            for key, value in data.items():
-                if isinstance(value, str):
-                    data[key] = value.format(gt=gt, challenge=challenge)
+            data = json.loads(json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge))
             response = await post(
                 _conf.preference.geetest_url,
                 params=params,
