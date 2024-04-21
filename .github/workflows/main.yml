@@ -16,6 +16,11 @@ jobs:
         with:
             python-version: '3.11'
 
+      - name: Use the output
+        run: |
+          apt-get install -y git
+          git describe --tags --abbrev=0
+          
       - name: test
         id: generate_changelog
         uses: Night-stars-1/changelog-generator-action@main
