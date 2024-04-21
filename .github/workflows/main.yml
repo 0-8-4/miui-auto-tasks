@@ -18,7 +18,8 @@ jobs:
 
       - name: Use the output
         run: |
-          apt-get install -y git
+          sudo apt-get update
+          sudo apt-get install -y git
           git describe --tags --abbrev=0
           
       - name: test
