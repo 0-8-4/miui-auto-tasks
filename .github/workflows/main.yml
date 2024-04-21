@@ -11,13 +11,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
         with:
-         fetch-depth: 0
+         fetch-depth: 1
          fetch-tags: true
-
-      - name: Set up python 3.11
-        uses: actions/setup-python@v4
-        with:
-            python-version: '3.11'
 
       - name: Use the output
         run: |
