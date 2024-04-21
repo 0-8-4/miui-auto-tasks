@@ -1,0 +1,26 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up python 3.11
+        uses: actions/setup-python@v4
+        with:
+            python-version: '3.11'
+
+      - name: test
+        id: generate_changelog
+        uses: Night-stars-1/changelog-generator-action@main
+
+    - name: Use the output
+      run: |
+        echo "Generated changelog:"
+        echo "${{ steps.generate_changelog.outputs.changelog }}"
