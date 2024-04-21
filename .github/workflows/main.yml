@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
         with:
-         fetch-depth: 1
+         fetch-depth: 0
          fetch-tags: true
 
       - name: Use the output
