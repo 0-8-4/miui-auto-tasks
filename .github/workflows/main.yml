@@ -20,7 +20,7 @@ jobs:
         id: generate_changelog
         uses: Night-stars-1/changelog-generator-action@main
 
-    - name: Use the output
-      run: |
-        echo "Generated changelog:"
-        echo "${{ steps.generate_changelog.outputs.changelog }}"
+      - name: Use the output
+        run: |
+          echo "Generated changelog:"
+          echo "${{ steps.generate_changelog.outputs.changelog }}"
