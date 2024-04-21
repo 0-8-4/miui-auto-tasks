@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add --no-cache gcc g++ musl-dev python3-dev libffi-dev rust rustc cargo pkgconfig libressl-dev
+RUN apk add --no-cache gcc g++ musl-dev python3-dev libffi-dev rust openssl-dev cargo pkgconfig 
 
 RUN pip install --no-cache-dir pdm
 
