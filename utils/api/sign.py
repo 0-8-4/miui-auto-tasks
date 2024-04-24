@@ -268,6 +268,25 @@ class BrowseSpecialPage(BaseSign):
     URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
 
 
+class BrowseVideoPost(BaseSign):
+    """
+    浏览指定视频流超过5分钟
+    """
+    NAME = "浏览指定视频流超过5分钟"
+
+    PARAMS = {
+        'ref': 'vipAccountShortcut',
+        'pathname': '/mio/detail',
+        'version': 'dev.231026',
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
+    }
+    DATA = {
+        'action': 'BROWSE_VIDEO_POST',
+        'miui_vip_a_ph': "{miui_vip_a_ph}"
+    }
+    URL_SIGN = 'https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2'
+
+
 class BoardFollow(BaseSign):
     """
     加入小米圈子
@@ -329,6 +348,7 @@ class CarrotPull(BaseSign):
 # 注册签到任务
 BaseSign.AVAILABLE_SIGNS[CheckIn.NAME] = CheckIn
 BaseSign.AVAILABLE_SIGNS[BrowsePost.NAME] = BrowsePost
+BaseSign.AVAILABLE_SIGNS[BrowseVideoPost.NAME] = BrowseVideoPost
 BaseSign.AVAILABLE_SIGNS[BrowseUserPage.NAME] = BrowseUserPage
 BaseSign.AVAILABLE_SIGNS[BrowseSpecialPage.NAME] = BrowseSpecialPage
 BaseSign.AVAILABLE_SIGNS[BoardFollow.NAME] = BoardFollow
