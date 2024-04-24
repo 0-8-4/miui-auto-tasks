@@ -73,6 +73,8 @@ class Account(BaseModel):
     """社区浏览个人主页10秒，启用功能意味着你愿意自行承担相关风险"""
     BrowsePost: bool = False
     """社区浏览帖子10秒，启用功能意味着你愿意自行承担相关风险"""
+    BrowseVideoPost: bool = False
+    """社区浏览视频帖子5分钟，启用功能意味着你愿意自行承担相关风险"""
     ThumbUp: bool = False
     """点赞帖子，启用功能意味着你愿意自行承担相关风险"""
     BrowseSpecialPage: bool = False
