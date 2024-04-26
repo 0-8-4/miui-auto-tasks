@@ -1,0 +1,26 @@
+name: Build & Release App
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+            fetch-depth: 0
+            fetch-tags: true
+      
+      - name: Generate Changelog
+        id: generate_changelog
+        uses: Night-stars-1/changelog-generator-action@main
