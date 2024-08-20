@@ -1,7 +1,7 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2024-04-05 22:53:24
+LastEditTime: 2024-08-20 22:35:53
 """
 
 import time
@@ -14,8 +14,8 @@ from ..config import Account, write_plugin_data
 from ..data_model import LoginResultHandler
 from ..logger import log
 from ..request import get, post
-from .sign import BaseSign
 from ..utils import generate_qrcode
+from .sign import BaseSign
 
 
 class Login:
@@ -32,6 +32,9 @@ class Login:
     async def login(
         self,
     ) -> Union[Dict[str, str], bool]:
+        if not self.user_agent:
+            log.error("请设置 login_user_agent")
+            return False
         """登录小米账号"""
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -87,11 +90,12 @@ class Login:
                     cookies := await self.get_cookies_by_passtk(
                         api_data.user_id, api_data.pass_token
                     )
-                ) is False:
-                    return False
-                self.account.cookies.update(cookies)
-                write_plugin_data()
-                return cookies
+                ):
+                    self.account.cookies.update(cookies)
+                    write_plugin_data()
+                    return cookies
+                log.error("获取Cookie失败，可能是 login_user_agent 异常")
+                return False
             elif api_data.pwd_wrong:
                 log.error("小米账号登录失败：用户名或密码不正确, 请扫码登录")
                 check_url = await self.qr_login()
@@ -122,7 +126,7 @@ class Login:
 
     async def get_cookies_by_passtk(
         self, user_id: str, pass_token: str
-    ) -> Union[Dict[str, str], bool]:
+    ):
         """使用passToken获取签到cookies"""
         try:
             headers = {
