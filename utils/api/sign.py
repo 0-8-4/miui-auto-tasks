@@ -270,9 +270,9 @@ class BrowseSpecialPage(BaseSign):
 
 class BrowseVideoPost(BaseSign):
     """
-    浏览指定视频流超过5分钟
+    浏览指定页面的多个视频超过5分钟（中途退出重新计算时间）
     """
-    NAME = "浏览指定视频流超过5分钟"
+    NAME = "浏览指定页面的多个视频超过5分钟（中途退出重新计算时间）"
 
     PARAMS = {
         'ref': 'vipAccountShortcut',
