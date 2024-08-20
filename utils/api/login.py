@@ -1,7 +1,7 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2024-08-20 22:35:53
+LastEditTime: 2024-08-20 22:40:54
 """
 
 import time
@@ -32,10 +32,10 @@ class Login:
     async def login(
         self,
     ) -> Union[Dict[str, str], bool]:
+        """登录小米账号"""
         if not self.user_agent:
             log.error("请设置 login_user_agent")
             return False
-        """登录小米账号"""
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
@@ -86,10 +86,8 @@ class Login:
                 log.success("小米账号登录成功")
                 self.account.cookies["passToken"] = api_data.pass_token
                 self.account.uid = api_data.user_id
-                if (
-                    cookies := await self.get_cookies_by_passtk(
-                        api_data.user_id, api_data.pass_token
-                    )
+                if cookies := await self.get_cookies_by_passtk(
+                    api_data.user_id, api_data.pass_token
                 ):
                     self.account.cookies.update(cookies)
                     write_plugin_data()
@@ -124,9 +122,7 @@ class Login:
             log.exception("社区获取 Cookie 失败")
             return False
 
-    async def get_cookies_by_passtk(
-        self, user_id: str, pass_token: str
-    ):
+    async def get_cookies_by_passtk(self, user_id: str, pass_token: str):
         """使用passToken获取签到cookies"""
         try:
             headers = {
