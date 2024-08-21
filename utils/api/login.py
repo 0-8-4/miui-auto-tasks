@@ -1,7 +1,7 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2024-04-05 22:53:24
+LastEditTime: 2024-08-20 22:40:54
 """
 
 import time
@@ -14,8 +14,8 @@ from ..config import Account, write_plugin_data
 from ..data_model import LoginResultHandler
 from ..logger import log
 from ..request import get, post
-from .sign import BaseSign
 from ..utils import generate_qrcode
+from .sign import BaseSign
 
 
 class Login:
@@ -33,6 +33,9 @@ class Login:
         self,
     ) -> Union[Dict[str, str], bool]:
         """登录小米账号"""
+        if not self.user_agent:
+            log.error("请设置 login_user_agent")
+            return False
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
@@ -83,15 +86,14 @@ class Login:
                 log.success("小米账号登录成功")
                 self.account.cookies["passToken"] = api_data.pass_token
                 self.account.uid = api_data.user_id
-                if (
-                    cookies := await self.get_cookies_by_passtk(
-                        api_data.user_id, api_data.pass_token
-                    )
-                ) is False:
-                    return False
-                self.account.cookies.update(cookies)
-                write_plugin_data()
-                return cookies
+                if cookies := await self.get_cookies_by_passtk(
+                    api_data.user_id, api_data.pass_token
+                ):
+                    self.account.cookies.update(cookies)
+                    write_plugin_data()
+                    return cookies
+                log.error("获取Cookie失败，可能是 login_user_agent 异常")
+                return False
             elif api_data.pwd_wrong:
                 log.error("小米账号登录失败：用户名或密码不正确, 请扫码登录")
                 check_url = await self.qr_login()
@@ -120,9 +122,7 @@ class Login:
             log.exception("社区获取 Cookie 失败")
             return False
 
-    async def get_cookies_by_passtk(
-        self, user_id: str, pass_token: str
-    ) -> Union[Dict[str, str], bool]:
+    async def get_cookies_by_passtk(self, user_id: str, pass_token: str):
         """使用passToken获取签到cookies"""
         try:
             headers = {

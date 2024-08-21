@@ -1,13 +1,9 @@
 """
 Author: Night-stars-1 nujj1042633805@gmail.com
 Date: 2024-02-21 22:50:45
-LastEditTime: 2024-04-05 22:43:45
+LastEditTime: 2024-08-20 22:36:18
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 """
-
-# new Env("MIUI-Auto-Task") # pylint: disable=missing-module-docstring
-# cron 30 8 * * * miuitask.py
-
 import asyncio
 
 from tenacity import Retrying, stop_after_attempt
