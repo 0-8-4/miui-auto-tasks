@@ -1,7 +1,7 @@
 """
 Date: 2023-12-03 02:07:29
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-17 22:47:09
+LastEditTime: 2025-01-17 22:54:11
 """
 
 import time
@@ -214,7 +214,7 @@ class BaseSign:
                     result = response.json()
                     api_data = ApiResultHandler(result)
                     if api_data.success:
-                        return UserInfoResult.model_validate(api_data.data)
+                        return UserInfoResult(**api_data.data)
                     else:
                         log.error(f"获取用户信息失败：{api_data.message}")
                         return UserInfoResult()
