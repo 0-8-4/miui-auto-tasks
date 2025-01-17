@@ -12,7 +12,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding, serialization
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from pydantic import ValidationError
 from tenacity import RetryError, Retrying, stop_after_attempt
 
 from .captcha import get_validate
@@ -78,7 +77,7 @@ def rsa_encrypt(public_key_pem: str, data: str) -> base64:
     return base64.b64encode(ciphertext).decode('utf-8')
 
 
-IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError, ValidationError)
+IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError)
 """API返回数据无效会触发的异常组合"""
 
 
