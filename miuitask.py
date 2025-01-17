@@ -1,7 +1,7 @@
 """
 Author: Night-stars-1 nujj1042633805@gmail.com
 Date: 2024-02-21 22:50:45
-LastEditTime: 2024-08-20 22:36:18
+LastEditTime: 2025-01-17 22:26:41
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 """
 import asyncio
@@ -55,10 +55,11 @@ async def main():
                                 raise ValueError("Cookie失效")
                         user_info = await sign_obj.user_info()
                         log.info(f"{user_info.title} 成长值: {user_info.point}")
-        except ValueError:
-            ...
+        except ValueError as e:
+            log.error(e)
     notify_me(InterceptHandler.message)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
+    # asyncio.run(get_token(''))

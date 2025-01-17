@@ -1,7 +1,7 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2024-08-20 22:40:54
+LastEditTime: 2025-01-17 22:29:32
 """
 
 import time
@@ -227,7 +227,7 @@ class Login:
             return None, None
 
     async def checkin_info(self) -> Union[Dict[str, str], bool]:
-        """获取签到+1概率"""
+        """获取公告消息"""
         headers = {
             "Accept": "*/*",
             "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
@@ -260,6 +260,6 @@ class Login:
             )
             log.debug(response.text)
             data: dict = response.json()  # pylint: disable=no-member
-            log.info(data.get("entity", {}).get("checkinInfoList", ["", "异常"])[1])
+            log.info(",".join(data.get("entity", {}).get("checkinInfoList", ["异常"])))
         except Exception:  # pylint: disable=broad-exception-caught
             log.exception("获取用户信息失败")

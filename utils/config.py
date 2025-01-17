@@ -83,6 +83,8 @@ class Account(BaseModel):
     """社区可能会出现限时的“加入圈子”任务，启用功能意味着你愿意自行承担相关风险"""
     CarrotPull: bool = False
     """社区拔萝卜，启用功能意味着你愿意自行承担相关风险"""
+    WxSign: bool = False
+    """微信小程序签到，启用功能意味着你愿意自行承担相关风险"""
 
     @field_validator("password")
     @classmethod
