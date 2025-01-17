@@ -10,7 +10,7 @@ from typing import Dict, Optional, Tuple, Union
 
 import orjson
 
-from ..config import Account, write_plugin_data
+from ..config import Account, ConfigManager
 from ..data_model import LoginResultHandler
 from ..logger import log
 from ..request import get, post
@@ -70,7 +70,7 @@ class Login:
                 log.info("Cookie无效，重新复写")
                 self.cookies.update(cookies)
                 self.account.cookies = self.cookies
-                write_plugin_data()
+                ConfigManager.write_plugin_data()
                 return cookies
             response = post(
                 "https://account.xiaomi.com/pass/serviceLoginAuth2",
@@ -90,7 +90,7 @@ class Login:
                     api_data.user_id, api_data.pass_token
                 ):
                     self.account.cookies.update(cookies)
-                    write_plugin_data()
+                    ConfigManager.write_plugin_data()
                     return cookies
                 log.error("获取Cookie失败，可能是 login_user_agent 异常")
                 return False
@@ -101,7 +101,7 @@ class Login:
                 self.cookies.update(cookies)
                 self.account.cookies = self.cookies
                 self.account.uid = userid
-                write_plugin_data()
+                ConfigManager.write_plugin_data()
                 return cookies
             elif api_data.need_captcha:
                 log.error("当前账号需要短信验证码, 请尝试修改UA或设备ID")

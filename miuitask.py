@@ -1,11 +1,9 @@
 """
 Author: Night-stars-1 nujj1042633805@gmail.com
 Date: 2024-02-21 22:50:45
-LastEditTime: 2025-01-17 22:26:41
+LastEditTime: 2025-01-17 22:43:57
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
 """
-import asyncio
-
 from tenacity import Retrying, stop_after_attempt
 
 from utils.api.login import Login

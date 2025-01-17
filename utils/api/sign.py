@@ -1,7 +1,7 @@
 """
 Date: 2023-12-03 02:07:29
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-17 22:40:28
+LastEditTime: 2025-01-17 22:47:09
 """
 
 import time
@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from requests_toolbelt import MultipartEncoder
 from tenacity import RetryError, Retrying, stop_after_attempt
 
-from ..config import Account, ConfigManager, write_plugin_data
+from ..config import Account, ConfigManager
 from ..data_model import (
     ApiResultHandler,
     DailyTasksResult,
