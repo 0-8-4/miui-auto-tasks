@@ -19,7 +19,7 @@ from utils.utils import get_token
 _conf = ConfigManager.data_obj
 
 
-async def main():
+def main():
     """启动签到"""
     print_info()
     for account in _conf.accounts:
@@ -27,10 +27,10 @@ async def main():
             for attempt in Retrying(stop=stop_after_attempt(2)):
                 with attempt:
                     login_obj = Login(account)
-                    if cookies := await login_obj.login():
-                        await login_obj.checkin_info()
+                    if cookies := login_obj.login():
+                        login_obj.checkin_info()
                         sign_obj = BaseSign(account)
-                        daily_tasks = await sign_obj.check_daily_tasks()
+                        daily_tasks = sign_obj.check_daily_tasks()
                         sign_task_obj = sign_obj.AVAILABLE_SIGNS  # 签到任务对象合集
                         for task in daily_tasks:
                             log.info(f"开始执行{task.name}任务")
@@ -46,14 +46,14 @@ async def main():
                                 log.info(f"任务{task.name}被禁用")
                                 continue
                             token = (
-                                await get_token(cookies["cUserId"])
+                                get_token(cookies["cUserId"])
                                 if task_obj == CheckIn
                                 else None
                             )
-                            status, reason = await task_obj(account, token).sign()
+                            status, reason = task_obj(account, token).sign()
                             if not status and reason == "cookie":
                                 raise ValueError("Cookie失效")
-                        user_info = await sign_obj.user_info()
+                        user_info = sign_obj.user_info()
                         log.info(f"{user_info.title} 成长值: {user_info.point}")
         except ValueError as e:
             log.error(e)
@@ -61,5 +61,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
-    # asyncio.run(get_token(''))
+    main()

@@ -82,13 +82,13 @@ class BaseSign:
             "miui_vip_a_ph": None,
         }
 
-    async def check_daily_tasks(self, nolog: bool = False):
+    def check_daily_tasks(self, nolog: bool = False):
         """获取每日任务状态"""
         try:
             task_status: List[DailyTasksResult] = []
             for attempt in Retrying(stop=stop_after_attempt(3)):
                 with attempt:
-                    response = await get(
+                    response = get(
                         "https://api-alpha.vip.miui.com/mtop/planet/vip/member/getCheckinPageCakeList",
                         cookies=self.cookies,
                     )
@@ -136,7 +136,7 @@ class BaseSign:
                 log.exception("获取每日任务异常")
             return task_status
 
-    async def sign(self) -> Tuple[bool, str]:  # pylint: disable=too-many-branches
+    def sign(self) -> Tuple[bool, str]:  # pylint: disable=too-many-branches
         """
         每日任务处理器
         """
@@ -163,7 +163,7 @@ class BaseSign:
                     boundary = f'----WebKitFormBoundaryZ{get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
                     data = MultipartEncoder(fields=data, boundary=boundary)
                     self.headers["Content-Type"] = data.content_type
-                    response = await post(
+                    response = post(
                         self.URL_SIGN,
                         params=self.params,
                         data=data.to_string(),
@@ -192,7 +192,7 @@ class BaseSign:
                 log.exception("{self.NAME}出错")
             return False, "None"
 
-    async def user_info(self) -> UserInfoResult:
+    def user_info(self) -> UserInfoResult:
         """获取用户信息"""
         try:
             for attempt in Retrying(stop=stop_after_attempt(3)):
@@ -205,7 +205,7 @@ class BaseSign:
                         "Connection": "Keep-Alive",
                     }
 
-                    response = await get(
+                    response = get(
                         "https://api-alpha.vip.miui.com/mtop/planet/vip/homepage/mineInfo",
                         cookies=self.cookies,
                         headers=headers,
