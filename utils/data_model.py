@@ -1,3 +1,6 @@
+"""
+数据模型
+"""
 from typing import Any, Dict, NamedTuple, Optional
 
 
@@ -15,7 +18,7 @@ class ApiResultHandler:
         self.data = self.content.get("data", {})
         self.message = self.content.get("message", "")
         self.status = self.content.get("status")
-        
+
         # 尝试从其他键获取数据
         for key in ["data", "entity"]:
             if self.data == {}:

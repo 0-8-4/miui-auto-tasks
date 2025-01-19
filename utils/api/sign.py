@@ -1,16 +1,16 @@
 """
 Date: 2023-12-03 02:07:29
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-17 22:54:11
+LastEditTime: 2025-01-19 17:03:47
 """
 
 import time
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 from requests_toolbelt import MultipartEncoder
 from tenacity import RetryError, Retrying, stop_after_attempt
 
-from ..config import Account, ConfigManager
+from ..config import Account
 from ..data_model import (
     ApiResultHandler,
     DailyTasksResult,
@@ -107,9 +107,7 @@ class BaseSign:
                             for daily_task in task["data"]:
                                 task_name = daily_task["title"]
                                 task_desc = daily_task.get("desc", "")
-                                show_type = (
-                                    True if daily_task["showType"] == 0 else False
-                                )  # pylint: disable=simplifiable-if-expression
+                                show_type = daily_task["showType"] == 0
                                 task_status.append(
                                     DailyTasksResult(
                                         name=task_name,

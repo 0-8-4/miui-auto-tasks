@@ -257,4 +257,3 @@ def generate_qrcode(url):
         line = "".join(chaes[pixel] for pixel in row)
         print(line)
         log.debug(line)
-        

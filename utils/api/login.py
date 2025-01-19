@@ -1,7 +1,7 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-17 22:29:32
+LastEditTime: 2025-01-19 16:35:56
 """
 
 import time
@@ -218,9 +218,7 @@ class Login:
             data = orjson.loads(result)  # pylint: disable=no-member
             pass_token = data["passToken"]
             user_id = str(data["userId"])
-            cookies = self.get_cookies_by_passtk(
-                user_id=user_id, pass_token=pass_token
-            )
+            cookies = self.get_cookies_by_passtk(user_id=user_id, pass_token=pass_token)
             cookies.update({"passToken": pass_token})
             return user_id, cookies
         except Exception:  # pylint: disable=broad-exception-caught

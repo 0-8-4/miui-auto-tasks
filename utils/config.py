@@ -43,6 +43,7 @@ def cookies_to_dict(cookies: str):
         cookies_dict[key] = value
     return cookies_dict
 
+
 def get_platform() -> str:
     """获取当前运行平台"""
     if os.path.exists("/.dockerenv"):
@@ -52,9 +53,12 @@ def get_platform() -> str:
             return "docker"
     return platform.system().lower()
 
+
+# pylint: disable=too-many-instance-attributes
 class Account:
     """账号处理器"""
 
+    # pylint: disable=too-many-arguments, too-many-positional-arguments, too-many-locals
     def __init__(
         self,
         uid="100000",
@@ -117,6 +121,7 @@ class Account:
             return cookies_to_dict(self.cookies)
         return self.cookies
 
+
 class OnePush:
     """推送配置"""
 
@@ -129,6 +134,7 @@ class OnePush:
             "userid": "",
         }
 
+
 class Preference:
     """偏好设置"""
 
@@ -136,6 +142,7 @@ class Preference:
         self.geetest_url = geetest_url
         self.geetest_params = geetest_params or {}
         self.geetest_data = geetest_data or {}
+
 
 class Config:
     """插件数据"""
@@ -160,6 +167,7 @@ class Config:
         accounts = [Account(**account) for account in data.get("accounts", [])]
         onepush = OnePush(**data.get("ONEPUSH", {}))
         return cls(preference, accounts, onepush)
+
 
 class ConfigManager:
     """配置管理器"""
@@ -217,7 +225,7 @@ class ConfigManager:
                         sort_keys=False,
                     )
             return True
-        except Exception as e:
+        except (json.JSONDecodeError, yaml.YAMLError) as e:
             log.exception(f"写入数据文件失败: {e}")
             return False
 
