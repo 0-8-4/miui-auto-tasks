@@ -151,13 +151,14 @@ class Login:
                 "https://api-alpha.vip.miui.com/page/login",
                 params=params,
                 headers=headers,
+                allow_redirects=False
             )
             url = response.headers.get("location")
 
-            response = get(url, cookies=cookies, headers=headers)
+            response = get(url, cookies=cookies, headers=headers, allow_redirects=False)
             url = response.headers.get("location")
 
-            response = get(url, cookies=cookies, headers=headers)
+            response = get(url, cookies=cookies, headers=headers, allow_redirects=False)
             return dict(response.cookies)
         except Exception:  # pylint: disable=broad-exception-caught
             log.exception("从passToken获取 Cookie 失败")
