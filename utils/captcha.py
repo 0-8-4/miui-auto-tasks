@@ -21,7 +21,7 @@ def find_key(data: dict, key: str):
             find_key(dvalue, key)
     return None
 
-async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
+def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""
     try:
         validate = None
@@ -30,7 +30,7 @@ async def get_validate(gt: str, challenge: str) -> GeetestResult:  # pylint: dis
             params = json.loads(json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge))
             data = _conf.preference.geetest_data.copy()
             data = json.loads(json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge))
-            response = await post(
+            response = post(
                 _conf.preference.geetest_url,
                 params=params,
                 json=data,

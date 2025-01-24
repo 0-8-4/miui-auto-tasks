@@ -12,7 +12,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding, serialization
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from pydantic import ValidationError
 from tenacity import RetryError, Retrying, stop_after_attempt
 
 from .captcha import get_validate
@@ -78,7 +77,7 @@ def rsa_encrypt(public_key_pem: str, data: str) -> base64:
     return base64.b64encode(ciphertext).decode('utf-8')
 
 
-IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError, ValidationError)
+IncorrectReturn = (KeyError, TypeError, AttributeError, IndexError)
 """API返回数据无效会触发的异常组合"""
 
 
@@ -92,14 +91,14 @@ def is_incorrect_return(exception: Exception, *addition_exceptions: Type[Excepti
     return isinstance(exception, exceptions) or isinstance(exception.__cause__, exceptions)
 
 
-async def get_token_by_captcha(url: str) -> str | bool:
+def get_token_by_captcha(url: str) -> str | bool:
     """通过人机验证码获取TOKEN"""
     try:
         parsed_url = urlparse(url)
         query_params = dict(parse_qsl(parsed_url.query))  # 解析URL参数
         gt = query_params.get("c")  # pylint: disable=invalid-name
         challenge = query_params.get("l")
-        geetest_data = await get_validate(gt, challenge)
+        geetest_data = get_validate(gt, challenge)
         params = {
             'k': '3dc42a135a8d45118034d1ab68213073',
             'locale': 'zh_CN',
@@ -112,7 +111,7 @@ async def get_token_by_captcha(url: str) -> str | bool:
             'seccode': f'{geetest_data.validate}|jordan',
         }
 
-        response = await post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers,
+        response = post('https://verify.sec.xiaomi.com/captcha/v2/gt/dk/verify', params=params, headers=headers,
                               data=data)
         log.debug(response.text)
         result = response.json()
@@ -131,7 +130,7 @@ async def get_token_by_captcha(url: str) -> str | bool:
 
 
 # pylint: disable=trailing-whitespace
-async def get_token(uid: str) -> str | bool:
+def get_token(uid: str) -> str | bool:
     """获取TOKEN"""
     try:
         for attempt in Retrying(stop=stop_after_attempt(3)):
@@ -215,7 +214,7 @@ async def get_token(uid: str) -> str | bool:
                     'd': aes_encrypt(key, str(data)),
                     'a': 'GROW_UP_CHECKIN',
                 }
-                response = await post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers,
+                response = post('https://verify.sec.xiaomi.com/captcha/v2/data', params=params, headers=headers,
                                       data=data)
                 log.debug(response.text)
                 result = response.json()
@@ -225,7 +224,7 @@ async def get_token(uid: str) -> str | bool:
                 elif api_data.need_verify:
                     log.error("遇到人机验证码, 尝试调用解决方案")
                     url = api_data.data.get("url")
-                    if token := await get_token_by_captcha(url):
+                    if token := get_token_by_captcha(url):
                         return token
                     else:
                         raise ValueError("人机验证失败")
@@ -258,4 +257,3 @@ def generate_qrcode(url):
         line = "".join(chaes[pixel] for pixel in row)
         print(line)
         log.debug(line)
-        
