@@ -8,3 +8,4 @@ requests_toolbelt==1.0.0
 tenacity==8.2.3
 qrcode>=7.4.2
 requests_toolbelt
+jsonpath-ng>=1.7.0
