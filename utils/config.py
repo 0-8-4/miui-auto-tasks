@@ -5,6 +5,7 @@ import os
 import platform
 from hashlib import md5
 from pathlib import Path
+from typing import Dict, Literal, Optional
 
 import yaml  # pylint: disable=wrong-import-order
 
@@ -21,7 +22,7 @@ CONFIG_TYPE = "json" if os.path.isfile(DATA_PATH / "config.json") else "yaml"
 CONFIG_PATH = (
     DATA_PATH / f"config.{CONFIG_TYPE}"
     if os.getenv("MIUITASK_CONFIG_PATH") is None
-    else Path(os.getenv("MIUITASK_CONFIG_PATH"))
+    else Path(str(os.getenv("MIUITASK_CONFIG_PATH")))
 )
 """数据文件默认路径"""
 
@@ -138,10 +139,46 @@ class OnePush:
 class Preference:
     """偏好设置"""
 
-    def __init__(self, geetest_url="", geetest_params=None, geetest_data=None):
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        geetest_url="",
+        geetest_method: Literal["post", "get"] = "post",
+        geetest_params: Optional[dict] = None,
+        geetest_data: Optional[dict] = None,
+        geetest_validate_path="$.data.validate",
+        geetest_challenge_path="$.data.challenge",
+        get_geetest_url="",
+        get_geetest_method: Literal["post", "get"] = "post",
+        get_geetest_params: Optional[dict] = None,
+        get_geetest_data: Optional[dict] = None,
+        get_geetest_validate_path="",
+        get_geetest_challenge_path="",
+    ):
         self.geetest_url = geetest_url
+        """极验验证URL"""
+        self.geetest_method = geetest_method
+        """极验请求方法"""
         self.geetest_params = geetest_params or {}
+        """极验自定义params参数"""
         self.geetest_data = geetest_data or {}
+        """极验自定义data参数"""
+        self.geetest_validate_path = geetest_validate_path
+        """极验验证validate的路径"""
+        self.geetest_challenge_path = geetest_challenge_path
+        """极验验证challenge的路径"""
+        self.get_geetest_url = get_geetest_url
+        """获取极验验证结果的URL"""
+        self.get_geetest_method = get_geetest_method
+        """获取极验验证结果的请求方法"""
+        self.get_geetest_params = get_geetest_params or {}
+        """获取极验验证结果的自定义params参数"""
+        self.get_geetest_data = get_geetest_data or {}
+        """获取极验验证结果的自定义data参数"""
+        self.get_geetest_validate_path = get_geetest_validate_path
+        """获取极验验证validate的路径"""
+        self.get_geetest_challenge_path = get_geetest_challenge_path
+        """获取极验验证challenge的路径"""
 
 
 class Config:

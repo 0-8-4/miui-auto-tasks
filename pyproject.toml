@@ -1,12 +1,10 @@
 [project]
-name = ""
-version = ""
+name = "miui-auto-task"
+version = "1.0.0"
 description = ""
 authors = []
 dependencies = [
-    "orjson>=3.9.10",
     "loguru>=0.7.2",
-    "pydantic>=2.4.2",
     "httpx>=0.25.1",
     "cryptography>=41.0.5",
     "pyyaml>=6.0.1",
@@ -15,6 +13,7 @@ dependencies = [
     "onepush>=1.3.0",
     "qrcode>=7.4.2",
     "requests-toolbelt>=1.0.0",
+    "jsonpath-ng>=1.7.0",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -22,3 +21,5 @@ license = {text = "MIT"}
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm]

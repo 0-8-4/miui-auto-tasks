@@ -58,6 +58,28 @@ def post(
     """
     return requests.post(url, headers=headers, params=params, timeout=timeout, **kwargs)
 
+def request(
+    method: str | bytes,
+    url: str,
+    *,
+    headers: Optional[Dict[str, str]] = None,
+    params: Optional[Dict[str, Any]] = None,
+    timeout: Optional[int] = 20,
+    **kwargs,
+):
+    """
+    说明：
+        request请求封装
+    参数：
+        :param method: 请求方法
+        :param url: url
+        :param headers: 请求头
+        :param params: params
+        :param data: data
+        :param json: json
+        :param timeout: 超时时间
+    """
+    return requests.request(method, url, headers=headers, params=params, timeout=timeout, **kwargs)
 
 def notify_me(content=""):
     """
