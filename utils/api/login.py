@@ -1,14 +1,13 @@
 """
 Date: 2023-11-12 14:05:06
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-19 16:35:56
+LastEditTime: 2025-01-24 22:41:00
 """
 
+import json
 import time
 from os import getenv
 from typing import Dict, Optional, Tuple, Union
-
-import orjson
 
 from ..config import Account, ConfigManager
 from ..data_model import LoginResultHandler
@@ -80,7 +79,7 @@ class Login:
             )
             log.debug(response.text)
             result = response.text.lstrip("&").lstrip("START").lstrip("&")
-            data = orjson.loads(result)  # pylint: disable=no-member
+            data = json.loads(result)  # pylint: disable=no-member
             api_data = LoginResultHandler(data)
             if api_data.success:
                 log.success("小米账号登录成功")
@@ -188,7 +187,7 @@ class Login:
             headers=headers,
         )
         result = response.text.replace("&&&START&&&", "")
-        data = orjson.loads(result)  # pylint: disable=no-member
+        data = json.loads(result)  # pylint: disable=no-member
         log.info(f"浏览器访问: {data['qr']}\n获取扫描下方二维码登录")
         login_url = data["loginUrl"]
         check_url = data["lp"]
@@ -216,7 +215,7 @@ class Login:
             }
             response = get(url, headers=headers)
             result = response.text.replace("&&&START&&&", "")
-            data = orjson.loads(result)  # pylint: disable=no-member
+            data = json.loads(result)  # pylint: disable=no-member
             pass_token = data["passToken"]
             user_id = str(data["userId"])
             cookies = self.get_cookies_by_passtk(user_id=user_id, pass_token=pass_token)

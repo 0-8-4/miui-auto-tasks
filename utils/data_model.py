@@ -15,8 +15,8 @@ class ApiResultHandler:
         :param content: API返回的原始JSON对象
         """
         self.content = content
-        self.data = self.content.get("data", {})
-        self.message = self.content.get("message", "")
+        self.data: Dict[str, str] = self.content.get("data", {})
+        self.message: str = self.content.get("message", "")
         self.status = self.content.get("status")
 
         # 尝试从其他键获取数据
@@ -36,7 +36,7 @@ class ApiResultHandler:
             if self.message == "":
                 self.message = self.content.get(key, "")
                 if self.message is None and isinstance(self.data, dict):
-                    self.message = self.data.get(key)
+                    self.message = self.data.get(key, "")
 
     @property
     def success(self):
