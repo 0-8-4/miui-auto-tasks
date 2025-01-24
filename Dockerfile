@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add python-pycryptodome
+RUN apk add gcc
 
 WORKDIR /srv
 
