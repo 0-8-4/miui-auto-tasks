@@ -5,7 +5,7 @@ import os
 import platform
 from hashlib import md5
 from pathlib import Path
-from typing import Dict, Literal, Optional
+from typing import Literal, Optional
 
 import yaml  # pylint: disable=wrong-import-order
 

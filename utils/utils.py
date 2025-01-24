@@ -8,11 +8,11 @@ from io import BytesIO
 from typing import Type
 from urllib.parse import parse_qsl, urlparse
 
-from qrcode import QRCode, constants
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding, serialization
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from qrcode import QRCode, constants
 from tenacity import RetryError, Retrying, stop_after_attempt
 
 from .captcha import get_validate
