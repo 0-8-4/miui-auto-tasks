@@ -1,5 +1,7 @@
 FROM python:alpine
 
+RUN apk add python-pycryptodome
+
 WORKDIR /srv
 
 COPY ./utils ./utils
