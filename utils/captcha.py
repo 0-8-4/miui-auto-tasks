@@ -1,13 +1,15 @@
 """
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-24 22:02:00
+LastEditTime: 2025-01-25 21:27:29
 """
 
 import json
 import time
+from traceback import print_exc
 
 from jsonpath_ng import parse
+from jsonpath_ng.exceptions import JsonPathParserError
 
 from .config import ConfigManager
 from .data_model import GeetestResult
@@ -99,18 +101,21 @@ def get_validate(
             )
             log.debug(response.text)
             result = response.json()
-            geetest_validate_expr = parse(_conf.preference.geetest_validate_path)
-            geetest_validate_match = geetest_validate_expr.find(result)
-            if len(geetest_validate_match) > 0:
-                validate = geetest_validate_match[0].value
-            geetest_challenge_expr = parse(_conf.preference.geetest_challenge_path)
-            geetest_challenge_match = geetest_challenge_expr.find(result)
-            if len(geetest_challenge_match) > 0:
-                challenge = geetest_challenge_match[0].value
-            geetest_result_expr = parse(_conf.preference.geetest_result_path)
-            geetest_result_match = geetest_result_expr.find(result)
-            if len(geetest_result_match) > 0:
-                result = geetest_result_match[0].value
+            try:
+                geetest_validate_expr = parse(_conf.preference.geetest_validate_path)
+                geetest_validate_match = geetest_validate_expr.find(result)
+                if len(geetest_validate_match) > 0:
+                    validate = geetest_validate_match[0].value
+                geetest_challenge_expr = parse(_conf.preference.geetest_challenge_path)
+                geetest_challenge_match = geetest_challenge_expr.find(result)
+                if len(geetest_challenge_match) > 0:
+                    challenge = geetest_challenge_match[0].value
+                geetest_result_expr = parse(_conf.preference.geetest_result_path)
+                geetest_result_match = geetest_result_expr.find(result)
+                if len(geetest_result_match) > 0:
+                    result = geetest_result_match[0].value
+            except JsonPathParserError:
+                print_exc()
             if validate and challenge:
                 return GeetestResult(challenge=challenge, validate=validate)
             else:
