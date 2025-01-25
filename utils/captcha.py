@@ -28,7 +28,7 @@ def find_key(data: dict, key: str):
 
 
 def get_validate_other(
-    gt: str, challenge: str
+    gt: str, challenge: str, result: str
 ) -> GeetestResult:  # pylint: disable=invalid-name
     """获取人机验证结果"""
     try:
@@ -36,11 +36,11 @@ def get_validate_other(
         if _conf.preference.get_geetest_url:
             params = _conf.preference.get_geetest_params.copy()
             params = json.loads(
-                json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge)
+                json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge).replace("{result}", result)
             )
             data = _conf.preference.get_geetest_data.copy()
             data = json.loads(
-                json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge)
+                json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge).replace("{result}", result)
             )
             for i in range(10):
                 log.info(f"第{i}次获取结果")
@@ -81,6 +81,7 @@ def get_validate(
     """创建人机验证并结果"""
     try:
         validate = ""
+        result = ""
         if _conf.preference.geetest_url:
             params = _conf.preference.geetest_params.copy()
             params = json.loads(
@@ -106,10 +107,14 @@ def get_validate(
             geetest_challenge_match = geetest_challenge_expr.find(result)
             if len(geetest_challenge_match) > 0:
                 challenge = geetest_challenge_match[0].value
+            geetest_result_expr = parse(_conf.preference.geetest_result_path)
+            geetest_result_match = geetest_result_expr.find(result)
+            if len(geetest_result_match) > 0:
+                result = geetest_result_match[0].value
             if validate and challenge:
                 return GeetestResult(challenge=challenge, validate=validate)
             else:
-                return get_validate_other(gt=gt, challenge=challenge)
+                return get_validate_other(gt=gt, challenge=challenge, result=result)
         else:
             return GeetestResult(challenge="", validate="")
     except Exception:  # pylint: disable=broad-exception-caught
