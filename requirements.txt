@@ -1,8 +1,9 @@
-pycryptodome==3.21.0
-httpx==0.25.2
-loguru==0.7.2
-onepush==1.3.0
-PyYAML==6.0.1
-tenacity==8.2.3
-qrcode>=7.4.2
-requests_toolbelt
+cryptography==44.0.0
+jsonpath_ng==1.7.0
+loguru==0.7.3
+onepush==1.4.0
+PyYAML==6.0.2
+qrcode==8.0
+Requests==2.32.3
+requests_toolbelt==1.0.0
+tenacity==9.0.0
