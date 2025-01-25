@@ -8,10 +8,9 @@ from io import BytesIO
 from typing import Type
 from urllib.parse import parse_qsl, urlparse
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding, serialization
-from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from Crypto.Cipher import AES, PKCS1_v1_5
+from Crypto.PublicKey import RSA
+from Crypto.Util.Padding import pad
 from qrcode import QRCode, constants
 from tenacity import RetryError, Retrying, stop_after_attempt
 
@@ -56,27 +55,20 @@ def get_random_chars_as_string(
     return "".join(random.choice(characters) for _ in range(length))
 
 
-def aes_encrypt(key: str, data: str) -> base64:
-    """AES加密"""
-    iv = b"0102030405060708"  # pylint: disable=invalid-name
-    cipher = Cipher(
-        algorithms.AES(key.encode("utf-8")), modes.CBC(iv), backend=default_backend()
-    )
-    encryptor = cipher.encryptor()
-    padder = padding.PKCS7(algorithms.AES.block_size).padder()
-    padded_data = padder.update(data.encode("utf-8")) + padder.finalize()
-    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+def aes_encrypt(key: str, data: str):
+    """AES 加密"""
+    iv = "0102030405060708".encode("utf-8")
+    cipher = AES.new(key.encode("utf-8"), AES.MODE_CBC, iv)
+    padded_data = pad(data.encode("utf-8"), AES.block_size, style="pkcs7")
+    ciphertext = cipher.encrypt(padded_data)
     return base64.b64encode(ciphertext).decode("utf-8")
 
 
-def rsa_encrypt(public_key_pem: str, data: str) -> base64:
-    """RSA加密"""
-    public_key = serialization.load_pem_public_key(
-        public_key_pem.encode("utf-8"), backend=default_backend()
-    )
-    encoded_data = base64.b64encode(data.encode("utf-8"))
-    ciphertext = public_key.encrypt(encoded_data, PKCS1v15())
-
+def rsa_encrypt(key: str, data: str):
+    """RSA 加密"""
+    public_key = RSA.import_key(key)
+    cipher = PKCS1_v1_5.new(public_key)
+    ciphertext = cipher.encrypt(base64.b64encode(data.encode("utf-8")))
     return base64.b64encode(ciphertext).decode("utf-8")
 
 
