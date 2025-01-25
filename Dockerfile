@@ -8,6 +8,8 @@ WORKDIR /srv
 
 COPY ./utils ./utils
 
+RUN echo "VERSION='$(git describe --tags --abbrev=0)'" > ./utils/__version__.py
+
 COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./docker_start.sh ./
 
 RUN pdm install --prod && \
