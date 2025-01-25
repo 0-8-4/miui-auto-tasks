@@ -148,13 +148,13 @@ class Preference:
         geetest_data: Optional[dict] = None,
         geetest_validate_path="$.data.validate",
         geetest_challenge_path="$.data.challenge",
-        geetest_result_path="",
+        geetest_result_path="$",
         get_geetest_url="",
         get_geetest_method: Literal["post", "get"] = "post",
         get_geetest_params: Optional[dict] = None,
         get_geetest_data: Optional[dict] = None,
-        get_geetest_validate_path="",
-        get_geetest_challenge_path="",
+        get_geetest_validate_path="$",
+        get_geetest_challenge_path="$",
     ):
         self.geetest_url = geetest_url
         """极验验证URL"""

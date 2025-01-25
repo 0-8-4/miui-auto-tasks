@@ -8,12 +8,13 @@ LastEditTime: 2025-01-19 16:48:47
 import platform
 from urllib.request import getproxies
 
+from utils.__version__ import VERSION
 from utils.logger import log
 
 
 def print_info():
     """打印系统信息"""
-    log.info("MIUI-AUTO-TASK v1.7.5")
+    log.info(f"MIUI-AUTO-TASK {VERSION}")
     log.info("---------- 系统信息 -------------")
     system_info()
     log.info("---------- 项目信息 -------------")

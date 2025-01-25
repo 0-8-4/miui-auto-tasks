@@ -8,7 +8,9 @@ WORKDIR /srv
 
 COPY ./utils ./utils
 
-COPY ./pyproject.toml ./miuitask.py ./docker_start.sh ./
+RUN echo "VERSION='$(git describe --tags --abbrev=0)'" > ./utils/__version__.py
+
+COPY ./pyproject.toml ./pdm.lock ./miuitask.py ./docker_start.sh ./
 
 RUN pdm install --prod && \
     echo '0 4 * * * /bin/sh -c "sleep $((RANDOM % 1800 + 1)); cd /srv && pdm run /srv/miuitask.py"' > /var/spool/cron/crontabs/root && \
