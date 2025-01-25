@@ -148,6 +148,7 @@ class Preference:
         geetest_data: Optional[dict] = None,
         geetest_validate_path="$.data.validate",
         geetest_challenge_path="$.data.challenge",
+        geetest_result_path="",
         get_geetest_url="",
         get_geetest_method: Literal["post", "get"] = "post",
         get_geetest_params: Optional[dict] = None,
@@ -167,6 +168,8 @@ class Preference:
         """极验验证validate的路径"""
         self.geetest_challenge_path = geetest_challenge_path
         """极验验证challenge的路径"""
+        self.geetest_result_path = geetest_result_path
+        """极验验证返回参数的路径"""
         self.get_geetest_url = get_geetest_url
         """获取极验验证结果的URL"""
         self.get_geetest_method = get_geetest_method
