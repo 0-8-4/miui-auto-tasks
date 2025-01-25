@@ -6,7 +6,7 @@ authors = []
 dependencies = [
     "loguru>=0.7.2",
     "httpx>=0.25.1",
-    "cryptography=44.0.0",
+    "cryptography==44.0.0",
     "pyyaml>=6.0.1",
     "tenacity>=8.2.3",
     "tzdata>=2023.3",
