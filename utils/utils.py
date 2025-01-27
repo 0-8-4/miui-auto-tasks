@@ -5,7 +5,7 @@ import random
 import string
 import time
 from io import BytesIO
-from typing import Type
+from typing import Type, Union
 from urllib.parse import parse_qsl, urlparse
 
 from Crypto.Cipher import AES, PKCS1_v1_5
@@ -90,7 +90,7 @@ def is_incorrect_return(
     )
 
 
-def get_token_by_captcha(url: str) -> str | bool:
+def get_token_by_captcha(url: str) -> Union[str, bool]:
     """通过人机验证码获取TOKEN"""
     try:
         parsed_url = urlparse(url)
