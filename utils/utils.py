@@ -5,9 +5,8 @@ import random
 import string
 import time
 from io import BytesIO
-from typing import Type
+from typing import Type, Union
 from urllib.parse import parse_qsl, urlparse
-from typing import Union
 
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
