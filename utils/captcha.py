@@ -1,7 +1,7 @@
 """
 Date: 2023-11-13 19:55:22
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2025-01-25 21:27:29
+LastEditTime: 2025-02-11 00:59:19
 """
 
 import json
@@ -38,11 +38,17 @@ def get_validate_other(
         if _conf.preference.get_geetest_url:
             params = _conf.preference.get_geetest_params.copy()
             params = json.loads(
-                json.dumps(params).replace("{gt}", gt).replace("{challenge}", challenge).replace("{result}", result)
+                json.dumps(params)
+                .replace("{gt}", gt)
+                .replace("{challenge}", challenge)
+                .replace("{result}", str(result))
             )
             data = _conf.preference.get_geetest_data.copy()
             data = json.loads(
-                json.dumps(data).replace("{gt}", gt).replace("{challenge}", challenge).replace("{result}", result)
+                json.dumps(data)
+                .replace("{gt}", gt)
+                .replace("{challenge}", challenge)
+                .replace("{result}", str(result))
             )
             for i in range(10):
                 log.info(f"第{i}次获取结果")
