@@ -50,7 +50,7 @@ def get_validate_other(
                 .replace("{challenge}", challenge)
                 .replace("{result}", str(result))
             )
-            for i in range(10):
+            for i in range(_conf.preference.get_geetest_try_count):
                 log.info(f"第{i}次获取结果")
                 response = request(
                     _conf.preference.get_geetest_method,
