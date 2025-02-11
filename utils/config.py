@@ -155,6 +155,7 @@ class Preference:
         get_geetest_data: Optional[dict] = None,
         get_geetest_validate_path="$",
         get_geetest_challenge_path="$",
+        get_geetest_try_count=20,
     ):
         self.geetest_url = geetest_url
         """极验验证URL"""
@@ -182,7 +183,8 @@ class Preference:
         """获取极验验证validate的路径"""
         self.get_geetest_challenge_path = get_geetest_challenge_path
         """获取极验验证challenge的路径"""
-
+        self.get_geetest_try_count = get_geetest_try_count
+        """获取极验验证结果尝试次数"""
 
 class Config:
     """插件数据"""
