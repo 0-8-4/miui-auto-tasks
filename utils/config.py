@@ -5,7 +5,7 @@ import os
 import platform
 from hashlib import md5
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 import yaml  # pylint: disable=wrong-import-order
 
@@ -81,9 +81,9 @@ class Account:
     ):
         self.uid = uid
         """账户ID 非账户用户名或手机号"""
-        self.password = password
+        self.password = self._password(password)
         """账户密码或其MD5哈希"""
-        self.cookies = cookies or {}
+        self.cookies = self._cookies(cookies) or {}
         """账户登录后的cookies"""
         self.login_user_agent = login_user_agent
         """登录账户时所用浏览器的 User-Agent"""
@@ -112,16 +112,17 @@ class Account:
         self.WxSign = WxSign
         """微信小程序签到，启用功能意味着你愿意自行承担相关风险"""
 
-    def _password(self):
-        if len(self.password) == 32:
-            return self.password
-        return md5_crypto(self.password)
+    def _password(self, password: str):
+        if password == 32:
+            return password
+        return md5_crypto(password)
 
-    def _cookies(self):
-        if isinstance(self.cookies, str):
-            return cookies_to_dict(self.cookies)
-        return self.cookies
+    def _cookies(self, cookies: Union[dict, str]):
+        if isinstance(cookies, str):
+            return cookies_to_dict(cookies)
+        return cookies
 
+    
 
 class OnePush:
     """推送配置"""
@@ -196,6 +197,7 @@ class Config:
 
     def to_dict(self):
         """将 Config 转换为字典"""
+        print([vars(account) for account in self.accounts])
         return {
             "preference": vars(self.preference),
             "accounts": [vars(account) for account in self.accounts],
