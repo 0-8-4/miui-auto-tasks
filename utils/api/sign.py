@@ -36,6 +36,9 @@ class BaseSign:
     DATA = {}
     """签到数据"""
 
+    FORMDATA = {}
+    """签到数据"""
+
     URL_SIGN = ""
     """签到地址"""
 
@@ -149,22 +152,33 @@ class BaseSign:
                     self.params.update(params)
                     self.params["version"] = self.user_agent.split("/")[-1]
 
-                    data = self.DATA.copy()
-                    if "miui_vip_a_ph" in self.cookies:
-                        data["miui_vip_a_ph"] = self.cookies["miui_vip_a_ph"]
-                    if "token" in data:
-                        if self.token:
-                            data["token"] = self.token
-                        else:
-                            log.info(f"未获取到token, 跳过{self.NAME}")
-                            return False, "None"
-                    boundary = f'----WebKitFormBoundaryZ{get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
-                    data = MultipartEncoder(fields=data, boundary=boundary)
-                    self.headers["Content-Type"] = data.content_type
+                    if self.FORMDATA:
+                        data = self.FORMDATA.copy()
+                        if "miui_vip_a_ph" in self.cookies:
+                            data["miui_vip_a_ph"] = self.cookies["miui_vip_a_ph"]
+                        if "token" in data:
+                            if self.token:
+                                data["token"] = self.token
+                            else:
+                                log.info(f"未获取到token, 跳过{self.NAME}")
+                                return False, "None"
+                        boundary = f'----WebKitFormBoundaryZ{get_random_chars_as_string(16, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")}'
+                        data = MultipartEncoder(fields=data, boundary=boundary)
+                        self.headers["Content-Type"] = data.content_type
+                    elif self.DATA:
+                        data = self.DATA.copy()
+                        if "miui_vip_a_ph" in self.cookies:
+                            data["miui_vip_a_ph"] = self.cookies["miui_vip_a_ph"]
+                        if "token" in data:
+                            if self.token:
+                                data["token"] = self.token
+                            else:
+                                log.info(f"未获取到token, 跳过{self.NAME}")
+                                return False, "None"
                     response = post(
                         self.URL_SIGN,
                         params=self.params,
-                        data=data.to_string(),
+                        data=data,
                         cookies=self.cookies,
                         headers=self.headers,
                     )
@@ -239,7 +253,7 @@ class CheckIn(BaseSign):
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
 
-    DATA = {"miui_vip_a_ph": "{miui_vip_a_ph}", "token": "{token}"}
+    FORMDATA = {"miui_vip_a_ph": "{miui_vip_a_ph}", "token": "{token}"}
     URL_SIGN = "https://api-alpha.vip.miui.com/mtop/planet/vip/user/checkinV2"
 
 
@@ -256,7 +270,7 @@ class BrowsePost(BaseSign):
         "version": "dev.231026",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
-    DATA = {"action": "BROWSE_POST_10S", "miui_vip_a_ph": "{miui_vip_a_ph}"}
+    FORMDATA = {"action": "BROWSE_POST_10S", "miui_vip_a_ph": "{miui_vip_a_ph}"}
     URL_SIGN = "https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2"
 
 
@@ -273,7 +287,7 @@ class BrowseUserPage(BaseSign):
         "version": "dev.231026",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
-    DATA = {
+    FORMDATA = {
         "action": "BROWSE_SPECIAL_PAGES_USER_HOME",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
@@ -293,7 +307,7 @@ class BrowseSpecialPage(BaseSign):
         "version": "dev.231026",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
-    DATA = {
+    FORMDATA = {
         "action": "BROWSE_SPECIAL_PAGES_SPECIAL_PAGE",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
@@ -313,7 +327,7 @@ class BrowseVideoPost(BaseSign):
         "version": "dev.231026",
         "miui_vip_a_ph": "{miui_vip_a_ph}",
     }
-    DATA = {"action": "BROWSE_VIDEO_POST", "miui_vip_a_ph": "{miui_vip_a_ph}"}
+    FORMDATA = {"action": "BROWSE_VIDEO_POST", "miui_vip_a_ph": "{miui_vip_a_ph}"}
     URL_SIGN = "https://api-alpha.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2"
 
 
@@ -358,7 +372,7 @@ class ThumbUp(BaseSign):
 
     NAME = "点赞他人帖子"
 
-    DATA = {
+    FORMDATA = {
         "postId": "36625780",
         "sign": "36625780",
         "timestamp": int(round(time.time() * 1000)),
@@ -373,7 +387,7 @@ class CarrotPull(BaseSign):
     """
 
     NAME = "参与拔萝卜获得奖励"
-    DATA = {"miui_vip_a_ph": "{miui_vip_a_ph}"}
+    FORMDATA = {"miui_vip_a_ph": "{miui_vip_a_ph}"}
     URL_SIGN = "https://api-alpha.vip.miui.com/api/carrot/pull"
 
 
