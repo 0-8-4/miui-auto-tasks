@@ -396,7 +396,7 @@ class WxSign(BaseSign):
     微信签到
     """
 
-    NAME = "微信小程序签到"
+    NAME = "小米社区微信小程序签到获额外成长值"
     PARAMS = {"miui_vip_a_ph": "{miui_vip_a_ph}"}
     DATA = {"action": "WECHAT_CHECKIN_TASK"}
     URL_SIGN = "https://api.vip.miui.com/mtop/planet/vip/member/addCommunityGrowUpPointByActionV2"

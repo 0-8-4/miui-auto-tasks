@@ -197,7 +197,6 @@ class Config:
 
     def to_dict(self):
         """将 Config 转换为字典"""
-        print([vars(account) for account in self.accounts])
         return {
             "preference": vars(self.preference),
             "accounts": [vars(account) for account in self.accounts],
