@@ -4,6 +4,6 @@ onepush==1.5.0
 pycryptodome==3.23.0
 PyYAML==6.0.2
 qrcode==8.2
-Requests==2.32.4
+Requests==2.32.5
 requests_toolbelt==1.0.0
 tenacity==9.1.2
