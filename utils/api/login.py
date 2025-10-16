@@ -9,12 +9,12 @@ import time
 from os import getenv
 from typing import Dict, Optional, Tuple, Union
 
+from .sign import BaseSign
 from ..config import Account, ConfigManager
 from ..data_model import LoginResultHandler
 from ..logger import log
 from ..request import get, post
 from ..utils import generate_qrcode
-from .sign import BaseSign
 
 
 class Login:
@@ -29,13 +29,13 @@ class Login:
 
     # pylint: disable=too-many-return-statements
     def login(
-        self,
+            self,
     ) -> Union[Dict[str, str], bool]:
         """登录小米账号"""
         if not self.user_agent:
             log.error("login_user_agent 未设置，已使用默认UA")
-            self.user_agent='Mozilla/5.0 (Linux; Android 12; V2324HA Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.61 Safari/537.36XiaoMi/HybridView/ app/vipaccount/dev.250915'
-            #return False
+            self.user_agent = 'Mozilla/5.0 (Linux; Android 12; V2324HA Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.61 Safari/537.36XiaoMi/HybridView/ app/vipaccount/dev.250915'
+            # return False
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
@@ -57,15 +57,15 @@ class Login:
             if repo_owner not in [None, "0-8-4"]:
                 return False
             if (
-                self.cookies != {}
-                and BaseSign(self.account).check_daily_tasks(nolog=True) != []
+                    self.cookies != {}
+                    and BaseSign(self.account).check_daily_tasks(nolog=True) != []
             ):
                 log.info("Cookie有效，跳过登录")
                 return self.cookies
             elif self.cookies.get("passToken") and (
-                cookies := self.get_cookies_by_passtk(
-                    user_id=self.uid, pass_token=self.cookies["passToken"]
-                )
+                    cookies := self.get_cookies_by_passtk(
+                        user_id=self.uid, pass_token=self.cookies["passToken"]
+                    )
             ):
                 log.info("Cookie无效，重新复写")
                 self.cookies.update(cookies)
@@ -87,7 +87,7 @@ class Login:
                 self.account.cookies["passToken"] = api_data.pass_token
                 self.account.uid = api_data.user_id
                 if cookies := self.get_cookies_by_passtk(
-                    api_data.user_id, api_data.pass_token
+                        api_data.user_id, api_data.pass_token
                 ):
                     self.account.cookies.update(cookies)
                     ConfigManager.write_plugin_data()
@@ -184,7 +184,8 @@ class Login:
         }
 
         response = get(
-            "https://account.xiaomi.com/longPolling/loginUrl?_group=DEFAULT&_qrsize=240&qs=%253Fcallback%253Dhttps%25253A%25252F%25252Faccount.xiaomi.com%25252Fsts%25253Fsign%25253DZvAtJIzsDsFe60LdaPa76nNNP58%2525253D%252526followup%25253Dhttps%2525253A%2525252F%2525252Faccount.xiaomi.com%2525252Fpass%2525252Fauth%2525252Fsecurity%2525252Fhome%252526sid%25253Dpassport%2526sid%253Dpassport%2526_group%253DDEFAULT&bizDeviceType=&callback=https:%2F%2Faccount.xiaomi.com%2Fsts%3Fsign%3DZvAtJIzsDsFe60LdaPa76nNNP58%253D%26followup%3Dhttps%253A%252F%252Faccount.xiaomi.com%252Fpass%252Fauth%252Fsecurity%252Fhome%26sid%3Dpassport&theme=&sid=passport&needTheme=false&showActiveX=false&serviceParam=%7B%22checkSafePhone%22:false,%22checkSafeAddress%22:false,%22lsrp_score%22:0.0%7D&_locale=zh_CN&_sign=2%26V1_passport%26BUcblfwZ4tX84axhVUaw8t6yi2E%3D&_dc=1702105962382",  # pylint: disable=line-too-long
+            "https://account.xiaomi.com/longPolling/loginUrl?_group=DEFAULT&_qrsize=240&qs=%253Fcallback%253Dhttps%25253A%25252F%25252Faccount.xiaomi.com%25252Fsts%25253Fsign%25253DZvAtJIzsDsFe60LdaPa76nNNP58%2525253D%252526followup%25253Dhttps%2525253A%2525252F%2525252Faccount.xiaomi.com%2525252Fpass%2525252Fauth%2525252Fsecurity%2525252Fhome%252526sid%25253Dpassport%2526sid%253Dpassport%2526_group%253DDEFAULT&bizDeviceType=&callback=https:%2F%2Faccount.xiaomi.com%2Fsts%3Fsign%3DZvAtJIzsDsFe60LdaPa76nNNP58%253D%26followup%3Dhttps%253A%252F%252Faccount.xiaomi.com%252Fpass%252Fauth%252Fsecurity%252Fhome%26sid%3Dpassport&theme=&sid=passport&needTheme=false&showActiveX=false&serviceParam=%7B%22checkSafePhone%22:false,%22checkSafeAddress%22:false,%22lsrp_score%22:0.0%7D&_locale=zh_CN&_sign=2%26V1_passport%26BUcblfwZ4tX84axhVUaw8t6yi2E%3D&_dc=1702105962382",
+            # pylint: disable=line-too-long
             headers=headers,
         )
         result = response.text.replace("&&&START&&&", "")
