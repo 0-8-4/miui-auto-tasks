@@ -33,8 +33,9 @@ class Login:
     ) -> Union[Dict[str, str], bool]:
         """登录小米账号"""
         if not self.user_agent:
-            log.error("请设置 login_user_agent")
-            return False
+            log.error("login_user_agent 未设置，已使用默认UA")
+            self.user_agent='Mozilla/5.0 (Linux; Android 12; V2324HA Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.61 Safari/537.36XiaoMi/HybridView/ app/vipaccount/dev.250915'
+            #return False
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": self.user_agent,
