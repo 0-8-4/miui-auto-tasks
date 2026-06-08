@@ -119,7 +119,7 @@ def get_token_by_captcha(url: str) -> Union[str, bool]:
         log.debug(response.text)
         result = response.json()
         api_data = TokenResultHandler(result)
-        if api_data.success:
+        if not api_data:success:
             return api_data.token
         elif not api_data.data.get("result"):
             log.error("遇到人机验证码，无法获取TOKEN")
