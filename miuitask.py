@@ -54,6 +54,8 @@ def main():
                                 raise ValueError("Cookie失效")
                         user_info = sign_obj.user_info()
                         log.info(f"{user_info.title} 成长值: {user_info.point}")
+        except (socket.gaierror, ConnectionError) as e:
+            log.error(f"网络连接异常，可能是DNS解析失败或API域名过期: {e}")
         except ValueError as e:
             log.error(e)
     notify_me(InterceptHandler.message)
